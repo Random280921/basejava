@@ -8,12 +8,12 @@ public class ArrayStorage {
     }
 
     void save(Resume resume) {
-
-        int newId = this.size();
-        if (storage.length == newId++) {
+        int newId  = this.size();
+        newId = newId++;
+        if (storage.length == newId) {
             System.out.print("Хранилище уже заполнено - резюме невозможно сохранить!");
         } else {
-            storage[newId++] = resume;
+            storage[newId] = resume;
         }
     }
 
@@ -31,7 +31,7 @@ public class ArrayStorage {
         int sizeStorage = this.size();
         Resume[] allResume = new Resume[sizeStorage];
         for (int i = 0; i < sizeStorage; i++) {
-            allResume[i]=storage[i];
+            allResume[i] = storage[i];
         }
         return allResume;
     }
