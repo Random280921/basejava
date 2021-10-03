@@ -4,44 +4,43 @@
 public class ArrayStorage {
     Resume[] storage = new Resume[10000];
 
+    int size = 0;
+
     void clear() {
-        int size = this.size();
         for (int i = 0; i < size; i++) {
             storage[i] = null;
         }
+        size = 0;
     }
 
     void save(Resume resume) {
         if (resume.uuid != null) {
-            int newId = this.size();
-            newId = newId++;
-            if (storage.length == newId) {
+            if (storage.length - 1 == size) {
                 System.out.print("Хранилище уже заполнено - резюме невозможно сохранить!");
             } else {
-                storage[newId] = resume;
+                storage[size] = resume;
+                size++;
             }
         }
     }
 
     Resume get(String uuid) {
-        Resume findResume = null;
         int i = 0;
-        while (storage[i] != null) {
+        while (i < size) {
             if (uuid.equals(storage[i].uuid)) {
-                findResume = storage[i];
-                break;
+                return storage[i];
             }
             i++;
         }
-        return findResume;
+        return null;
     }
 
     void delete(String uuid) {
-        int size = this.size();
         for (int i = 0; i < size; i++) {
-            if (uuid.equals(storage[i].toString())) {
-                storage[i] = storage[size - 1];
-                storage[size - 1] = null;
+            if (uuid.equals(storage[i].uuid)) {
+                size--;
+                storage[i] = storage[size];
+                storage[size] = null;
                 break;
             }
         }
@@ -51,19 +50,14 @@ public class ArrayStorage {
      * @return array, contains only Resumes in storage (without null)
      */
     Resume[] getAll() {
-        int sizeStorage = this.size();
-        Resume[] allResume = new Resume[sizeStorage];
-        for (int i = 0; i < sizeStorage; i++) {
+        Resume[] allResume = new Resume[size];
+        for (int i = 0; i < size; i++) {
             allResume[i] = storage[i];
         }
         return allResume;
     }
 
     int size() {
-        int size = 0;
-        while (storage[size] != null) {
-            size++;
-        }
         return size;
     }
 }
