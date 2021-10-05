@@ -1,20 +1,23 @@
+package ru.topjava.webapp.storage;
+
+import ru.topjava.webapp.model.Resume;
+
 /**
  * Array based storage for Resumes
  */
 public class ArrayStorage {
-    Resume[] storage = new Resume[10000];
+    private Resume[] storage = new Resume[10000];
+    private int size = 0;
 
-    int size = 0;
-
-    void clear() {
+    public void clear() {
         for (int i = 0; i < size; i++) {
             storage[i] = null;
         }
         size = 0;
     }
 
-    void save(Resume resume) {
-        if (resume.uuid != null) {
+    public void save(Resume resume) {
+        if (resume.getUuid() != null) {
             if (size >= storage.length) {
                 System.out.print("Хранилище уже заполнено - резюме невозможно сохранить!");
             } else {
@@ -24,10 +27,10 @@ public class ArrayStorage {
         }
     }
 
-    Resume get(String uuid) {
+    public Resume get(String uuid) {
         int i = 0;
         while (i < size) {
-            if (uuid.equals(storage[i].uuid)) {
+            if (uuid.equals(storage[i].getUuid())) {
                 return storage[i];
             }
             i++;
@@ -35,9 +38,9 @@ public class ArrayStorage {
         return null;
     }
 
-    void delete(String uuid) {
+    public void delete(String uuid) {
         for (int i = 0; i < size; i++) {
-            if (uuid.equals(storage[i].uuid)) {
+            if (uuid.equals(storage[i].getUuid())) {
                 size--;
                 storage[i] = storage[size];
                 storage[size] = null;
@@ -49,7 +52,7 @@ public class ArrayStorage {
     /**
      * @return array, contains only Resumes in storage (without null)
      */
-    Resume[] getAll() {
+    public Resume[] getAll() {
         Resume[] allResume = new Resume[size];
         for (int i = 0; i < size; i++) {
             allResume[i] = storage[i];
@@ -57,7 +60,7 @@ public class ArrayStorage {
         return allResume;
     }
 
-    int size() {
+    public int size() {
         return size;
     }
 }
