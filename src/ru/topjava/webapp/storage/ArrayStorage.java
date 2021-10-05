@@ -42,6 +42,7 @@ public class ArrayStorage {
         } else {
             Integer id = this.getIdResume(uuid);
             if (id == null) {
+                System.out.println("Такого резюме в хранилище нет!");
                 return null;
             } else if (id >= 0) {
                 return storage[id];
@@ -72,7 +73,11 @@ public class ArrayStorage {
 
     public void delete(String uuid) {
         Integer id = this.getIdResume(uuid);
-        if (id >= 0) {
+        if (null == id) {
+            System.out.println("Такого резюме в хранилище нет!");
+        } else if (id < 0) {
+            System.out.println("uuid пустой - невозможно удалить резюме!");
+        } else {
             size--;
             storage[id] = storage[size];
             storage[size] = null;
