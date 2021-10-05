@@ -26,14 +26,21 @@ public class ArrayStorage {
                 size++;
             } else if (id >= 0) {
                 System.out.printf("Такое резюме уже есть: Id storage= %d\n", id);
-            } else if (id == -1) {
-                System.out.println("uuid пустой - невозможно сохранить!");
             }
         }
     }
 
-    public void update(Resume Resume) {
-
+    public void update(Resume resume) {
+        if (resume.getUuid() == null) {
+            System.out.println("uuid пустой - невозможно обновить резюме!");
+        } else {
+            Integer id = this.getIdResume(resume.getUuid());
+            if (id == null) {
+                System.out.println("Такого резюме для обновления в хранилище нет!");
+            } else if (id >= 0) {
+                storage[id] = resume;
+            }
+        }
     }
 
     public Resume get(String uuid) {
@@ -42,7 +49,7 @@ public class ArrayStorage {
         } else {
             Integer id = this.getIdResume(uuid);
             if (id == null) {
-                System.out.println("Такого резюме в хранилище нет!");
+                System.out.println("Такого резюме для получения в хранилище нет!");
                 return null;
             } else if (id >= 0) {
                 return storage[id];
@@ -53,6 +60,7 @@ public class ArrayStorage {
 
     /**
      * @return Id storage, contains Resume
+     * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * Получаем идентификатор хранилища, где лежит резюме
      * При пустом входном uuid возвращаем признак ошибки
      */
@@ -74,7 +82,7 @@ public class ArrayStorage {
     public void delete(String uuid) {
         Integer id = this.getIdResume(uuid);
         if (null == id) {
-            System.out.println("Такого резюме в хранилище нет!");
+            System.out.println("Такого резюме для удаления в хранилище нет!");
         } else if (id < 0) {
             System.out.println("uuid пустой - невозможно удалить резюме!");
         } else {
