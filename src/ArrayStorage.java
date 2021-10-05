@@ -15,7 +15,7 @@ public class ArrayStorage {
 
     void save(Resume resume) {
         if (resume.uuid != null) {
-            if (storage.length - 1 == size) {
+            if (size >= storage.length) {
                 System.out.print("Хранилище уже заполнено - резюме невозможно сохранить!");
             } else {
                 storage[size] = resume;
