@@ -17,35 +17,65 @@ public class ArrayStorage {
     }
 
     public void save(Resume resume) {
-        if (resume.getUuid() != null) {
-            if (size >= storage.length) {
-                System.out.print("Хранилище уже заполнено - резюме невозможно сохранить!");
-            } else {
+        if (size >= storage.length) {
+            System.out.print("Хранилище уже заполнено - резюме невозможно сохранить!");
+        } else {
+            Integer id = this.getIdResume(resume.getUuid());
+            if (id == null) {
                 storage[size] = resume;
                 size++;
+            } else if (id >= 0) {
+                System.out.printf("Такое резюме уже есть: Id storage= %d\n", id);
+            } else if (id == -1) {
+                System.out.println("uuid пустой - невозможно сохранить!");
             }
         }
     }
 
+    public void update(Resume Resume) {
+
+    }
+
     public Resume get(String uuid) {
-        int i = 0;
-        while (i < size) {
-            if (uuid.equals(storage[i].getUuid())) {
-                return storage[i];
+        if (uuid == null) {
+            System.out.println("uuid пустой - невозможно получить резюме!");
+        } else {
+            Integer id = this.getIdResume(uuid);
+            if (id == null) {
+                return null;
+            } else if (id >= 0) {
+                return storage[id];
             }
-            i++;
         }
         return null;
     }
 
-    public void delete(String uuid) {
-        for (int i = 0; i < size; i++) {
-            if (uuid.equals(storage[i].getUuid())) {
-                size--;
-                storage[i] = storage[size];
-                storage[size] = null;
-                break;
+    /**
+     * @return Id storage, contains Resume
+     * Получаем идентификатор хранилища, где лежит резюме
+     * При пустом входном uuid возвращаем признак ошибки
+     */
+    public Integer getIdResume(String uuid) {
+        if (uuid != null) {
+            int id = 0;
+            while (id < size) {
+                if (uuid.equals(storage[id].getUuid())) {
+                    return id;
+                }
+                id++;
             }
+            return null;
+        } else {
+            return -1;
+        }
+    }
+
+    public void delete(String uuid) {
+        Integer id = this.getIdResume(uuid);
+        if (id >= 0) {
+            size--;
+            storage[id] = storage[size];
+            storage[size] = null;
         }
     }
 
