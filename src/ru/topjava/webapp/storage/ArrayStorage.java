@@ -19,48 +19,40 @@ public class ArrayStorage {
     public void save(Resume resume) {
         if (size >= storage.length) {
             System.out.print("Хранилище уже заполнено - резюме невозможно сохранить!");
+        } else if (resume.getUuid() == null) {
+            System.out.println("uuid некорректный - невозможно сохранить резюме!");
         } else {
             int index = findIndex(resume.getUuid());
-            switch (index) {
-                case -2:
-                    System.out.println("uuid некорректный - невозможно сохранить резюме!");
-                    break;
-                case -1:
-                    storage[size] = resume;
-                    size++;
-                    break;
-                default:
-                    System.out.printf("Такое резюме уже есть: Id storage= %d\n", index);
-                    break;
-            }
+            if (index < 0) {
+                storage[size] = resume;
+                size++;
+            } else
+                System.out.printf("Такое резюме уже есть: Id storage= %d\n", index);
         }
     }
 
     public void update(Resume resume) {
-        int index = findIndex(resume.getUuid());
-        switch (index) {
-            case -2:
-                System.out.println("uuid некорректный - невозможно обновить резюме!");
-                break;
-            case -1:
+        if (resume.getUuid() == null) {
+            System.out.println("uuid некорректный - невозможно обновить резюме!");
+        } else {
+            int index = findIndex(resume.getUuid());
+            if (index < 0) {
                 System.out.println("Такого резюме для обновления в хранилище нет!");
-                break;
-            default:
+            } else
                 storage[index] = resume;
-                break;
         }
     }
 
     public Resume get(String uuid) {
-        int index = findIndex(uuid);
-        switch (index) {
-            case -2:
-                System.out.println("uuid некорректный - невозможно получить резюме!");
-                return null;
-            case -1:
+        if (uuid == null) {
+            System.out.println("uuid некорректный - невозможно получить резюме!");
+            return null;
+        } else {
+            int index = findIndex(uuid);
+            if (index < 0) {
                 System.out.println("Такого резюме для получения в хранилище нет!");
                 return null;
-            default:
+            } else
                 return storage[index];
         }
     }
@@ -70,35 +62,28 @@ public class ArrayStorage {
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * Получаем индекс хранилища, где лежит резюме
      * Если резюме не найдено, возвращает -1
-     * Если uuid некорректный (и поиск не выполнялся), возвращает -2
      */
-    public int findIndex(String uuid) {
-        if (uuid != null) {
-            for (int index = 0; index < size; index++) {
-                if (uuid.equals(storage[index].getUuid())) {
-                    return index;
-                }
+    private int findIndex(String uuid) {
+        for (int index = 0; index < size; index++) {
+            if (uuid.equals(storage[index].getUuid())) {
+                return index;
             }
-            return -1;
-        } else {
-            return -2;
         }
+        return -1;
     }
 
     public void delete(String uuid) {
-        int index = this.findIndex(uuid);
-        switch (index) {
-            case -2:
-                System.out.println("uuid некорректный - невозможно удалить резюме!");
-                break;
-            case -1:
+        if (uuid == null) {
+            System.out.println("uuid некорректный - невозможно удалить резюме!");
+        } else {
+            int index = this.findIndex(uuid);
+            if (index < 0) {
                 System.out.println("Такого резюме для удаления в хранилище нет!");
-                break;
-            default:
+            } else {
                 size--;
                 storage[index] = storage[size];
                 storage[size] = null;
-                break;
+            }
         }
     }
 
