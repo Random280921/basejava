@@ -19,42 +19,43 @@ public class ArrayStorage {
     public void save(Resume resume) {
         if (size >= storage.length) {
             System.out.print("Хранилище уже заполнено - резюме невозможно сохранить!");
-        } else if (resume.getUuid() == null) {
-            System.out.println("uuid некорректный - невозможно сохранить резюме!");
-        } else {
-            int index = findIndex(resume.getUuid());
-            if (index < 0) {
-                storage[size] = resume;
-                size++;
-            } else
-                System.out.printf("Такое резюме уже есть: Id storage= %d\n", index);
+            return;
         }
+        if (resume.getUuid() == null) {
+            System.out.println("uuid некорректный - невозможно сохранить резюме!");
+            return;
+        }
+        int index = findIndex(resume.getUuid());
+        if (index < 0) {
+            storage[size] = resume;
+            size++;
+        } else
+            System.out.printf("Такое резюме уже есть: Id storage= %d\n", index);
     }
 
     public void update(Resume resume) {
         if (resume.getUuid() == null) {
             System.out.println("uuid некорректный - невозможно обновить резюме!");
-        } else {
-            int index = findIndex(resume.getUuid());
-            if (index < 0) {
-                System.out.println("Такого резюме для обновления в хранилище нет!");
-            } else
-                storage[index] = resume;
+            return;
         }
+        int index = findIndex(resume.getUuid());
+        if (index < 0) {
+            System.out.printf("Такого резюме (uuid = %s) для обновления в хранилище нет!\n", resume.getUuid());
+        } else
+            storage[index] = resume;
     }
 
     public Resume get(String uuid) {
         if (uuid == null) {
             System.out.println("uuid некорректный - невозможно получить резюме!");
             return null;
-        } else {
-            int index = findIndex(uuid);
-            if (index < 0) {
-                System.out.println("Такого резюме для получения в хранилище нет!");
-                return null;
-            } else
-                return storage[index];
         }
+        int index = findIndex(uuid);
+        if (index < 0) {
+            System.out.printf("Такого резюме (uuid = %s) для получения в хранилище нет!\n", uuid);
+            return null;
+        }
+        return storage[index];
     }
 
     /**
@@ -75,16 +76,16 @@ public class ArrayStorage {
     public void delete(String uuid) {
         if (uuid == null) {
             System.out.println("uuid некорректный - невозможно удалить резюме!");
-        } else {
-            int index = this.findIndex(uuid);
-            if (index < 0) {
-                System.out.println("Такого резюме для удаления в хранилище нет!");
-            } else {
-                size--;
-                storage[index] = storage[size];
-                storage[size] = null;
-            }
+            return;
         }
+        int index = findIndex(uuid);
+        if (index < 0) {
+            System.out.printf("Такого резюме (uuid = %s) для удаления в хранилище нет!\n", uuid);
+            return;
+        }
+        size--;
+        storage[index] = storage[size];
+        storage[size] = null;
     }
 
     /**
