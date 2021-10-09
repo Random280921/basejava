@@ -1,15 +1,14 @@
 import ru.topjava.webapp.model.Resume;
 import ru.topjava.webapp.storage.ArrayStorage;
-
-import java.io.IOException;
+import ru.topjava.webapp.storage.Storage;
 
 /**
  * Test for your ru.topjava.webapp.storage.ArrayStorage implementation
  */
 public class MainTestArrayStorage {
-    static final ArrayStorage ARRAY_STORAGE = new ArrayStorage();
+    static final Storage ARRAY_STORAGE = new ArrayStorage();
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         Resume r1 = new Resume();
         r1.setUuid("uuid1");
         Resume r2 = new Resume();
