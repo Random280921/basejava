@@ -7,10 +7,14 @@ import java.util.Arrays;
 /**
  * Array based storage for Resumes
  */
-public class ArrayStorage implements Storage {
+public class ArrayStorage extends AbstractArrayStorage {
     private static final int STORAGE_LIMIT = 10_000;
     private Resume[] storage = new Resume[STORAGE_LIMIT];
     private int size = 0;
+
+    public int size() {
+        return size;
+    }
 
     public void clear() {
         Arrays.fill(storage, 0, size, null);
@@ -46,34 +50,6 @@ public class ArrayStorage implements Storage {
             storage[index] = resume;
     }
 
-    public Resume get(String uuid) {
-        if (uuid == null) {
-            System.out.println("uuid некорректный - невозможно получить резюме!");
-            return null;
-        }
-        int index = findIndex(uuid);
-        if (index < 0) {
-            System.out.printf("Такого резюме (uuid = %s) для получения в хранилище нет!\n", uuid);
-            return null;
-        }
-        return storage[index];
-    }
-
-    /**
-     * @return index storage, contains Resume
-     * Вспомогательный метод, чтобы убрать дублирование кода в методах
-     * Получаем индекс хранилища, где лежит резюме
-     * Если резюме не найдено, возвращает -1
-     */
-    private int findIndex(String uuid) {
-        for (int index = 0; index < size; index++) {
-            if (uuid.equals(storage[index].getUuid())) {
-                return index;
-            }
-        }
-        return -1;
-    }
-
     public void delete(String uuid) {
         if (uuid == null) {
             System.out.println("uuid некорректный - невозможно удалить резюме!");
@@ -96,7 +72,19 @@ public class ArrayStorage implements Storage {
         return Arrays.copyOfRange(storage, 0, size);
     }
 
-    public int size() {
-        return size;
+    /**
+     * @return index storage, contains Resume
+     * Вспомогательный метод, чтобы убрать дублирование кода в методах
+     * Получаем индекс хранилища, где лежит резюме
+     * Если резюме не найдено, возвращает -1
+     */
+    protected int findIndex(String uuid) {
+        for (int index = 0; index < size; index++) {
+            if (uuid.equals(storage[index].getUuid())) {
+                return index;
+            }
+        }
+        return -1;
     }
+
 }

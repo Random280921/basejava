@@ -28,14 +28,6 @@ public abstract class AbstractArrayStorage implements Storage {
 
     /**
      * @return index storage, contains Resume
-     * Вспомогательный метод, чтобы убрать дублирование кода в методах
-     * Получаем индекс хранилища, где лежит резюме
-     * Если резюме не найдено, возвращает -1
-     */
-    protected abstract int findIndex(String uuid);
-
-    /**
-     * @return index storage, contains Resume
      * Вспомогательный метод, для сокращения общего кода в методах
      * Проверяет входной параметр uuid на null
      */
@@ -46,4 +38,12 @@ public abstract class AbstractArrayStorage implements Storage {
         }
         return false;
     }
+
+    /**
+     * @return index storage, contains Resume
+     * Вспомогательный метод, чтобы убрать дублирование кода в методах
+     * Получаем индекс хранилища, где лежит резюме
+     * Если резюме не найдено, возвращает -1
+     */
+    protected abstract int findIndex(String uuid);
 }
