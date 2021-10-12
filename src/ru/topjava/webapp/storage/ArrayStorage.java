@@ -6,13 +6,6 @@ import ru.topjava.webapp.model.Resume;
  * Array based storage for Resumes
  */
 public class ArrayStorage extends AbstractArrayStorage {
-    private static final int STORAGE_LIMIT = 10_000;
-    private Resume[] storage = new Resume[STORAGE_LIMIT];
-    private int size = 0;
-
-    public int size() {
-        return size;
-    }
 
     @Override
     protected int findIndex(String uuid) {
@@ -25,12 +18,12 @@ public class ArrayStorage extends AbstractArrayStorage {
     }
 
     @Override
-    protected void saveResumeToIndex(Resume resume) {
+    protected void saveResumeToArray(Resume resume) {
         storage[size] = resume;
     }
 
     @Override
-    protected void deleteResumeFromIndex(int index) {
+    protected void deleteResumeFromArray(int index) {
         storage[index] = storage[size];
     }
 

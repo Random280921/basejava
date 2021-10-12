@@ -3,6 +3,7 @@ package ru.topjava.webapp.storage;
 import ru.topjava.webapp.model.Resume;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Array based storage for Resumes
@@ -17,10 +18,7 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     public final Resume get(String uuid) {
-        if (checkUuidToNull(uuid, "get")) {
-            return null;
-        }
-        int index = findIndex(uuid);
+        int index = findIndex(checkUuidToNull(uuid));
         if (index < 0) {
             System.out.printf("Такого резюме (uuid = %s) для получения в хранилище нет!\n", uuid);
             return null;
@@ -38,22 +36,16 @@ public abstract class AbstractArrayStorage implements Storage {
             System.out.print("Хранилище уже заполнено - резюме невозможно сохранить!");
             return;
         }
-        if (checkUuidToNull(resume.getUuid(), "save")) {
-            return;
-        }
-        int index = findIndex(resume.getUuid());
+        int index = findIndex(checkUuidToNull(resume.getUuid()));
         if (index < 0) {
-            saveResumeToIndex(resume);
+            saveResumeToArray(resume);
             size++;
         } else
             System.out.printf("Такое резюме уже есть: Id storage= %d\n", index);
     }
 
     public final void update(Resume resume) {
-        if (checkUuidToNull(resume.getUuid(), "update")) {
-            return;
-        }
-        int index = findIndex(resume.getUuid());
+        int index = findIndex(checkUuidToNull(resume.getUuid()));
         if (index < 0) {
             System.out.printf("Такого резюме (uuid = %s) для обновления в хранилище нет!\n", resume.getUuid());
         } else
@@ -61,15 +53,12 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     public final void delete(String uuid) {
-        if (checkUuidToNull(uuid, "delete")) {
-            return;
-        }
-        int index = findIndex(uuid);
+        int index = findIndex(checkUuidToNull(uuid));
         if (index < 0) {
             System.out.printf("Такого резюме (uuid = %s) для удаления в хранилище нет!\n", uuid);
             return;
         }
-        deleteResumeFromIndex(index);
+        deleteResumeFromArray(index);
         storage[size] = null;
         size--;
     }
@@ -86,12 +75,8 @@ public abstract class AbstractArrayStorage implements Storage {
      * Вспомогательный метод, для сокращения общего кода в методах
      * Проверяет входной параметр uuid на null
      */
-    protected boolean checkUuidToNull(String uuid, String oper) {
-        if (uuid == null) {
-            System.out.printf("uuid invalid - don't %s resume!\n", oper);
-            return true;
-        }
-        return false;
+    protected String checkUuidToNull(String uuid) {
+        return  Objects.requireNonNull(uuid, "Resume.uuid must not be null");
     }
 
     /**
@@ -106,11 +91,11 @@ public abstract class AbstractArrayStorage implements Storage {
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * По заданному индексу хранилища сохраняем резюме
      */
-    protected abstract void saveResumeToIndex(Resume resume);
+    protected abstract void saveResumeToArray(Resume resume);
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * По заданному индексу хранилища удаляем резюме
      */
-    protected abstract void deleteResumeFromIndex(int index);
+    protected abstract void deleteResumeFromArray(int index);
 }
