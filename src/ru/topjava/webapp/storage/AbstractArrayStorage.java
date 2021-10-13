@@ -58,9 +58,9 @@ public abstract class AbstractArrayStorage implements Storage {
             System.out.printf("Такого резюме (uuid = %s) для удаления в хранилище нет!\n", uuid);
             return;
         }
+        size--;
         deleteResumeFromArray(index);
         storage[size] = null;
-        size--;
     }
 
     /**
@@ -76,7 +76,7 @@ public abstract class AbstractArrayStorage implements Storage {
      * Проверяет входной параметр uuid на null
      */
     protected String checkUuidToNull(String uuid) {
-        return  Objects.requireNonNull(uuid, "Resume.uuid must not be null");
+        return Objects.requireNonNull(uuid, "Resume.uuid must not be null");
     }
 
     /**

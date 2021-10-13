@@ -10,8 +10,8 @@ public class MainAutoTestSortedArray {
     private final static Storage ARRAY_STORAGE = new SortedArrayStorage();
 
     public static void main(String[] args) {
-        String[] comBuf = {"gdsfdajgfj","size", "save", "save q1", "save w2", "save e3", "save r4", "update t5", "update", "update w2",
-                "size", "delete y6", "delete", "delete r4", "size", "get u7", "get", "get e3", "clear", "size"};
+        String[] comBuf = {"gdsfdajgfj", "size", "save", "save q1", "save w2", "save e3", "save r4", "update t5", "update", "update w2",
+                "size", "delete y6", "delete", "delete e3", "size", "get u7", "get", "get w2", "clear", "size"};
         for (String com : comBuf) {
             try {
                 System.out.println("---Command: " + com);
