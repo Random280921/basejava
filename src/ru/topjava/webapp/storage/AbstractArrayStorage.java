@@ -1,5 +1,8 @@
 package ru.topjava.webapp.storage;
 
+import ru.topjava.webapp.exception.ExistStorageException;
+import ru.topjava.webapp.exception.NotExistStorageException;
+import ru.topjava.webapp.exception.StorageException;
 import ru.topjava.webapp.model.Resume;
 
 import java.util.Arrays;
@@ -20,8 +23,7 @@ public abstract class AbstractArrayStorage implements Storage {
     public final Resume get(String uuid) {
         int index = findIndex(checkUuidToNull(uuid));
         if (index < 0) {
-            System.out.printf("Такого резюме (uuid = %s) для получения в хранилище нет!\n", uuid);
-            return null;
+            throw new NotExistStorageException(uuid);
         }
         return storage[index];
     }
@@ -33,21 +35,20 @@ public abstract class AbstractArrayStorage implements Storage {
 
     public final void save(Resume resume) {
         if (size >= STORAGE_LIMIT) {
-            System.out.print("Хранилище уже заполнено - резюме невозможно сохранить!");
-            return;
+            throw new StorageException("Хранилище уже заполнено - резюме невозможно сохранить!", resume.getUuid());
         }
         int index = findIndex(checkUuidToNull(resume.getUuid()));
         if (index < 0) {
             saveResumeToArray(resume);
             size++;
         } else
-            System.out.printf("Такое резюме уже есть: Id storage= %d\n", index);
+            throw new ExistStorageException(resume.getUuid(), index);
     }
 
     public final void update(Resume resume) {
         int index = findIndex(checkUuidToNull(resume.getUuid()));
         if (index < 0) {
-            System.out.printf("Такого резюме (uuid = %s) для обновления в хранилище нет!\n", resume.getUuid());
+            throw new NotExistStorageException(resume.getUuid());
         } else
             storage[index] = resume;
     }
@@ -55,8 +56,7 @@ public abstract class AbstractArrayStorage implements Storage {
     public final void delete(String uuid) {
         int index = findIndex(checkUuidToNull(uuid));
         if (index < 0) {
-            System.out.printf("Такого резюме (uuid = %s) для удаления в хранилище нет!\n", uuid);
-            return;
+            throw new NotExistStorageException(uuid);
         }
         size--;
         deleteResumeFromArray(index);
