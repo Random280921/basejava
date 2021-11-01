@@ -1,3 +1,5 @@
+package ru.topjava.webapp;
+
 import ru.topjava.webapp.model.Resume;
 import ru.topjava.webapp.storage.SortedArrayStorage;
 import ru.topjava.webapp.storage.Storage;
