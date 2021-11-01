@@ -34,15 +34,16 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     public final void save(Resume resume) {
+        String uuidRes = resume.getUuid();
         if (size >= STORAGE_LIMIT) {
-            throw new StorageException("Хранилище уже заполнено - резюме невозможно сохранить!", resume.getUuid());
+            throw new StorageException("Хранилище уже заполнено - резюме невозможно сохранить!", uuidRes);
         }
-        int index = findIndex(checkUuidToNull(resume.getUuid()));
+        int index = findIndex(checkUuidToNull(uuidRes));
         if (index < 0) {
-            saveResumeToArray(resume);
+            saveResumeToArray(resume, index);
             size++;
         } else
-            throw new ExistStorageException(resume.getUuid(), index);
+            throw new ExistStorageException(uuidRes, index);
     }
 
     public final void update(Resume resume) {
@@ -75,7 +76,7 @@ public abstract class AbstractArrayStorage implements Storage {
      * Вспомогательный метод, для сокращения общего кода в методах
      * Проверяет входной параметр uuid на null
      */
-    protected String checkUuidToNull(String uuid) {
+    private String checkUuidToNull(String uuid) {
         return Objects.requireNonNull(uuid, "Resume.uuid must not be null");
     }
 
@@ -91,7 +92,7 @@ public abstract class AbstractArrayStorage implements Storage {
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * По заданному индексу хранилища сохраняем резюме
      */
-    protected abstract void saveResumeToArray(Resume resume);
+    protected abstract void saveResumeToArray(Resume resume, int index);
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах

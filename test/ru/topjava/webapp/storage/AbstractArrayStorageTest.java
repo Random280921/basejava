@@ -9,14 +9,15 @@ import ru.topjava.webapp.model.Resume;
 public abstract class AbstractArrayStorageTest {
 
     private final Storage storage;
+    private static final String UUID_1 = "uuid1";
+    private static final String UUID_2 = "uuid2";
+    private static final String UUID_3 = "uuid3";
+    private static final String UUID_4 = "uuid4";
+    private static final Resume[] etalonResume = {new Resume(UUID_1), new Resume(UUID_2), new Resume(UUID_3)};
 
     public AbstractArrayStorageTest(Storage storage) {
         this.storage = storage;
     }
-
-    private static final String UUID_1 = "uuid1";
-    private static final String UUID_2 = "uuid2";
-    private static final String UUID_3 = "uuid3";
 
     @Before
     public void setUp() {
@@ -24,6 +25,7 @@ public abstract class AbstractArrayStorageTest {
         storage.save(new Resume(UUID_1));
         storage.save(new Resume(UUID_2));
         storage.save(new Resume(UUID_3));
+
     }
 
     @Test
@@ -33,9 +35,7 @@ public abstract class AbstractArrayStorageTest {
 
     @Test
     public void get() {
-        Assert.assertEquals(new Resume(UUID_1), storage.get("uuid1"));
-        Assert.assertEquals(new Resume(UUID_2), storage.get("uuid2"));
-        Assert.assertEquals(new Resume(UUID_3), storage.get("uuid3"));
+        Assert.assertEquals(new Resume(UUID_1), storage.get(UUID_1));
     }
 
     @Test(expected = NotExistStorageException.class)
@@ -56,9 +56,10 @@ public abstract class AbstractArrayStorageTest {
 
     @Test
     public void save() {
-        Resume resumeSave = new Resume("uuid4");
+        Resume resumeSave = new Resume(UUID_4);
         storage.save(resumeSave);
-        Assert.assertEquals(resumeSave, storage.get("uuid4"));
+        Assert.assertEquals(resumeSave, storage.get(UUID_4));
+        Assert.assertEquals(4, storage.size());
     }
 
     @Test(expected = NullPointerException.class)
@@ -77,7 +78,7 @@ public abstract class AbstractArrayStorageTest {
             for (int i = storage.size() + 1; i <= AbstractArrayStorage.STORAGE_LIMIT; i++) {
                 storage.save(new Resume(String.format("uuid%d", i)));
             }
-        } catch (Exception e) {
+        } catch (StorageException e) {
             Assert.fail("Переполнение произошло до нужной проверки");
         }
         storage.save(new Resume(String.format("uuid%d", AbstractArrayStorage.STORAGE_LIMIT + 1)));
@@ -97,7 +98,7 @@ public abstract class AbstractArrayStorageTest {
 
     @Test(expected = NotExistStorageException.class)
     public void updateNotExist() {
-        storage.update(new Resume("uuid4"));
+        storage.update(new Resume(UUID_4));
     }
 
     @Test(expected = NotExistStorageException.class)
@@ -114,25 +115,12 @@ public abstract class AbstractArrayStorageTest {
 
     @Test(expected = NotExistStorageException.class)
     public void deleteNotExist() {
-        storage.delete("uuid4");
+        storage.delete(UUID_4);
     }
 
     @Test
     public void getAll() {
-        Resume[] resumes = storage.getAll();
-        Assert.assertEquals(resumes.length, storage.size());
-        try {
-            for (Resume resume : resumes) {
-                Assert.assertEquals(resume, storage.get(resume.getUuid()));
-            }
-        } catch (Exception e) {
-            Assert.fail("Не совпадают резюме в storage и в результате getAll");
-        }
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void checkUuidToNull() {
-        Assert.assertEquals(UUID_1, ((AbstractArrayStorage) storage).checkUuidToNull(UUID_1));
-        Assert.assertNull(((AbstractArrayStorage) storage).checkUuidToNull(null));
+        Assert.assertEquals(etalonResume.length, storage.size());
+        Assert.assertArrayEquals(etalonResume, storage.getAll());
     }
 }
