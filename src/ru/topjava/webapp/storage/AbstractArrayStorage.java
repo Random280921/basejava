@@ -71,7 +71,7 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     /**
-     * @return index storage, contains Resume
+     * @return uuid or NullPointerException
      * Вспомогательный метод, для сокращения общего кода в методах
      * Проверяет входной параметр uuid на null
      */
