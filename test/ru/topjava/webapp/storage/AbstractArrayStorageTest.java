@@ -22,8 +22,6 @@ public abstract class AbstractArrayStorageTest {
     private static final String UUID_4 = "uuid4";
     private static final Resume RESUME_4 = new Resume(UUID_4);
 
-    private static final Resume[] etalonResume = {RESUME_1, RESUME_2, RESUME_3};
-
     protected AbstractArrayStorageTest(Storage storage) {
         this.storage = storage;
     }
@@ -127,6 +125,7 @@ public abstract class AbstractArrayStorageTest {
 
     @Test
     public void getAll() {
+        final Resume[] etalonResume = {RESUME_1, RESUME_2, RESUME_3};
         Resume[] getAllResume = storage.getAll();
         Assert.assertEquals(etalonResume.length, getAllResume.length);
         Assert.assertArrayEquals(etalonResume, getAllResume);
