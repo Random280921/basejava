@@ -6,12 +6,11 @@ import ru.topjava.webapp.exception.StorageException;
 import ru.topjava.webapp.model.Resume;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * Array based storage for Resumes
  */
-public abstract class AbstractArrayStorage implements Storage {
+public abstract class AbstractArrayStorage extends AbstractStorage {
     protected static final int STORAGE_LIMIT = 10_000;
     protected Resume[] storage = new Resume[STORAGE_LIMIT];
     protected int size = 0;
@@ -69,15 +68,6 @@ public abstract class AbstractArrayStorage implements Storage {
      */
     public final Resume[] getAll() {
         return Arrays.copyOfRange(storage, 0, size);
-    }
-
-    /**
-     * @return uuid or NullPointerException
-     * Вспомогательный метод, для сокращения общего кода в методах
-     * Проверяет входной параметр uuid на null
-     */
-    private String checkUuidToNull(String uuid) {
-        return Objects.requireNonNull(uuid, "Resume.uuid must not be null");
     }
 
     /**

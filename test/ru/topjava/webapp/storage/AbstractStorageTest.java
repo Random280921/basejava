@@ -6,9 +6,9 @@ import org.junit.Test;
 import ru.topjava.webapp.exception.*;
 import ru.topjava.webapp.model.Resume;
 
-public abstract class AbstractArrayStorageTest {
+public abstract class AbstractStorageTest {
 
-    private final Storage storage;
+    protected final Storage storage;
 
     private static final String UUID_1 = "uuid1";
     private static final String UUID_2 = "uuid2";
@@ -27,7 +27,7 @@ public abstract class AbstractArrayStorageTest {
         RESUME_4 = new Resume(UUID_4);
     }
 
-    protected AbstractArrayStorageTest(Storage storage) {
+    protected AbstractStorageTest(Storage storage) {
         this.storage = storage;
     }
 
