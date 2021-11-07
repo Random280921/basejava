@@ -1,12 +1,9 @@
 package ru.topjava.webapp.storage;
 
-import ru.topjava.webapp.exception.ExistStorageException;
-import ru.topjava.webapp.exception.NotExistStorageException;
 import ru.topjava.webapp.model.Resume;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Objects;
+import java.util.ListIterator;
 
 /**
  * List based storage for Resumes
@@ -14,60 +11,62 @@ import java.util.Objects;
 public class ListStorage extends AbstractStorage {
 
     protected ArrayList<Resume> storage = new ArrayList<>();
+    ListIterator<Resume> iterator = storage.listIterator();
 
+    @Override
     public int size() {
         return storage.size();
     }
 
-    public final Resume get(String uuid) {
-        String checkUuid = checkUuidToNull(uuid);
-        for (Resume resume : storage) {
-            if (Objects.equals(resume.getUuid(), checkUuid)) {
-                return resume;
-            }
-        }
-        throw new NotExistStorageException(uuid);
+    @Override
+    protected Resume getResumeForIndex(int index) {
+        return storage.get(index);
     }
 
+    @Override
     public final void clear() {
         storage.clear();
     }
 
-    public final void save(Resume resume) {
-        String uuidRes = checkUuidToNull(resume.getUuid());
-        int index = storage.indexOf(resume);
-        if (index >= 0) {
-            throw new ExistStorageException(uuidRes, index);
-        } else storage.add(resume);
+    @Override
+    protected void checkSizeToLimitArray(String uuidRes) {
     }
 
-    public final void update(Resume resume) {
-        int index = storage.indexOf(resume);
-        if (index < 0) {
-            throw new NotExistStorageException(resume.getUuid());
-        } else
-            storage.set(index, resume);
-    }
-
-    public final void delete(String uuid) {
-        String checkUuid = checkUuidToNull(uuid);
-        Iterator<Resume> iterator = storage.iterator();
-        int cnt = 0;
-        while (iterator.hasNext()) {
-            cnt++;
-            Resume r = iterator.next();
-            System.out.println(r);
-            if (Objects.equals(r.getUuid(), checkUuid)) {
-                iterator.remove();
-                break;
+    @Override
+    protected int findIndex(String uuid) {
+        for (Resume resume : storage) {
+            if (uuid.equals(resume.getUuid())) {
+                return storage.indexOf(resume);
             }
         }
-        if (cnt == storage.size()) throw new NotExistStorageException(uuid);
+        return -1;
+    }
+
+    @Override
+    protected void saveResumeToStorage(Resume resume, int index) {
+        storage.add(resume);
+    }
+
+    @Override
+    protected void deleteResumeFromStorage(int index) {
+        storage.remove(index);
+    }
+
+
+    @Override
+    public final void updateResumeToStorage(Resume resume, int index) {
+        storage.set(index, resume);
+    }
+
+    @Override
+    public final void deleteResumeAndTrimStorage(int index) {
+        deleteResumeFromStorage(index);
     }
 
     /**
      * @return array, contains only Resumes in storage (without null)
      */
+    @Override
     public final Resume[] getAll() {
         return storage.toArray(new Resume[0]);
     }
