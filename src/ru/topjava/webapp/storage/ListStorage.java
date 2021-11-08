@@ -5,6 +5,7 @@ import ru.topjava.webapp.model.Resume;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 
 /**
  * List based storage for Resumes
@@ -12,7 +13,6 @@ import java.util.ListIterator;
 public class ListStorage extends AbstractStorage {
 
     private final List<Resume> storage = new ArrayList<>();
-    ListIterator<Resume> iterator = storage.listIterator();
 
     @Override
     public int size() {
@@ -31,9 +31,11 @@ public class ListStorage extends AbstractStorage {
 
     @Override
     protected int findIndex(String uuid) {
-        for (Resume resume : storage) {
-            if (uuid.equals(resume.getUuid())) {
-                return storage.indexOf(resume);
+        ListIterator<Resume> iterator = storage.listIterator();
+        while (iterator.hasNext()) {
+            Resume r = iterator.next();
+            if (Objects.equals(r.getUuid(), uuid)) {
+                return iterator.previousIndex();
             }
         }
         return -1;
