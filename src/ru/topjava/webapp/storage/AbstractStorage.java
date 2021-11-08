@@ -2,36 +2,40 @@ package ru.topjava.webapp.storage;
 
 import ru.topjava.webapp.exception.ExistStorageException;
 import ru.topjava.webapp.exception.NotExistStorageException;
+import ru.topjava.webapp.exception.StorageException;
 import ru.topjava.webapp.model.Resume;
 
 import java.util.Objects;
 
 public abstract class AbstractStorage implements Storage {
+    protected static final int STORAGE_LIMIT = 10_000;
+    protected int size = 0;
 
     public final Resume get(String uuid) {
         int index = findIndex(checkUuidToNull(uuid));
         if (index < 0) {
             throw new NotExistStorageException(uuid);
         }
-        return getResumeForIndex(index);
+        return getResume(index);
     }
 
     public final void save(Resume resume) {
         String uuidRes = checkUuidToNull(resume.getUuid());
         checkSizeToLimitArray(uuidRes);
         int index = findIndex(uuidRes);
-        if (index < 0) {
-            saveResumeToStorage(resume, index);
-        } else
+        if (index >= 0) {
             throw new ExistStorageException(uuidRes, index);
+        }
+        saveResumeToStorage(resume, index);
+        size++;
     }
 
     public final void update(Resume resume) {
         int index = findIndex(checkUuidToNull(resume.getUuid()));
         if (index < 0) {
             throw new NotExistStorageException(resume.getUuid());
-        } else
-            updateResumeToStorage(resume, index);
+        }
+        updateResumeToStorage(resume, index);
     }
 
     public final void delete(String uuid) {
@@ -39,14 +43,18 @@ public abstract class AbstractStorage implements Storage {
         if (index < 0) {
             throw new NotExistStorageException(uuid);
         }
-        deleteResumeAndTrimStorage(index);
+        deleteResume(index);
     }
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * Проверяет хранилище на переполнение (там, где критично) - при перполнении выбрасывает StorageException
      */
-    protected abstract void checkSizeToLimitArray(String uuid);
+    protected void checkSizeToLimitArray(String uuidRes) {
+        if (size >= STORAGE_LIMIT) {
+            throw new StorageException("Хранилище уже заполнено - резюме невозможно сохранить!", uuidRes);
+        }
+    }
 
     /**
      * @return uuid or NullPointerException
@@ -62,7 +70,7 @@ public abstract class AbstractStorage implements Storage {
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * Возвращает резюме по индексу
      */
-    protected abstract Resume getResumeForIndex(int index);
+    protected abstract Resume getResume(int index);
 
     /**
      * @return index storage, contains Resume
@@ -94,5 +102,5 @@ public abstract class AbstractStorage implements Storage {
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * По заданному индексу хранилища удаляем резюме и меняем размер хранилища (если требуется)
      */
-    protected abstract void deleteResumeAndTrimStorage(int index);
+    protected abstract void deleteResume(int index);
 }

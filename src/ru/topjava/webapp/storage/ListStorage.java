@@ -3,6 +3,7 @@ package ru.topjava.webapp.storage;
 import ru.topjava.webapp.model.Resume;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 
 /**
@@ -10,7 +11,7 @@ import java.util.ListIterator;
  */
 public class ListStorage extends AbstractStorage {
 
-    protected ArrayList<Resume> storage = new ArrayList<>();
+    private final List<Resume> storage = new ArrayList<>();
     ListIterator<Resume> iterator = storage.listIterator();
 
     @Override
@@ -19,17 +20,13 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getResumeForIndex(int index) {
+    protected Resume getResume(int index) {
         return storage.get(index);
     }
 
     @Override
     public final void clear() {
         storage.clear();
-    }
-
-    @Override
-    protected void checkSizeToLimitArray(String uuidRes) {
     }
 
     @Override
@@ -52,14 +49,13 @@ public class ListStorage extends AbstractStorage {
         storage.remove(index);
     }
 
-
     @Override
     public final void updateResumeToStorage(Resume resume, int index) {
         storage.set(index, resume);
     }
 
     @Override
-    public final void deleteResumeAndTrimStorage(int index) {
+    public final void deleteResume(int index) {
         deleteResumeFromStorage(index);
     }
 
