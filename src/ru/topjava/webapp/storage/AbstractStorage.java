@@ -2,14 +2,11 @@ package ru.topjava.webapp.storage;
 
 import ru.topjava.webapp.exception.ExistStorageException;
 import ru.topjava.webapp.exception.NotExistStorageException;
-import ru.topjava.webapp.exception.StorageException;
 import ru.topjava.webapp.model.Resume;
 
 import java.util.Objects;
 
 public abstract class AbstractStorage implements Storage {
-    protected static final int STORAGE_LIMIT = 10_000;
-    protected int size = 0;
 
     public final Resume get(String uuid) {
         int index = findIndex(checkUuidToNull(uuid));
@@ -21,13 +18,11 @@ public abstract class AbstractStorage implements Storage {
 
     public final void save(Resume resume) {
         String uuidRes = checkUuidToNull(resume.getUuid());
-        checkSizeToLimitArray(uuidRes);
         int index = findIndex(uuidRes);
         if (index >= 0) {
             throw new ExistStorageException(uuidRes, index);
         }
-        saveResumeToStorage(resume, index);
-        size++;
+        saveResume(resume, index);
     }
 
     public final void update(Resume resume) {
@@ -35,7 +30,7 @@ public abstract class AbstractStorage implements Storage {
         if (index < 0) {
             throw new NotExistStorageException(resume.getUuid());
         }
-        updateResumeToStorage(resume, index);
+        updateResume(resume, index);
     }
 
     public final void delete(String uuid) {
@@ -44,16 +39,6 @@ public abstract class AbstractStorage implements Storage {
             throw new NotExistStorageException(uuid);
         }
         deleteResume(index);
-    }
-
-    /**
-     * Вспомогательный метод, чтобы убрать дублирование кода в методах
-     * Проверяет хранилище на переполнение (там, где критично) - при перполнении выбрасывает StorageException
-     */
-    protected void checkSizeToLimitArray(String uuidRes) {
-        if (size >= STORAGE_LIMIT) {
-            throw new StorageException("Хранилище уже заполнено - резюме невозможно сохранить!", uuidRes);
-        }
     }
 
     /**
@@ -84,19 +69,13 @@ public abstract class AbstractStorage implements Storage {
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * По заданному индексу хранилища сохраняем резюме
      */
-    protected abstract void saveResumeToStorage(Resume resume, int index);
+    protected abstract void saveResume(Resume resume, int index);
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * По заданному индексу хранилища сохраняем резюме
      */
-    protected abstract void updateResumeToStorage(Resume resume, int index);
-
-    /**
-     * Вспомогательный метод, чтобы убрать дублирование кода в методах
-     * По заданному индексу хранилища удаляем резюме
-     */
-    protected abstract void deleteResumeFromStorage(int index);
+    protected abstract void updateResume(Resume resume, int index);
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
