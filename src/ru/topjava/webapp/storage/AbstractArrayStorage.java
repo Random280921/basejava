@@ -19,7 +19,7 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getResume(int index) {
+    protected Resume getResume(int index, String key) {
         return storage[index];
     }
 
@@ -29,7 +29,7 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         size = 0;
     }
 
-    protected void saveResume(Resume resume, int index) {
+    protected void saveResume(Resume resume, int index, String key) {
         if (size >= STORAGE_LIMIT) {
             throw new StorageException("Хранилище уже заполнено - резюме невозможно сохранить!", resume.getUuid());
         }
@@ -38,12 +38,12 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    public final void updateResume(Resume resume, int index) {
+    public final void updateResume(Resume resume, int index, String key) {
         storage[index] = resume;
     }
 
     @Override
-    public final void deleteResume(int index) {
+    public final void deleteResume(int index, String key) {
         size--;
         deleteResumeFromStorage(index);
         storage[size] = null;

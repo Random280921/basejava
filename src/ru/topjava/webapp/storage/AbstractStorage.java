@@ -13,7 +13,7 @@ public abstract class AbstractStorage implements Storage {
         if (index < 0) {
             throw new NotExistStorageException(uuid);
         }
-        return getResume(index);
+        return getResume(index, uuid);
     }
 
     public final void save(Resume resume) {
@@ -22,15 +22,16 @@ public abstract class AbstractStorage implements Storage {
         if (index >= 0) {
             throw new ExistStorageException(uuidRes, index);
         }
-        saveResume(resume, index);
+        saveResume(resume, index, uuidRes);
     }
 
     public final void update(Resume resume) {
-        int index = findIndex(checkUuidToNull(resume.getUuid()));
+        String uuid = resume.getUuid();
+        int index = findIndex(checkUuidToNull(uuid));
         if (index < 0) {
-            throw new NotExistStorageException(resume.getUuid());
+            throw new NotExistStorageException(uuid);
         }
-        updateResume(resume, index);
+        updateResume(resume, index, uuid);
     }
 
     public final void delete(String uuid) {
@@ -38,7 +39,7 @@ public abstract class AbstractStorage implements Storage {
         if (index < 0) {
             throw new NotExistStorageException(uuid);
         }
-        deleteResume(index);
+        deleteResume(index, uuid);
     }
 
     /**
@@ -55,7 +56,7 @@ public abstract class AbstractStorage implements Storage {
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * Возвращает резюме по индексу
      */
-    protected abstract Resume getResume(int index);
+    protected abstract Resume getResume(int index, String key);
 
     /**
      * @return index storage, contains Resume
@@ -69,17 +70,17 @@ public abstract class AbstractStorage implements Storage {
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * По заданному индексу хранилища сохраняем резюме
      */
-    protected abstract void saveResume(Resume resume, int index);
+    protected abstract void saveResume(Resume resume, int index, String key);
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * По заданному индексу хранилища сохраняем резюме
      */
-    protected abstract void updateResume(Resume resume, int index);
+    protected abstract void updateResume(Resume resume, int index, String key);
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * По заданному индексу хранилища удаляем резюме и меняем размер хранилища (если требуется)
      */
-    protected abstract void deleteResume(int index);
+    protected abstract void deleteResume(int index, String key);
 }
