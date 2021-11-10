@@ -4,42 +4,48 @@ import ru.topjava.webapp.exception.ExistStorageException;
 import ru.topjava.webapp.exception.NotExistStorageException;
 import ru.topjava.webapp.model.Resume;
 
+import java.util.Map;
 import java.util.Objects;
 
 public abstract class AbstractStorage implements Storage {
+    protected Object abstractStorage;
+
+    protected AbstractStorage(Object storage) {
+        this.abstractStorage = storage;
+    }
 
     public final Resume get(String uuid) {
-        int index = findIndex(checkUuidToNull(uuid));
+        int index = getIndex(uuid);
         if (index < 0) {
             throw new NotExistStorageException(uuid);
         }
-        return getResume(index, uuid);
+        return (abstractStorage instanceof Map) ? getResume(uuid) : getResume(index);
     }
 
     public final void save(Resume resume) {
-        String uuidRes = checkUuidToNull(resume.getUuid());
-        int index = findIndex(uuidRes);
+        String uuidRes = resume.getUuid();
+        int index = getIndex(uuidRes);
         if (index >= 0) {
             throw new ExistStorageException(uuidRes, index);
         }
-        saveResume(resume, index, uuidRes);
+        saveResume(resume, abstractStorage instanceof Map ? uuidRes : Integer.valueOf(index));
     }
 
     public final void update(Resume resume) {
         String uuid = resume.getUuid();
-        int index = findIndex(checkUuidToNull(uuid));
+        int index = getIndex(uuid);
         if (index < 0) {
             throw new NotExistStorageException(uuid);
         }
-        updateResume(resume, index, uuid);
+        updateResume(resume, abstractStorage instanceof Map ? uuid : Integer.valueOf(index));
     }
 
     public final void delete(String uuid) {
-        int index = findIndex(checkUuidToNull(uuid));
+        int index = getIndex(uuid);
         if (index < 0) {
             throw new NotExistStorageException(uuid);
         }
-        deleteResume(index, uuid);
+        deleteResume(abstractStorage instanceof Map ? uuid : Integer.valueOf(index));
     }
 
     /**
@@ -56,7 +62,7 @@ public abstract class AbstractStorage implements Storage {
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * Возвращает резюме по индексу
      */
-    protected abstract Resume getResume(int index, String key);
+    protected abstract Resume getResume(Object inky);
 
     /**
      * @return index storage, contains Resume
@@ -70,17 +76,26 @@ public abstract class AbstractStorage implements Storage {
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * По заданному индексу хранилища сохраняем резюме
      */
-    protected abstract void saveResume(Resume resume, int index, String key);
+    protected abstract void saveResume(Resume resume, Object inky);
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * По заданному индексу хранилища сохраняем резюме
      */
-    protected abstract void updateResume(Resume resume, int index, String key);
+    protected abstract void updateResume(Resume resume, Object inky);
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * По заданному индексу хранилища удаляем резюме и меняем размер хранилища (если требуется)
      */
-    protected abstract void deleteResume(int index, String key);
+    protected abstract void deleteResume(Object inky);
+
+    /**
+     * @return index storage, contains Resume
+     * Вспомогательный метод, чтобы убрать дублирование кода в методах
+     * Возвращает полученный индекс хранилища, с предварительной проверкой uuid на null
+     */
+    private int getIndex(String uuid) {
+        return findIndex(checkUuidToNull(uuid));
+    }
 }

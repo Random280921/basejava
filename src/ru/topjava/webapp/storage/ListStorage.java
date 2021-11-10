@@ -2,17 +2,19 @@ package ru.topjava.webapp.storage;
 
 import ru.topjava.webapp.model.Resume;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * List based storage for Resumes
  */
 public class ListStorage extends AbstractStorage {
 
-    private final List<Resume> storage = new ArrayList<>();
+    public ListStorage() {
+        super(new ArrayList<>());
+    }
+
+    @SuppressWarnings("unchecked")
+    private final List<Resume> storage = (ArrayList<Resume>) abstractStorage;
 
     @Override
     public int size() {
@@ -20,8 +22,8 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getResume(int index, String key) {
-        return storage.get(index);
+    protected Resume getResume(Object inky) {
+        return storage.get((int) inky);
     }
 
     @Override
@@ -42,18 +44,18 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected void saveResume(Resume resume, int index, String key) {
+    protected void saveResume(Resume resume, Object inky) {
         storage.add(resume);
     }
 
     @Override
-    protected void deleteResume(int index, String key) {
-        storage.remove(index);
+    protected void deleteResume(Object inky) {
+        storage.remove((int) inky);
     }
 
     @Override
-    public final void updateResume(Resume resume, int index, String key) {
-        storage.set(index, resume);
+    public final void updateResume(Resume resume, Object inky) {
+        storage.set((int) inky, resume);
     }
 
     /**

@@ -11,7 +11,12 @@ import java.util.Arrays;
 public abstract class AbstractArrayStorage extends AbstractStorage {
     protected static final int STORAGE_LIMIT = 10_000;
     protected int size = 0;
-    protected Resume[] storage = new Resume[STORAGE_LIMIT];
+
+    public AbstractArrayStorage() {
+        super(new Resume[STORAGE_LIMIT]);
+    }
+
+    protected Resume[] storage = (Resume[]) abstractStorage;
 
     @Override
     public int size() {
@@ -19,8 +24,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getResume(int index, String key) {
-        return storage[index];
+    protected Resume getResume(Object inky) {
+        return storage[(int) inky];
     }
 
     @Override
@@ -29,23 +34,24 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         size = 0;
     }
 
-    protected void saveResume(Resume resume, int index, String key) {
+    @Override
+    protected void saveResume(Resume resume, Object inky) {
         if (size >= STORAGE_LIMIT) {
             throw new StorageException("Хранилище уже заполнено - резюме невозможно сохранить!", resume.getUuid());
         }
-        saveResumeToStorage(resume, index);
+        saveResumeToStorage(resume, (int) inky);
         size++;
     }
 
     @Override
-    public final void updateResume(Resume resume, int index, String key) {
-        storage[index] = resume;
+    public final void updateResume(Resume resume, Object inky) {
+        storage[(int) inky] = resume;
     }
 
     @Override
-    public final void deleteResume(int index, String key) {
+    public final void deleteResume(Object inky) {
         size--;
-        deleteResumeFromStorage(index);
+        deleteResumeFromStorage((int) inky);
         storage[size] = null;
     }
 

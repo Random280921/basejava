@@ -6,6 +6,8 @@ import org.junit.Test;
 import ru.topjava.webapp.exception.*;
 import ru.topjava.webapp.model.Resume;
 
+import java.util.Arrays;
+
 public abstract class AbstractStorageTest {
 
     protected final Storage storage;
@@ -132,7 +134,9 @@ public abstract class AbstractStorageTest {
     public void getAll() {
         final Resume[] expectedResume = {RESUME_1, RESUME_2, RESUME_3};
         Resume[] actualResumes = storage.getAll();
-        assertArray(expectedResume, actualResumes);
+        Arrays.sort(actualResumes);
+        Arrays.sort(expectedResume);
+        Assert.assertArrayEquals(expectedResume, actualResumes);
     }
 
     private void assertGet(Resume resume) {
@@ -141,9 +145,5 @@ public abstract class AbstractStorageTest {
 
     private void assertSize(int size) {
         Assert.assertEquals(size, storage.size());
-    }
-
-    protected void assertArray(Resume[] expectedResume, Resume[] actualResumes) {
-        Assert.assertArrayEquals(expectedResume, actualResumes);
     }
 }

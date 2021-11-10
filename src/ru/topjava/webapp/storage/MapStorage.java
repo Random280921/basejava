@@ -9,7 +9,12 @@ import java.util.*;
  */
 public class MapStorage extends AbstractStorage {
 
-    private final Map<String, Resume> storage = new HashMap<>();
+    public MapStorage() {
+        super(new HashMap<String, Resume>());
+    }
+
+    @SuppressWarnings("unchecked")
+    private final Map<String, Resume> storage = (HashMap<String, Resume>) abstractStorage;
 
     @Override
     public int size() {
@@ -17,8 +22,8 @@ public class MapStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getResume(int index, String key) {
-        return storage.get(key);
+    protected Resume getResume(Object inky) {
+        return storage.get((String) inky);
     }
 
     @Override
@@ -28,23 +33,22 @@ public class MapStorage extends AbstractStorage {
 
     @Override
     protected int findIndex(String uuid) {
-        if (storage.containsKey(uuid)) return 1;
-        return -1;
+        return (storage.containsKey(uuid)) ? 1 : -1;
     }
 
     @Override
-    protected void saveResume(Resume resume, int index, String key) {
-        storage.put(key, resume);
+    protected void saveResume(Resume resume, Object inky) {
+        storage.put((String) inky, resume);
     }
 
     @Override
-    protected void deleteResume(int index, String key) {
-        storage.remove(key);
+    protected void deleteResume(Object inky) {
+        storage.remove((String) inky);
     }
 
     @Override
-    public final void updateResume(Resume resume, int index, String key) {
-        storage.replace(key, resume);
+    public final void updateResume(Resume resume, Object inky) {
+        storage.replace((String) inky, resume);
     }
 
     /**
