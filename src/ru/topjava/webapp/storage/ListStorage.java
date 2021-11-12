@@ -1,6 +1,7 @@
 package ru.topjava.webapp.storage;
 
 import ru.topjava.webapp.model.Resume;
+import ru.topjava.webapp.model.SearchKey;
 
 import java.util.*;
 
@@ -9,12 +10,7 @@ import java.util.*;
  */
 public class ListStorage extends AbstractStorage {
 
-    public ListStorage() {
-        super(new ArrayList<>());
-    }
-
-    @SuppressWarnings("unchecked")
-    private final List<Resume> storage = (ArrayList<Resume>) abstractStorage;
+    private final List<Resume> storage = new ArrayList<>();
 
     @Override
     public int size() {
@@ -22,8 +18,8 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getResume(Object inky) {
-        return storage.get((int) inky);
+    protected Resume getResume(SearchKey searchKey) {
+        return storage.get(searchKey.getIndex());
     }
 
     @Override
@@ -44,18 +40,18 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected void saveResume(Resume resume, Object inky) {
+    protected void saveResume(Resume resume, SearchKey searchKey) {
         storage.add(resume);
     }
 
     @Override
-    protected void deleteResume(Object inky) {
-        storage.remove((int) inky);
+    protected void deleteResume(SearchKey searchKey) {
+        storage.remove(searchKey.getIndex());
     }
 
     @Override
-    public final void updateResume(Resume resume, Object inky) {
-        storage.set((int) inky, resume);
+    public final void updateResume(Resume resume, SearchKey searchKey) {
+        storage.set(searchKey.getIndex(), resume);
     }
 
     /**

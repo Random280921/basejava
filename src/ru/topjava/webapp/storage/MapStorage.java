@@ -1,6 +1,7 @@
 package ru.topjava.webapp.storage;
 
 import ru.topjava.webapp.model.Resume;
+import ru.topjava.webapp.model.SearchKey;
 
 import java.util.*;
 
@@ -9,12 +10,7 @@ import java.util.*;
  */
 public class MapStorage extends AbstractStorage {
 
-    public MapStorage() {
-        super(new HashMap<String, Resume>());
-    }
-
-    @SuppressWarnings("unchecked")
-    private final Map<String, Resume> storage = (HashMap<String, Resume>) abstractStorage;
+    private final Map<String, Resume> storage = new HashMap<>();
 
     @Override
     public int size() {
@@ -22,8 +18,8 @@ public class MapStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getResume(Object inky) {
-        return storage.get((String) inky);
+    protected Resume getResume(SearchKey searchKey) {
+        return storage.get(searchKey.getKey());
     }
 
     @Override
@@ -33,22 +29,22 @@ public class MapStorage extends AbstractStorage {
 
     @Override
     protected int findIndex(String uuid) {
-        return (storage.containsKey(uuid)) ? 1 : -1;
+        return storage.containsKey(uuid) ? 1 : -1;
     }
 
     @Override
-    protected void saveResume(Resume resume, Object inky) {
-        storage.put((String) inky, resume);
+    protected void saveResume(Resume resume, SearchKey searchKey) {
+        storage.put(searchKey.getKey(), resume);
     }
 
     @Override
-    protected void deleteResume(Object inky) {
-        storage.remove((String) inky);
+    protected void deleteResume(SearchKey searchKey) {
+        storage.remove(searchKey.getKey());
     }
 
     @Override
-    public final void updateResume(Resume resume, Object inky) {
-        storage.replace((String) inky, resume);
+    public final void updateResume(Resume resume, SearchKey searchKey) {
+        storage.replace(searchKey.getKey(), resume);
     }
 
     /**

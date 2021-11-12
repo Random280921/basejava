@@ -3,53 +3,29 @@ package ru.topjava.webapp.storage;
 import ru.topjava.webapp.exception.ExistStorageException;
 import ru.topjava.webapp.exception.NotExistStorageException;
 import ru.topjava.webapp.model.Resume;
+import ru.topjava.webapp.model.SearchKey;
 
-import java.util.Map;
 import java.util.Objects;
 
 public abstract class AbstractStorage implements Storage {
-    protected Object abstractStorage;
-
-    protected AbstractStorage(Object storage) {
-        this.abstractStorage = storage;
-    }
 
     public final Resume get(String uuid) {
-        int index = getIndex(uuid);
-        if (index < 0) {
-            throw new NotExistStorageException(uuid);
-        }
-        return (abstractStorage instanceof Map) ? getResume(uuid) : getResume(index);
+        return getResume(getKey(uuid, -1));
     }
 
     public final void save(Resume resume) {
-        String uuidRes = resume.getUuid();
-        int index = getIndex(uuidRes);
-        if (index >= 0) {
-            throw new ExistStorageException(uuidRes, index);
-        }
-        saveResume(resume, abstractStorage instanceof Map ? uuidRes : Integer.valueOf(index));
+        saveResume(resume, getKey(resume.getUuid(), 1));
     }
 
     public final void update(Resume resume) {
-        String uuid = resume.getUuid();
-        int index = getIndex(uuid);
-        if (index < 0) {
-            throw new NotExistStorageException(uuid);
-        }
-        updateResume(resume, abstractStorage instanceof Map ? uuid : Integer.valueOf(index));
+        updateResume(resume, getKey(resume.getUuid(), -1));
     }
 
     public final void delete(String uuid) {
-        int index = getIndex(uuid);
-        if (index < 0) {
-            throw new NotExistStorageException(uuid);
-        }
-        deleteResume(abstractStorage instanceof Map ? uuid : Integer.valueOf(index));
+        deleteResume(getKey(uuid, -1));
     }
 
     /**
-     * @return uuid or NullPointerException
      * Вспомогательный метод, для сокращения общего кода в методах
      * Проверяет входной параметр uuid на null
      */
@@ -58,44 +34,49 @@ public abstract class AbstractStorage implements Storage {
     }
 
     /**
-     * @return Resume from storage for input index
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
-     * Возвращает резюме по индексу
+     * Возвращает резюме по ключу
      */
-    protected abstract Resume getResume(Object inky);
+    protected abstract Resume getResume(SearchKey searchKey);
 
     /**
-     * @return index storage, contains Resume
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
-     * Получаем индекс хранилища, где лежит резюме
+     * Получаем индекс хранилища (для индексированных хранилищи, иначе возвращает 1), где лежит резюме
      * Если резюме не найдено, возвращает -1
      */
     protected abstract int findIndex(String uuid);
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
-     * По заданному индексу хранилища сохраняем резюме
+     * По заданному ключу хранилища сохраняем резюме
      */
-    protected abstract void saveResume(Resume resume, Object inky);
+    protected abstract void saveResume(Resume resume, SearchKey searchKey);
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
-     * По заданному индексу хранилища сохраняем резюме
+     * По заданному ключу хранилища сохраняем резюме
      */
-    protected abstract void updateResume(Resume resume, Object inky);
+    protected abstract void updateResume(Resume resume, SearchKey searchKey);
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
-     * По заданному индексу хранилища удаляем резюме и меняем размер хранилища (если требуется)
+     * По заданному ключу хранилища удаляем резюме и меняем размер хранилища (если требуется)
      */
-    protected abstract void deleteResume(Object inky);
+    protected abstract void deleteResume(SearchKey searchKey);
 
     /**
-     * @return index storage, contains Resume
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
-     * Возвращает полученный индекс хранилища, с предварительной проверкой uuid на null
+     * Возвращает полученный ключ хранилища или нужное исключение, с предварительной проверкой uuid на null
      */
-    private int getIndex(String uuid) {
-        return findIndex(checkUuidToNull(uuid));
+    private SearchKey getKey(String uuid, int checkType) {
+        SearchKey searchKey = new SearchKey(findIndex(checkUuidToNull(uuid)), uuid);
+        int index = searchKey.getIndex();
+        if (index < 0 && checkType == -1) {
+            throw new NotExistStorageException(uuid);
+        }
+        if (index >= 0 && checkType == 1) {
+            throw new ExistStorageException(uuid, searchKey.getIndex());
+        }
+        return searchKey;
     }
 }

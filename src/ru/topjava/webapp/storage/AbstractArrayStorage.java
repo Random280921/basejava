@@ -2,6 +2,7 @@ package ru.topjava.webapp.storage;
 
 import ru.topjava.webapp.exception.StorageException;
 import ru.topjava.webapp.model.Resume;
+import ru.topjava.webapp.model.SearchKey;
 
 import java.util.Arrays;
 
@@ -11,12 +12,7 @@ import java.util.Arrays;
 public abstract class AbstractArrayStorage extends AbstractStorage {
     protected static final int STORAGE_LIMIT = 10_000;
     protected int size = 0;
-
-    public AbstractArrayStorage() {
-        super(new Resume[STORAGE_LIMIT]);
-    }
-
-    protected Resume[] storage = (Resume[]) abstractStorage;
+    protected Resume[] storage = new Resume[STORAGE_LIMIT];
 
     @Override
     public int size() {
@@ -24,8 +20,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getResume(Object inky) {
-        return storage[(int) inky];
+    protected Resume getResume(SearchKey searchKey) {
+        return storage[searchKey.getIndex()];
     }
 
     @Override
@@ -35,23 +31,23 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected void saveResume(Resume resume, Object inky) {
+    protected void saveResume(Resume resume, SearchKey searchKey) {
         if (size >= STORAGE_LIMIT) {
             throw new StorageException("Хранилище уже заполнено - резюме невозможно сохранить!", resume.getUuid());
         }
-        saveResumeToStorage(resume, (int) inky);
+        saveResumeToStorage(resume, searchKey.getIndex());
         size++;
     }
 
     @Override
-    public final void updateResume(Resume resume, Object inky) {
-        storage[(int) inky] = resume;
+    public final void updateResume(Resume resume, SearchKey searchKey) {
+        storage[searchKey.getIndex()] = resume;
     }
 
     @Override
-    public final void deleteResume(Object inky) {
+    public final void deleteResume(SearchKey searchKey) {
         size--;
-        deleteResumeFromStorage((int) inky);
+        deleteResumeFromStorage(searchKey.getIndex());
         storage[size] = null;
     }
 
@@ -74,4 +70,5 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
      * По заданному индексу хранилища удаляем резюме
      */
     protected abstract void deleteResumeFromStorage(int index);
+
 }
