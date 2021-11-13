@@ -29,7 +29,7 @@ public abstract class AbstractStorage implements Storage {
      * Вспомогательный метод, для сокращения общего кода в методах
      * Проверяет входной параметр uuid на null
      */
-    protected String checkUuidToNull(String uuid) {
+    private String checkUuidToNull(String uuid) {
         return Objects.requireNonNull(uuid, "Resume.uuid must not be null");
     }
 
@@ -41,7 +41,7 @@ public abstract class AbstractStorage implements Storage {
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
-     * Получаем индекс хранилища (для индексированных хранилищи, иначе возвращает 1), где лежит резюме
+     * Получаем индекс хранилища (для индексированных хранилищ, иначе возвращает 1), где лежит резюме
      * Если резюме не найдено, возвращает -1
      */
     protected abstract int findIndex(String uuid);
