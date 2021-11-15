@@ -3,6 +3,7 @@ package ru.topjava.webapp.storage;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import ru.topjava.webapp.exception.ExistStorageException;
 import ru.topjava.webapp.exception.NotExistStorageException;
 import ru.topjava.webapp.exception.StorageException;
@@ -87,6 +88,7 @@ public abstract class AbstractStorageTest {
     }
 
     @Test(expected = StorageException.class)
+    @Category(ArrayTest.class)
     public void saveOverFlow() {
         try {
             for (int i = storage.size() + 1; i <= AbstractArrayStorage.STORAGE_LIMIT; i++) {
