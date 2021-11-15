@@ -7,6 +7,7 @@ import ru.topjava.webapp.exception.*;
 import ru.topjava.webapp.model.Resume;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 public abstract class AbstractStorageTest {
 
@@ -134,8 +135,11 @@ public abstract class AbstractStorageTest {
     public void getAll() {
         final Resume[] expectedResume = {RESUME_1, RESUME_2, RESUME_3};
         Resume[] actualResumes = storage.getAll();
-        Arrays.sort(actualResumes);
-        Arrays.sort(expectedResume);
+
+        Comparator<Resume> RESUME_COMPARATOR = SortedArrayStorage.RESUME_COMPARATOR;
+
+        Arrays.sort(actualResumes, RESUME_COMPARATOR);
+        Arrays.sort(expectedResume, RESUME_COMPARATOR);
         Assert.assertArrayEquals(expectedResume, actualResumes);
     }
 
