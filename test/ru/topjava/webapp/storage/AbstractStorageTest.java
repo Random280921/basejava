@@ -3,11 +3,12 @@ package ru.topjava.webapp.storage;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import ru.topjava.webapp.exception.*;
+import ru.topjava.webapp.exception.ExistStorageException;
+import ru.topjava.webapp.exception.NotExistStorageException;
+import ru.topjava.webapp.exception.StorageException;
 import ru.topjava.webapp.model.Resume;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
 public abstract class AbstractStorageTest {
 
@@ -136,10 +137,8 @@ public abstract class AbstractStorageTest {
         final Resume[] expectedResume = {RESUME_1, RESUME_2, RESUME_3};
         Resume[] actualResumes = storage.getAll();
 
-        Comparator<Resume> RESUME_COMPARATOR = SortedArrayStorage.RESUME_COMPARATOR;
-
-        Arrays.sort(actualResumes, RESUME_COMPARATOR);
-        Arrays.sort(expectedResume, RESUME_COMPARATOR);
+        Arrays.sort(actualResumes, SortedArrayStorage.RESUME_COMPARATOR);
+        Arrays.sort(expectedResume, SortedArrayStorage.RESUME_COMPARATOR);
         Assert.assertArrayEquals(expectedResume, actualResumes);
     }
 
