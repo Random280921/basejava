@@ -1,17 +1,18 @@
 package ru.topjava.webapp.storage;
 
 import ru.topjava.webapp.model.Resume;
-import ru.topjava.webapp.model.SearchKey;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * Map based storage for Resumes
  */
-public class MapStorage extends AbstractStorage {
+public abstract class MapStorage extends AbstractStorage {
 
-    private final Map<String, Resume> storage = new HashMap<>();
+    protected final Map<String, Resume> storage = new HashMap<>();
 
     @Override
     public int size() {
@@ -19,9 +20,7 @@ public class MapStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getResume(SearchKey searchKey) {
-        return storage.get(searchKey.getKey());
-    }
+    protected abstract Resume getResume(Object searchKey);
 
     @Override
     public final void clear() {
@@ -29,23 +28,19 @@ public class MapStorage extends AbstractStorage {
     }
 
     @Override
-    protected int findIndex(String uuid) {
-        return storage.containsKey(uuid) ? 1 : -1;
+    protected abstract Object findKey(String uuid);
+
+    @Override
+    protected void saveResume(Resume resume, Object searchKey) {
+        storage.put(resume.getUuid(), resume);
     }
 
     @Override
-    protected void saveResume(Resume resume, SearchKey searchKey) {
-        storage.put(searchKey.getKey(), resume);
-    }
+    protected abstract void deleteResume(Object searchKey);
 
     @Override
-    protected void deleteResume(SearchKey searchKey) {
-        storage.remove(searchKey.getKey());
-    }
-
-    @Override
-    public final void updateResume(Resume resume, SearchKey searchKey) {
-        storage.replace(searchKey.getKey(), resume);
+    public final void updateResume(Resume resume, Object searchKey) {
+        storage.replace(resume.getUuid(), resume);
     }
 
     /**

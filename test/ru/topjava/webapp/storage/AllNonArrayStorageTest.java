@@ -6,6 +6,6 @@ import org.junit.runners.Suite;
 
 @RunWith(Categories.class)
 @Categories.ExcludeCategory(ArrayTest.class)
-@Suite.SuiteClasses({ListStorageTest.class, MapStorageTest.class})
+@Suite.SuiteClasses({ListStorageTest.class, MapUuidStorageTest.class, MapResumeStorageTest.class})
 public class AllNonArrayStorageTest {
 }

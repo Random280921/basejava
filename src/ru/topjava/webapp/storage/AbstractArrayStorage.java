@@ -2,7 +2,6 @@ package ru.topjava.webapp.storage;
 
 import ru.topjava.webapp.exception.StorageException;
 import ru.topjava.webapp.model.Resume;
-import ru.topjava.webapp.model.SearchKey;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,8 +21,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getResume(SearchKey searchKey) {
-        return storage[searchKey.getIndex()];
+    protected Resume getResume(Object searchKey) {
+        return storage[(Integer) searchKey];
     }
 
     @Override
@@ -33,23 +32,23 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected void saveResume(Resume resume, SearchKey searchKey) {
+    protected void saveResume(Resume resume, Object searchKey) {
         if (size >= STORAGE_LIMIT) {
             throw new StorageException("Хранилище уже заполнено - резюме невозможно сохранить!", resume.getUuid());
         }
-        saveResumeToStorage(resume, searchKey.getIndex());
+        saveResumeToStorage(resume, (Integer) searchKey);
         size++;
     }
 
     @Override
-    public final void updateResume(Resume resume, SearchKey searchKey) {
-        storage[searchKey.getIndex()] = resume;
+    public final void updateResume(Resume resume, Object searchKey) {
+        storage[(Integer) searchKey] = resume;
     }
 
     @Override
-    public final void deleteResume(SearchKey searchKey) {
+    public final void deleteResume(Object searchKey) {
         size--;
-        deleteResumeFromStorage(searchKey.getIndex());
+        deleteResumeFromStorage((Integer) searchKey);
         storage[size] = null;
     }
 
