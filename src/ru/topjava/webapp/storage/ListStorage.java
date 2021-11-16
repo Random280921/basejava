@@ -4,6 +4,7 @@ import ru.topjava.webapp.model.Resume;
 import ru.topjava.webapp.model.SearchKey;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * List based storage for Resumes
@@ -58,7 +59,7 @@ public class ListStorage extends AbstractStorage {
      * @return array, contains only Resumes in storage (without null)
      */
     @Override
-    public final Resume[] getAll() {
-        return storage.toArray(new Resume[0]);
+    public final List<Resume> getAllSorted() {
+        return storage.stream().sorted(RESUME_COMPARATOR).collect(Collectors.toList());
     }
 }

@@ -5,9 +5,12 @@ import ru.topjava.webapp.exception.NotExistStorageException;
 import ru.topjava.webapp.model.Resume;
 import ru.topjava.webapp.model.SearchKey;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 public abstract class AbstractStorage implements Storage {
+
+    protected static Comparator<Resume> RESUME_COMPARATOR = Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid);
 
     public final Resume get(String uuid) {
         return getResume(getKey(uuid, -1));

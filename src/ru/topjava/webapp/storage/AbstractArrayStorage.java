@@ -5,6 +5,8 @@ import ru.topjava.webapp.model.Resume;
 import ru.topjava.webapp.model.SearchKey;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Array based storage for Resumes
@@ -55,8 +57,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
      * @return array, contains only Resumes in storage (without null)
      */
     @Override
-    public final Resume[] getAll() {
-        return Arrays.copyOfRange(storage, 0, size);
+    public final List<Resume> getAllSorted() {
+        return Arrays.stream(Arrays.copyOfRange(storage, 0, size)).sorted(RESUME_COMPARATOR).collect(Collectors.toList());
     }
 
     /**

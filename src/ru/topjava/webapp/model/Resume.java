@@ -11,7 +11,7 @@ public class Resume {
     // Unique identifier
     private final String uuid;
 
-    private String fullName;
+    private String fullName = "null";
 
     public Resume() {
         this(UUID.randomUUID().toString());
@@ -43,17 +43,17 @@ public class Resume {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Resume resume = (Resume) o;
-        return uuid.equals(resume.uuid);
+        return fullName.equals(resume.fullName) && uuid.equals(resume.uuid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid);
+        return Objects.hash(uuid + fullName);
     }
 
     @Override
     public String toString() {
-        return uuid;
+        return "ФИО: " + fullName + "; UUID: " + uuid;
     }
 
 }

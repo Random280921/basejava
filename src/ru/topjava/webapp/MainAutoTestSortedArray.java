@@ -4,6 +4,8 @@ import ru.topjava.webapp.model.Resume;
 import ru.topjava.webapp.storage.ArrayStorage;
 import ru.topjava.webapp.storage.Storage;
 
+import java.util.List;
+
 /**
  * Interactive test for ru.topjava.webapp.storage.SortedArrayStorage implementation
  * (just run, no need to understand)
@@ -73,11 +75,12 @@ public class MainAutoTestSortedArray {
     }
 
     static void printAll() {
-        Resume[] all = ARRAY_STORAGE.getAll();
+        List<Resume> all = ARRAY_STORAGE.getAllSorted();
         System.out.println("----------------------------");
-        if (all.length == 0) {
+        if (all.size() == 0) {
             System.out.println("Empty");
         } else {
+            System.out.println("Storage.size = " + all.size());
             for (Resume r : all) {
                 System.out.println(r);
             }
