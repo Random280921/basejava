@@ -1,5 +1,7 @@
+package ru.topjava.webapp;
+
 import ru.topjava.webapp.model.Resume;
-import ru.topjava.webapp.storage.SortedArrayStorage;
+import ru.topjava.webapp.storage.ArrayStorage;
 import ru.topjava.webapp.storage.Storage;
 
 /**
@@ -7,16 +9,16 @@ import ru.topjava.webapp.storage.Storage;
  * (just run, no need to understand)
  */
 public class MainAutoTestSortedArray {
-    private final static Storage ARRAY_STORAGE = new SortedArrayStorage();
+    private final static Storage ARRAY_STORAGE = new ArrayStorage();
 
     public static void main(String[] args) {
-        String[] comBuf = {"gdsfdajgfj", "size", "save", "save q1", "save w2", "save e3", "save r4", "update t5", "update", "update w2",
+        String[] comBuf = {"gdsfdajgfj", "size", "save", "save q1", "save w2", "save e3", "save r4", "save q1", "update t5", "update", "update w2",
                 "size", "delete y6", "delete", "delete e3", "size", "get u7", "get", "get w2", "clear", "size"};
         for (String com : comBuf) {
             try {
                 System.out.println("---Command: " + com);
                 testAllVariant(com);
-            } catch (NullPointerException e) {
+            } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -42,14 +44,12 @@ public class MainAutoTestSortedArray {
                 System.out.println(ARRAY_STORAGE.size());
                 break;
             case "save":
-                r = new Resume();
-                r.setUuid(uuid);
+                r = new Resume(uuid);
                 ARRAY_STORAGE.save(r);
                 printAll();
                 break;
             case "update":
-                r = new Resume();
-                r.setUuid(uuid);
+                r = new Resume(uuid);
                 ARRAY_STORAGE.update(r);
                 printAll();
                 break;

@@ -1,5 +1,8 @@
 package ru.topjava.webapp.storage;
 
+import ru.topjava.webapp.exception.ExistStorageException;
+import ru.topjava.webapp.exception.NotExistStorageException;
+import ru.topjava.webapp.exception.StorageException;
 import ru.topjava.webapp.model.Resume;
 
 import java.util.Arrays;
@@ -20,8 +23,7 @@ public abstract class AbstractArrayStorage implements Storage {
     public final Resume get(String uuid) {
         int index = findIndex(checkUuidToNull(uuid));
         if (index < 0) {
-            System.out.printf("Такого резюме (uuid = %s) для получения в хранилище нет!\n", uuid);
-            return null;
+            throw new NotExistStorageException(uuid);
         }
         return storage[index];
     }
@@ -32,22 +34,22 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     public final void save(Resume resume) {
+        String uuidRes = resume.getUuid();
         if (size >= STORAGE_LIMIT) {
-            System.out.print("Хранилище уже заполнено - резюме невозможно сохранить!");
-            return;
+            throw new StorageException("Хранилище уже заполнено - резюме невозможно сохранить!", uuidRes);
         }
-        int index = findIndex(checkUuidToNull(resume.getUuid()));
+        int index = findIndex(checkUuidToNull(uuidRes));
         if (index < 0) {
-            saveResumeToArray(resume);
+            saveResumeToArray(resume, index);
             size++;
         } else
-            System.out.printf("Такое резюме уже есть: Id storage= %d\n", index);
+            throw new ExistStorageException(uuidRes, index);
     }
 
     public final void update(Resume resume) {
         int index = findIndex(checkUuidToNull(resume.getUuid()));
         if (index < 0) {
-            System.out.printf("Такого резюме (uuid = %s) для обновления в хранилище нет!\n", resume.getUuid());
+            throw new NotExistStorageException(resume.getUuid());
         } else
             storage[index] = resume;
     }
@@ -55,8 +57,7 @@ public abstract class AbstractArrayStorage implements Storage {
     public final void delete(String uuid) {
         int index = findIndex(checkUuidToNull(uuid));
         if (index < 0) {
-            System.out.printf("Такого резюме (uuid = %s) для удаления в хранилище нет!\n", uuid);
-            return;
+            throw new NotExistStorageException(uuid);
         }
         size--;
         deleteResumeFromArray(index);
@@ -71,11 +72,11 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     /**
-     * @return index storage, contains Resume
+     * @return uuid or NullPointerException
      * Вспомогательный метод, для сокращения общего кода в методах
      * Проверяет входной параметр uuid на null
      */
-    protected String checkUuidToNull(String uuid) {
+    private String checkUuidToNull(String uuid) {
         return Objects.requireNonNull(uuid, "Resume.uuid must not be null");
     }
 
@@ -91,7 +92,7 @@ public abstract class AbstractArrayStorage implements Storage {
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * По заданному индексу хранилища сохраняем резюме
      */
-    protected abstract void saveResumeToArray(Resume resume);
+    protected abstract void saveResumeToArray(Resume resume, int index);
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
