@@ -3,7 +3,7 @@ package ru.topjava.webapp.storage;
 import ru.topjava.webapp.model.Resume;
 
 /**
- * Array based storage for Resumes
+ * Storage for Resumes
  */
 public interface Storage {
 
