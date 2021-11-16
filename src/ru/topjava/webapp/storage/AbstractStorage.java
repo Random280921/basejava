@@ -74,16 +74,10 @@ public abstract class AbstractStorage implements Storage {
         Object searchKey = findKey(checkUuidToNull(uuid));
         try {
             int index = Integer.parseInt(searchKey.toString());
-            if (index < 0 && checkType == -1) {
-                throw new NotExistStorageException(uuid);
-            }
-            if (index >= 0 && checkType == 1) {
-                throw new ExistStorageException(uuid, String.valueOf(index));
-            }
+            if (index < 0 && checkType == -1) throw new NotExistStorageException(uuid);
+            if (index >= 0 && checkType == 1) throw new ExistStorageException(uuid, String.valueOf(index));
         } catch (NumberFormatException n) {
-            if (checkType == 1) {
-                throw new ExistStorageException(uuid, uuid);
-            }
+            if (checkType == 1) throw new ExistStorageException(uuid, uuid);
             return searchKey;
         }
         return (searchKey == "-1") ? uuid : searchKey;
