@@ -5,7 +5,9 @@ import ru.topjava.webapp.exception.NotExistStorageException;
 import ru.topjava.webapp.model.Resume;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public abstract class AbstractStorage implements Storage {
 
@@ -25,6 +27,11 @@ public abstract class AbstractStorage implements Storage {
 
     public final void delete(String uuid) {
         deleteResume(getKey(uuid, -1));
+    }
+
+    public final List<Resume> getAllSorted() {
+        List<Resume> list = convertStorage();
+        return list.stream().sorted(RESUME_COMPARATOR).collect(Collectors.toList());
     }
 
     /**
@@ -65,6 +72,12 @@ public abstract class AbstractStorage implements Storage {
      * По заданному ключу хранилища удаляем резюме и меняем размер хранилища (если требуется)
      */
     protected abstract void deleteResume(Object searchKey);
+
+    /**
+     * Вспомогательный метод, чтобы убрать дублирование кода в методах
+     * Конвертирует storage в List
+     */
+    protected abstract List<Resume> convertStorage();
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах

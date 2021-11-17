@@ -2,15 +2,15 @@ package ru.topjava.webapp.storage;
 
 import ru.topjava.webapp.model.Resume;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Map based storage for Resumes
  */
-public abstract class MapStorage extends AbstractStorage {
+public abstract class AbstractMapStorage extends AbstractStorage {
 
     protected final Map<String, Resume> storage = new HashMap<>();
 
@@ -47,7 +47,7 @@ public abstract class MapStorage extends AbstractStorage {
      * @return array, contains only Resumes in storage (without null)
      */
     @Override
-    public final List<Resume> getAllSorted() {
-        return storage.values().stream().sorted(RESUME_COMPARATOR).collect(Collectors.toList());
+    public final List<Resume> convertStorage() {
+        return new ArrayList<>(storage.values());
     }
 }

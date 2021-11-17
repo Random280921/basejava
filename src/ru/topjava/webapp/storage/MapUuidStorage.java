@@ -5,7 +5,7 @@ import ru.topjava.webapp.model.Resume;
 /**
  * Map based storage for Resumes
  */
-public class MapUuidStorage extends MapStorage {
+public class MapUuidStorage extends AbstractMapStorage {
 
     @Override
     protected Object findKey(String uuid) {
