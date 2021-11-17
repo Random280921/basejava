@@ -3,10 +3,8 @@ package ru.topjava.webapp.storage;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import ru.topjava.webapp.exception.ExistStorageException;
 import ru.topjava.webapp.exception.NotExistStorageException;
-import ru.topjava.webapp.exception.StorageException;
 import ru.topjava.webapp.model.Resume;
 
 import java.util.ArrayList;
@@ -89,19 +87,6 @@ public abstract class AbstractStorageTest {
     @Test(expected = ExistStorageException.class)
     public void saveExist() {
         storage.save(RESUME_1);
-    }
-
-    @Test(expected = StorageException.class)
-    @Category(ArrayTest.class)
-    public void saveOverFlow() {
-        try {
-            for (int i = storage.size() + 1; i <= AbstractArrayStorage.STORAGE_LIMIT; i++) {
-                storage.save(new Resume(String.format("uuid%d", i)));
-            }
-        } catch (StorageException e) {
-            Assert.fail("Переполнение произошло до нужной проверки");
-        }
-        storage.save(new Resume(String.format("uuid%d", AbstractArrayStorage.STORAGE_LIMIT + 1)));
     }
 
     @Test
