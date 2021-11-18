@@ -126,7 +126,7 @@ public abstract class AbstractStorageTest {
     @Test
     public void getAllSorted() {
         final List<Resume> expectedResume = new ArrayList<>(Arrays.asList(RESUME_1, RESUME_2, RESUME_3));
-        final List<Resume> actualResumes = storage.getAllSorted();
+        final List<Resume> actualResumes = storage.convertToList();
 
         actualResumes.sort(RESUME_COMPARATOR);
         expectedResume.sort(RESUME_COMPARATOR);

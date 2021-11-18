@@ -75,7 +75,7 @@ public class MainAutoTestSortedArray {
     }
 
     static void printAll() {
-        List<Resume> all = ARRAY_STORAGE.getAllSorted();
+        List<Resume> all = ARRAY_STORAGE.convertToList();
         System.out.println("----------------------------");
         if (all.size() == 0) {
             System.out.println("Empty");

@@ -29,7 +29,7 @@ public abstract class AbstractStorage implements Storage {
         deleteResume(getKey(uuid, -1));
     }
 
-    public final List<Resume> getAllSorted() {
+    public final List<Resume> convertToList() {
         List<Resume> list = convertStorage();
         return list.stream().sorted(RESUME_COMPARATOR).collect(Collectors.toList());
     }
