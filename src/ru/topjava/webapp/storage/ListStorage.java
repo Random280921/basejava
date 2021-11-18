@@ -1,9 +1,11 @@
 package ru.topjava.webapp.storage;
 
 import ru.topjava.webapp.model.Resume;
-import ru.topjava.webapp.model.SearchKey;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Objects;
 
 /**
  * List based storage for Resumes
@@ -18,8 +20,8 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getResume(SearchKey searchKey) {
-        return storage.get(searchKey.getIndex());
+    protected Resume getResume(Object searchKey) {
+        return storage.get((Integer) searchKey);
     }
 
     @Override
@@ -28,7 +30,7 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected int findIndex(String uuid) {
+    protected Object findKey(String uuid) {
         ListIterator<Resume> iterator = storage.listIterator();
         while (iterator.hasNext()) {
             Resume r = iterator.next();
@@ -40,25 +42,25 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected void saveResume(Resume resume, SearchKey searchKey) {
+    protected void saveResume(Resume resume, Object searchKey) {
         storage.add(resume);
     }
 
     @Override
-    protected void deleteResume(SearchKey searchKey) {
-        storage.remove(searchKey.getIndex());
+    protected void deleteResume(Object searchKey) {
+        storage.remove(storage.get((Integer) searchKey));
     }
 
     @Override
-    public final void updateResume(Resume resume, SearchKey searchKey) {
-        storage.set(searchKey.getIndex(), resume);
+    public final void updateResume(Resume resume, Object searchKey) {
+        storage.set((Integer) searchKey, resume);
     }
 
     /**
-     * @return array, contains only Resumes in storage (without null)
+     * @return sorted list, contains only Resumes in storage (without null)
      */
     @Override
-    public final Resume[] getAll() {
-        return storage.toArray(new Resume[0]);
+    public final List<Resume> convertStorage() {
+        return storage;
     }
 }

@@ -3,10 +3,15 @@ package ru.topjava.webapp.storage;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import ru.topjava.webapp.exception.*;
+import ru.topjava.webapp.exception.ExistStorageException;
+import ru.topjava.webapp.exception.NotExistStorageException;
 import ru.topjava.webapp.model.Resume;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
+import static ru.topjava.webapp.storage.AbstractStorage.RESUME_COMPARATOR;
 
 public abstract class AbstractStorageTest {
 
@@ -23,10 +28,10 @@ public abstract class AbstractStorageTest {
     private static final Resume RESUME_4;
 
     static {
-        RESUME_1 = new Resume(UUID_1);
-        RESUME_2 = new Resume(UUID_2);
-        RESUME_3 = new Resume(UUID_3);
-        RESUME_4 = new Resume(UUID_4);
+        RESUME_1 = new Resume(UUID_1,"Пётр Петров");
+        RESUME_2 = new Resume(UUID_2,"Иван Иванов");
+        RESUME_3 = new Resume(UUID_3,"Николай Николаев");
+        RESUME_4 = new Resume(UUID_4,"Армен Арменов");
     }
 
     protected AbstractStorageTest(Storage storage) {
@@ -84,21 +89,9 @@ public abstract class AbstractStorageTest {
         storage.save(RESUME_1);
     }
 
-    @Test(expected = StorageException.class)
-    public void saveOverFlow() {
-        try {
-            for (int i = storage.size() + 1; i <= AbstractArrayStorage.STORAGE_LIMIT; i++) {
-                storage.save(new Resume(String.format("uuid%d", i)));
-            }
-        } catch (StorageException e) {
-            Assert.fail("Переполнение произошло до нужной проверки");
-        }
-        storage.save(new Resume(String.format("uuid%d", AbstractArrayStorage.STORAGE_LIMIT + 1)));
-    }
-
     @Test
     public void update() {
-        Resume resumeUpd = new Resume(UUID_2);
+        Resume resumeUpd = RESUME_2;
         storage.update(resumeUpd);
         assertGet(resumeUpd);
     }
@@ -131,12 +124,13 @@ public abstract class AbstractStorageTest {
     }
 
     @Test
-    public void getAll() {
-        final Resume[] expectedResume = {RESUME_1, RESUME_2, RESUME_3};
-        Resume[] actualResumes = storage.getAll();
-        Arrays.sort(actualResumes);
-        Arrays.sort(expectedResume);
-        Assert.assertArrayEquals(expectedResume, actualResumes);
+    public void getAllSorted() {
+        final List<Resume> expectedResume = new ArrayList<>(Arrays.asList(RESUME_1, RESUME_2, RESUME_3));
+        final List<Resume> actualResumes = storage.convertToList();
+
+        actualResumes.sort(RESUME_COMPARATOR);
+        expectedResume.sort(RESUME_COMPARATOR);
+        Assert.assertEquals(expectedResume, actualResumes);
     }
 
     private void assertGet(Resume resume) {
