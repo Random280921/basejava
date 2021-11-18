@@ -60,7 +60,7 @@ public class ListStorage extends AbstractStorage {
      * @return sorted list, contains only Resumes in storage (without null)
      */
     @Override
-    public final List<Resume> convertStorage() {
+    public final List<Resume> convertToList() {
         return storage;
     }
 }

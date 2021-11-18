@@ -4,14 +4,10 @@ import ru.topjava.webapp.exception.ExistStorageException;
 import ru.topjava.webapp.exception.NotExistStorageException;
 import ru.topjava.webapp.model.Resume;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public abstract class AbstractStorage implements Storage {
-
-    protected static Comparator<Resume> RESUME_COMPARATOR = Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid);
 
     public final Resume get(String uuid) {
         return getResume(getKey(uuid, -1));
@@ -29,9 +25,10 @@ public abstract class AbstractStorage implements Storage {
         deleteResume(getKey(uuid, -1));
     }
 
-    public final List<Resume> convertToList() {
-        List<Resume> list = convertStorage();
-        return list.stream().sorted(RESUME_COMPARATOR).collect(Collectors.toList());
+    public final List<Resume> getAllSorted() {
+        List<Resume> list = convertToList();
+        list.sort(Resume::compareTo);
+        return list;
     }
 
     /**
@@ -77,7 +74,7 @@ public abstract class AbstractStorage implements Storage {
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * Конвертирует storage в List
      */
-    protected abstract List<Resume> convertStorage();
+    protected abstract List<Resume> convertToList();
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах

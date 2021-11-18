@@ -55,7 +55,7 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
      * @return array, contains only Resumes in storage (without null)
      */
     @Override
-    public final List<Resume> convertStorage() {
+    public final List<Resume> convertToList() {
         return Arrays.asList(Arrays.copyOfRange(storage, 0, size));
     }
 

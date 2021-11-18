@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static ru.topjava.webapp.storage.AbstractStorage.RESUME_COMPARATOR;
-
 public abstract class AbstractStorageTest {
 
     protected final Storage storage;
@@ -28,10 +26,10 @@ public abstract class AbstractStorageTest {
     private static final Resume RESUME_4;
 
     static {
-        RESUME_1 = new Resume(UUID_1,"Пётр Петров");
-        RESUME_2 = new Resume(UUID_2,"Иван Иванов");
-        RESUME_3 = new Resume(UUID_3,"Николай Николаев");
-        RESUME_4 = new Resume(UUID_4,"Армен Арменов");
+        RESUME_1 = new Resume(UUID_1, "Пётр Петров");
+        RESUME_2 = new Resume(UUID_2, "Иван Иванов");
+        RESUME_3 = new Resume(UUID_3, "Николай Николаев");
+        RESUME_4 = new Resume(UUID_4, "Армен Арменов");
     }
 
     protected AbstractStorageTest(Storage storage) {
@@ -126,10 +124,9 @@ public abstract class AbstractStorageTest {
     @Test
     public void getAllSorted() {
         final List<Resume> expectedResume = new ArrayList<>(Arrays.asList(RESUME_1, RESUME_2, RESUME_3));
-        final List<Resume> actualResumes = storage.convertToList();
+        final List<Resume> actualResumes = storage.getAllSorted();
 
-        actualResumes.sort(RESUME_COMPARATOR);
-        expectedResume.sort(RESUME_COMPARATOR);
+        expectedResume.sort(Resume::compareTo);
         Assert.assertEquals(expectedResume, actualResumes);
     }
 

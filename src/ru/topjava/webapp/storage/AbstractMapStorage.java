@@ -47,7 +47,7 @@ public abstract class AbstractMapStorage extends AbstractStorage {
      * @return array, contains only Resumes in storage (without null)
      */
     @Override
-    public final List<Resume> convertStorage() {
+    public final List<Resume> convertToList() {
         return new ArrayList<>(storage.values());
     }
 }
