@@ -82,13 +82,8 @@ public abstract class AbstractStorage<SK> implements Storage {
      */
     private SK getKey(String uuid, int checkType) {
         SK searchKey = findKey(checkUuidToNull(uuid));
-        if (searchKey == null) {
-            if (checkType == -1)
-                throw new NotExistStorageException(uuid);
-            return null;
-        }
         try {
-            int index = Integer.parseInt(searchKey.toString());
+            int index = (searchKey == null) ? -1 : Integer.parseInt(searchKey.toString());
             if (index < 0 && checkType == -1) throw new NotExistStorageException(uuid);
             if (index >= 0 && checkType == 1) throw new ExistStorageException(uuid, String.valueOf(index));
         } catch (NumberFormatException n) {
