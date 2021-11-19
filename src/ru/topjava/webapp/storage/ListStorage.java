@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * List based storage for Resumes
  */
-public class ListStorage extends AbstractStorage {
+public class ListStorage extends AbstractStorage<Integer> {
 
     private final List<Resume> storage = new ArrayList<>();
 
@@ -20,8 +20,8 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getResume(Object searchKey) {
-        return storage.get((Integer) searchKey);
+    protected Resume getResume(Integer searchKey) {
+        return storage.get(searchKey);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected Object findKey(String uuid) {
+    protected Integer findKey(String uuid) {
         ListIterator<Resume> iterator = storage.listIterator();
         while (iterator.hasNext()) {
             Resume r = iterator.next();
@@ -42,18 +42,18 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected void saveResume(Resume resume, Object searchKey) {
+    protected void saveResume(Resume resume, Integer searchKey) {
         storage.add(resume);
     }
 
     @Override
-    protected void deleteResume(Object searchKey) {
-        storage.remove(storage.get((Integer) searchKey));
+    protected void deleteResume(Integer searchKey) {
+        storage.remove(storage.get(searchKey));
     }
 
     @Override
-    public final void updateResume(Resume resume, Object searchKey) {
-        storage.set((Integer) searchKey, resume);
+    public final void updateResume(Resume resume, Integer searchKey) {
+        storage.set(searchKey, resume);
     }
 
     /**

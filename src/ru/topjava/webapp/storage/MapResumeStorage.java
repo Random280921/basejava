@@ -5,20 +5,20 @@ import ru.topjava.webapp.model.Resume;
 /**
  * Map based storage for Resumes
  */
-public class MapResumeStorage extends AbstractMapStorage {
+public class MapResumeStorage extends AbstractMapStorage<Resume> {
 
     @Override
-    protected Object findKey(String uuid) {
-        return storage.containsKey(uuid) ? storage.get(uuid) : -1;
+    protected Resume findKey(String uuid) {
+        return storage.get(uuid);
     }
 
     @Override
-    protected Resume getResume(Object searchKey) {
-        return storage.get(((Resume) searchKey).getUuid());
+    protected Resume getResume(Resume searchKey) {
+        return storage.get(searchKey.getUuid());
     }
 
     @Override
-    protected void deleteResume(Object searchKey) {
-        storage.remove(((Resume) searchKey).getUuid());
+    protected void deleteResume(Resume searchKey) {
+        storage.remove(searchKey.getUuid());
     }
 }
