@@ -16,6 +16,7 @@ public abstract class AbstractArrayStorage extends AbstractStorage<Integer> {
 
     @Override
     public int size() {
+        LOG.info("size");
         return size;
     }
 
@@ -26,6 +27,7 @@ public abstract class AbstractArrayStorage extends AbstractStorage<Integer> {
 
     @Override
     public final void clear() {
+        LOG.info("clear");
         Arrays.fill(storage, 0, size, null);
         size = 0;
     }
@@ -33,7 +35,9 @@ public abstract class AbstractArrayStorage extends AbstractStorage<Integer> {
     @Override
     protected void saveResume(Resume resume, Integer searchKey) {
         if (size >= STORAGE_LIMIT) {
-            throw new StorageException("Хранилище уже заполнено - резюме невозможно сохранить!", resume.getUuid());
+            String message = "Хранилище уже заполнено - резюме невозможно сохранить!";
+            LOG.severe(message);
+            throw new StorageException(message, resume.getUuid());
         }
         saveResumeToStorage(resume, searchKey);
         size++;

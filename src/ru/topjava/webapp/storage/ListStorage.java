@@ -16,6 +16,7 @@ public class ListStorage extends AbstractStorage<Integer> {
 
     @Override
     public int size() {
+        LOG.info("size");
         return storage.size();
     }
 
@@ -26,6 +27,7 @@ public class ListStorage extends AbstractStorage<Integer> {
 
     @Override
     public final void clear() {
+        LOG.info("clear");
         storage.clear();
     }
 

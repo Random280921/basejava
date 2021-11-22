@@ -16,6 +16,7 @@ public abstract class AbstractMapStorage<SK> extends AbstractStorage<SK> {
 
     @Override
     public int size() {
+        LOG.info("size");
         return storage.size();
     }
 
@@ -24,6 +25,7 @@ public abstract class AbstractMapStorage<SK> extends AbstractStorage<SK> {
 
     @Override
     public final void clear() {
+        LOG.info("clear");
         storage.clear();
     }
 
