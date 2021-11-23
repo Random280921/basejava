@@ -43,7 +43,10 @@ public abstract class AbstractStorage<SK> implements Storage {
      * Проверяет входной параметр на null и логирует
      */
     private void logCheckToNull(String operation, Object object, String objectName) {
-        LOG.info(operation + " " + ((object == null) ? "null" : object.toString()));
+        LOG.info(operation + " " + ((object == null) ? "null"
+                : ((object instanceof Resume) ?
+                "Resume: uuid= " + ((Resume) object).getUuid()
+                : "uuid= " + object)));
         if (object == null) {
             LOG.severe(objectName + " is not be null!");
             throw new NullPointerException();
