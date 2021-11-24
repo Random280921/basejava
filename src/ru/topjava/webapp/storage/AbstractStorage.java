@@ -54,6 +54,15 @@ public abstract class AbstractStorage<SK> implements Storage {
     }
 
     /**
+     * Вспомогательный метод, для сокращения общего кода в методах
+     * Проверяет на существование в хранилище и логирует
+     */
+    private void logCheckToExist(String uuid, String key) {
+        LOG.severe(String.format("Такое резюме %s уже есть: Key storage= %s\n", uuid, key));
+        throw new ExistStorageException(uuid, key);
+    }
+
+    /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * Возвращает резюме по ключу
      */
@@ -103,13 +112,11 @@ public abstract class AbstractStorage<SK> implements Storage {
                 throw new NotExistStorageException(uuid);
             }
             if (index >= 0 && checkType == 1) {
-                LOG.severe(String.format("Такое резюме %s уже есть: Key storage= %s\n", uuid, index));
-                throw new ExistStorageException(uuid, String.valueOf(index));
+                logCheckToExist(uuid, String.valueOf(index));
             }
         } catch (NumberFormatException n) {
             if (checkType == 1) {
-                LOG.severe(String.format("Такое резюме %s уже есть: Key storage= %s\n", uuid, uuid));
-                throw new ExistStorageException(uuid, uuid);
+                logCheckToExist(uuid, uuid);
             }
         }
         return searchKey;
