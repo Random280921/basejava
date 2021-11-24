@@ -111,13 +111,9 @@ public abstract class AbstractStorage<SK> implements Storage {
                 LOG.severe(String.format("Такого резюме (uuid = %s) в хранилище нет!\n", uuid));
                 throw new NotExistStorageException(uuid);
             }
-            if (index >= 0 && checkType == 1) {
-                logCheckToExist(uuid, String.valueOf(index));
-            }
+            if (index >= 0 && checkType == 1) logCheckToExist(uuid, String.valueOf(index));
         } catch (NumberFormatException n) {
-            if (checkType == 1) {
-                logCheckToExist(uuid, uuid);
-            }
+            if (checkType == 1) logCheckToExist(uuid, uuid);
         }
         return searchKey;
     }
