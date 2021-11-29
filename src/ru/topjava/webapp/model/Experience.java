@@ -47,6 +47,6 @@ public class Experience implements Comparable<Experience> {
 
     @Override
     public int compareTo(Experience o) {
-        return dateFrom.compareTo(o.dateFrom);
+        return o.dateFrom.compareTo(dateFrom);
     }
 }
