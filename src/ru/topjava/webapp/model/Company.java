@@ -1,12 +1,13 @@
 package ru.topjava.webapp.model;
 
 import java.time.LocalDate;
-import java.util.Objects;
 import java.util.TreeSet;
+
+import static java.util.Objects.requireNonNull;
 
 public class Company implements Comparable<Company> {
     private final Contact companyName;
-    private final TreeSet<Experience> experienceSet = new TreeSet<>();
+    private TreeSet<Experience> experienceSet = new TreeSet<>();
 
     public Company(String value, String url) {
         this.companyName = new Contact(value, url);
@@ -14,6 +15,12 @@ public class Company implements Comparable<Company> {
 
     public Company(String value) {
         this(value, null);
+    }
+
+    public Company(Contact companyName,
+                   TreeSet<Experience> experienceSet) {
+        this.companyName = companyName;
+        this.experienceSet = experienceSet;
     }
 
     public Contact getCompanyName() {
@@ -30,7 +37,7 @@ public class Company implements Comparable<Company> {
 
     public void addExperience(LocalDate dateFrom, LocalDate dateTo, String positionTitle, String positionText) {
         if (!experienceSet.isEmpty() && experienceSet.first().getDateTo() == null)
-            Objects.requireNonNull(dateTo, "The null Experience.dateTo field allready exist");
+            requireNonNull(dateTo, "The null Experience.dateTo field allready exist");
         experienceSet.add(new Experience(dateFrom, dateTo, positionTitle, positionText));
     }
 

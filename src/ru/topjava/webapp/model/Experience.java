@@ -2,10 +2,10 @@ package ru.topjava.webapp.model;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 public class Experience implements Comparable<Experience> {
-
 
     private final LocalDate dateFrom;
     private final LocalDate dateTo;
@@ -15,9 +15,9 @@ public class Experience implements Comparable<Experience> {
     private final DateTimeFormatter PATTERN_DATE = DateTimeFormatter.ofPattern("MM/yyyy");
 
     public Experience(LocalDate dateFrom, LocalDate dateTo, String positionTitle, String positionText) {
-        Objects.requireNonNull(dateFrom, "Experience.dateFrom must not be null");
-        Objects.requireNonNull(positionTitle, "Experience.positionTitle must not be null");
-        Objects.requireNonNull(positionText, "Experience.positionText must not be null");
+        requireNonNull(dateFrom, "Experience.dateFrom must not be null");
+        requireNonNull(positionTitle, "Experience.positionTitle must not be null");
+        requireNonNull(positionText, "Experience.positionText must not be null");
         this.dateFrom = dateFrom;
         this.dateTo = dateTo;
         this.positionTitle = positionTitle;

@@ -1,6 +1,6 @@
 package ru.topjava.webapp.model;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 public class Contact {
     private final String value;
@@ -8,7 +8,7 @@ public class Contact {
     private String url;
 
     public Contact(String value, String url) {
-        Objects.requireNonNull(value, "Contact.value must not be null");
+        requireNonNull(value, "Contact.value must not be null");
         this.value = value;
         this.url = url;
     }
