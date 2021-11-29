@@ -28,6 +28,10 @@ public class Experience implements Comparable<Experience> {
         return dateFrom;
     }
 
+    public LocalDate getDateTo() {
+        return dateTo;
+    }
+
     public String getPositionTitle() {
         return positionTitle;
     }
@@ -44,7 +48,7 @@ public class Experience implements Comparable<Experience> {
 
     @Override
     public String toString() {
-        return String.format("%s\n%s\n%s",
+        return String.format("%s\n%s\n%s\n",
                 getPeriod(),
                 positionTitle,
                 positionText);
