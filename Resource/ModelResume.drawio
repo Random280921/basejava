@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2021-11-29T07:17:47.897Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36" etag="IBSn1Q2-UDaof0xzkrwp" version="15.8.6" type="github">
+<mxfile host="app.diagrams.net" modified="2021-11-29T07:26:54.423Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36" etag="t5YimkTKg6Sh_Vnsjyzc" version="15.8.6" type="github">
   <diagram id="C5RBs43oDa-KdzZeNtuy" name="ModelResume">
     <mxGraphModel dx="964" dy="587" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="none" math="0" shadow="0">
       <root>
@@ -18,7 +18,7 @@
         <mxCell id="dTCALStiIMGlmmFK-H2M-12" value="- header: Map&lt;ContactType, Contact&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="dTCALStiIMGlmmFK-H2M-1" vertex="1">
           <mxGeometry y="76" width="335" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="dTCALStiIMGlmmFK-H2M-11" value="- body: Map&lt;SectionType, Section&lt;POS&gt;&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="dTCALStiIMGlmmFK-H2M-1" vertex="1">
+        <mxCell id="dTCALStiIMGlmmFK-H2M-11" value="- body: Map&lt;SectionType, AbstractSection&lt;POS&gt;&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="dTCALStiIMGlmmFK-H2M-1" vertex="1">
           <mxGeometry y="102" width="335" height="26" as="geometry" />
         </mxCell>
         <mxCell id="dTCALStiIMGlmmFK-H2M-3" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" parent="dTCALStiIMGlmmFK-H2M-1" vertex="1">
@@ -103,8 +103,8 @@
             <mxPoint x="640" y="358" as="targetPoint" />
             <Array as="points">
               <mxPoint x="730" y="191" />
-              <mxPoint x="730" y="340" />
-              <mxPoint x="538" y="340" />
+              <mxPoint x="730" y="350" />
+              <mxPoint x="538" y="350" />
             </Array>
           </mxGeometry>
         </mxCell>
@@ -145,7 +145,7 @@
           <mxGeometry y="60" width="161" height="26" as="geometry" />
         </mxCell>
         <mxCell id="dTCALStiIMGlmmFK-H2M-96" value="&lt;i&gt;AbstractSection&amp;lt;POS&amp;gt;&lt;/i&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;strokeColor=default;html=1;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
-          <mxGeometry x="417.5" y="370" width="230" height="112" as="geometry" />
+          <mxGeometry x="417.5" y="392" width="230" height="112" as="geometry" />
         </mxCell>
         <mxCell id="dTCALStiIMGlmmFK-H2M-97" value="# blockPosition: String" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;html=1;" parent="dTCALStiIMGlmmFK-H2M-96" vertex="1">
           <mxGeometry y="26" width="230" height="26" as="geometry" />
