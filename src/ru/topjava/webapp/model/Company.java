@@ -45,9 +45,10 @@ public class Company implements Comparable<Company> {
 
     @Override
     public String toString() {
+        String url = companyName.getUrl();
         StringBuilder companyDescription = new StringBuilder(String.format("%s (%s)\n",
                 companyName.getValue(),
-                companyName.getUrl()));
+                (url == null) ? "url not exist" : url));
         for (Experience experience : experienceSet) {
             companyDescription.append(experience.toString());
         }
