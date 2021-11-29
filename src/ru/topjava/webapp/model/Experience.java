@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Experience implements Comparable<Experience> {
+
+
     private final LocalDate dateFrom;
     private final LocalDate dateTo;
     private final String positionTitle;
@@ -20,6 +22,10 @@ public class Experience implements Comparable<Experience> {
         this.dateTo = dateTo;
         this.positionTitle = positionTitle;
         this.positionText = positionText;
+    }
+
+    public LocalDate getDateFrom() {
+        return dateFrom;
     }
 
     public String getPositionTitle() {
@@ -38,13 +44,15 @@ public class Experience implements Comparable<Experience> {
 
     @Override
     public String toString() {
-        return String.format("%s - %s\n%s\n%s",
-                dateFrom.format(PATTERN_DATE),
-                (dateTo == null) ? "Сейчас" : dateTo.format(PATTERN_DATE),
+        return String.format("%s\n%s\n%s",
+                getPeriod(),
                 positionTitle,
                 positionText);
     }
 
+    /**
+     * Sorted: last date experience to first
+     */
     @Override
     public int compareTo(Experience o) {
         return o.dateFrom.compareTo(dateFrom);
