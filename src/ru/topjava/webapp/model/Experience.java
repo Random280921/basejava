@@ -13,9 +13,9 @@ public class Experience implements Comparable<Experience> {
     private final DateTimeFormatter PATTERN_DATE = DateTimeFormatter.ofPattern("MM/yyyy");
 
     public Experience(LocalDate dateFrom, LocalDate dateTo, String positionTitle, String positionText) {
-        Objects.requireNonNull(dateFrom, "dateFrom must not be null");
-        Objects.requireNonNull(positionTitle, "positionTitle must not be null");
-        Objects.requireNonNull(positionText, "positionText must not be null");
+        Objects.requireNonNull(dateFrom, "Experience.dateFrom must not be null");
+        Objects.requireNonNull(positionTitle, "Experience.positionTitle must not be null");
+        Objects.requireNonNull(positionText, "Experience.positionText must not be null");
         this.dateFrom = dateFrom;
         this.dateTo = dateTo;
         this.positionTitle = positionTitle;
