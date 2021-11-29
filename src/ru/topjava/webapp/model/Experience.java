@@ -17,7 +17,6 @@ public class Experience implements Comparable<Experience> {
     public Experience(LocalDate dateFrom, LocalDate dateTo, String positionTitle, String positionText) {
         requireNonNull(dateFrom, "Experience.dateFrom must not be null");
         requireNonNull(positionTitle, "Experience.positionTitle must not be null");
-        requireNonNull(positionText, "Experience.positionText must not be null");
         this.dateFrom = dateFrom;
         this.dateTo = dateTo;
         this.positionTitle = positionTitle;
@@ -37,7 +36,7 @@ public class Experience implements Comparable<Experience> {
     }
 
     public String getPositionText() {
-        return positionText;
+        return (positionText == null) ? "" : positionText;
     }
 
     public String getPeriod() {
@@ -50,8 +49,8 @@ public class Experience implements Comparable<Experience> {
     public String toString() {
         return String.format("%s\n%s\n%s\n",
                 getPeriod(),
-                positionTitle,
-                positionText);
+                getPositionTitle(),
+                getPositionText());
     }
 
     /**
