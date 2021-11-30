@@ -7,6 +7,10 @@ public class Contact {
 
     private String url;
 
+    public Contact(String value) {
+        this(value, null);
+    }
+
     public Contact(String value, String url) {
         requireNonNull(value, "Contact.value must not be null");
         this.value = value;

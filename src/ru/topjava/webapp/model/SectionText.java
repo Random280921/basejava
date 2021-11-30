@@ -3,9 +3,9 @@ package ru.topjava.webapp.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class SectionText implements Section {
+public class SectionText extends AbstractSection<String> {
     private String blockPosition;
-    private final List<String> listPosition = new ArrayList<>();
+    protected List<String> listPosition = new ArrayList<>();
 
     public void addBlockPosition(String blockPosition) {
         this.blockPosition = blockPosition;
@@ -15,11 +15,11 @@ public abstract class SectionText implements Section {
         return blockPosition;
     }
 
-    protected void addListPosition(String position) {
+    public void addListPosition(String position) {
         listPosition.add(position);
     }
 
-    protected List<String> getListPosition() {
+    public List<String> getListPosition() {
         return listPosition;
     }
 }
