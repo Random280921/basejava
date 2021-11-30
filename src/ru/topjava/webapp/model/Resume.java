@@ -78,9 +78,7 @@ public class Resume implements Comparable<Resume> {
             type = ContactType.NETWORK_DEFAULT;
         if (!header.containsKey(8) && o == 9)
             type = ContactType.NETWORK_ADD1;
-        if (o < 3 &&
-                (num.replaceAll("[0-9]+", "").length() > 0
-                        || num.replaceAll("[^0-9]+", "").length() < 10))
+        if (o < 3 && num.replaceAll("[^0-9]+", "").length() < 10)
             throw new PhoneNumberException(contact.getValue());
         header.put(type.ordinal(), contact);
     }

@@ -36,13 +36,17 @@ public class Company implements Comparable<Company> {
     }
 
     public void addExperience(LocalDate dateFrom, LocalDate dateTo, String positionTitle, String positionText) {
-        if (!experienceSet.isEmpty() && experienceSet.first().getDateTo() == null)
+        if (!getExperienceSet().isEmpty() && getExperienceSet().first().getDateTo() == null)
             requireNonNull(dateTo, "The null Experience.dateTo field allready exist");
-        experienceSet.add(new Experience(dateFrom, dateTo, positionTitle, positionText));
+        getExperienceSet().add(new Experience(dateFrom, dateTo, positionTitle, positionText));
+    }
+
+    public void addExperience(LocalDate dateFrom, LocalDate dateTo, String positionTitle) {
+        addExperience(dateFrom, dateTo, positionTitle, null);
     }
 
     public void removeExperience(LocalDate fistDate) {
-        experienceSet.removeIf(experience -> experience.getDateFrom().equals(fistDate));
+        getExperienceSet().removeIf(experience -> experience.getDateFrom().equals(fistDate));
     }
 
     /**
@@ -50,9 +54,9 @@ public class Company implements Comparable<Company> {
      */
     @Override
     public int compareTo(Company o) {
-        int compareResult = o.experienceSet.first().getDateFrom().compareTo(experienceSet.first().getDateFrom());
-        final LocalDate thisDateTo = experienceSet.first().getDateTo();
-        final LocalDate otherDateTo = o.experienceSet.first().getDateTo();
+        int compareResult = o.getExperienceSet().first().getDateFrom().compareTo(getExperienceSet().first().getDateFrom());
+        final LocalDate thisDateTo = getExperienceSet().first().getDateTo();
+        final LocalDate otherDateTo = o.getExperienceSet().first().getDateTo();
         if (thisDateTo == null && otherDateTo == null) return compareResult;
         if (thisDateTo == null) return -1;
         if (otherDateTo == null) return 1;
@@ -61,14 +65,14 @@ public class Company implements Comparable<Company> {
 
     @Override
     public String toString() {
-        String url = companyName.getUrl();
+        String url = getCompanyName().getUrl();
         StringBuilder companyDescription = new StringBuilder(String.format("%s (%s)\n",
-                companyName.getValue(),
+                getCompanyName().getValue(),
                 (url == null) ? "url not exist" : url));
-        for (Experience experience : experienceSet) {
-            companyDescription.append(experience.toString());
+        for (Experience experience : getExperienceSet()) {
+            companyDescription.append("   ").append(experience.toString());
         }
-        return companyDescription.append("\n").toString();
+        return companyDescription.toString();
     }
 
 

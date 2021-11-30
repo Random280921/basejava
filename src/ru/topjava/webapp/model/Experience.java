@@ -41,16 +41,22 @@ public class Experience implements Comparable<Experience> {
 
     public String getPeriod() {
         return String.format("%s - %s",
-                dateFrom.format(PATTERN_DATE),
-                (dateTo == null) ? "Сейчас" : dateTo.format(PATTERN_DATE));
+                getDateFrom().format(PATTERN_DATE),
+                (getDateTo() == null) ? "Сейчас" : getDateTo().format(PATTERN_DATE));
     }
 
     @Override
     public String toString() {
-        return String.format("%s\n%s\n%s\n",
-                getPeriod(),
-                getPositionTitle(),
-                getPositionText());
+        return ("".equals(getPositionText()))
+                ?
+                String.format("%s    %s\n",
+                        getPeriod(),
+                        getPositionTitle())
+                :
+                String.format("%s    %s\n                      %s\n",
+                        getPeriod(),
+                        getPositionTitle(),
+                        getPositionText());
     }
 
     /**
@@ -58,6 +64,6 @@ public class Experience implements Comparable<Experience> {
      */
     @Override
     public int compareTo(Experience o) {
-        return o.dateFrom.compareTo(dateFrom);
+        return o.getDateFrom().compareTo(getDateFrom());
     }
 }
