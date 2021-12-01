@@ -1,7 +1,5 @@
 package ru.topjava.webapp.model;
 
-import ru.topjava.webapp.exception.PhoneNumberException;
-
 import java.util.*;
 
 /**
@@ -12,17 +10,15 @@ public class Resume implements Comparable<Resume> {
     private final String uuid;
     private final String fullName;
 
-    private final Map<Integer, Contact> header = new TreeMap<>();
-    private final Map<Integer, Section> body = new TreeMap<>();
+    private final Map<ContactType, Contact> header = new EnumMap<>(ContactType.class);
+    private final Map<SectionType, Section> body = new EnumMap<>(SectionType.class);
 
     {
-        int o;
         Section s;
         for (SectionType bodyType :
                 SectionType.values()) {
-            o = bodyType.ordinal();
-            s = (o < 4) ? new SectionText() : new SectionCompany();
-            body.put(o, s);
+            s = (bodyType.ordinal() < 4) ? new SectionText() : new SectionCompany();
+            body.put(bodyType, s);
         }
     }
 
@@ -45,54 +41,16 @@ public class Resume implements Comparable<Resume> {
         return fullName;
     }
 
-    public Map<Integer, Contact> getHeader() {
+    public Map<ContactType, Contact> getHeader() {
         return header;
     }
 
-    public String getBodyText(int sectionOrdinal) {
-        return ((SectionText) body.get(sectionOrdinal)).getBlockPosition();
-    }
-
-    public List<String> getListText(int sectionOrdinal) {
-        return ((SectionText) body.get(sectionOrdinal)).getListPosition();
-    }
-
-    public List<Company> getListCompany(int sectionOrdinal) {
-        List<Company> willBeenSorted = ((SectionCompany) body.get(sectionOrdinal)).getListPosition();
-        willBeenSorted.sort(Company::compareTo);
-        return willBeenSorted;
+    public Map<SectionType, Section> getBody() {
+        return body;
     }
 
     public void addContact(ContactType type, Contact contact) {
-        final int o = type.ordinal();
-        final String num = contact.getValue();
-        if (!header.containsKey(0) && (o == 1 || o == 2))
-            type = ContactType.PHONE_DEFAULT;
-        if (!header.containsKey(1) && o == 2)
-            type = ContactType.PHONE_ADD1;
-        if (!header.containsKey(3) && (o == 4 || o == 5))
-            type = ContactType.MESSENGER_DEFAULT;
-        if (!header.containsKey(4) && o == 5)
-            type = ContactType.MESSENGER_ADD1;
-        if (!header.containsKey(7) && (o == 8 || o == 9))
-            type = ContactType.NETWORK_DEFAULT;
-        if (!header.containsKey(8) && o == 9)
-            type = ContactType.NETWORK_ADD1;
-        if (o < 3 && num.replaceAll("[^0-9]+", "").length() < 10)
-            throw new PhoneNumberException(contact.getValue());
-        header.put(type.ordinal(), contact);
-    }
-
-    public void addBodyText(int sectionOrdinal, String blockText) {
-        ((SectionText) body.get(sectionOrdinal)).addBlockPosition(blockText);
-    }
-
-    public void addListText(int sectionOrdinal, String blockText) {
-        ((SectionText) body.get(sectionOrdinal)).getListPosition().add(blockText);
-    }
-
-    public void addListCompany(int sectionOrdinal, Company company) {
-        ((SectionCompany) body.get(sectionOrdinal)).addListPosition(company);
+        header.put(type, contact);
     }
 
     @Override
@@ -100,12 +58,12 @@ public class Resume implements Comparable<Resume> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Resume resume = (Resume) o;
-        return fullName.equals(resume.fullName) && uuid.equals(resume.uuid);
+        return uuid.equals(resume.uuid) && fullName.equals(resume.fullName) && header.equals(resume.header) && body.equals(resume.body);
     }
 
     @Override
     public int hashCode() {
-        return uuid.hashCode() * 31 + fullName.hashCode();
+        return Objects.hash(uuid, fullName, header, body);
     }
 
     @Override

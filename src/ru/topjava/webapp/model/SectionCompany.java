@@ -11,6 +11,7 @@ public class SectionCompany extends AbstractSection<Company> {
     }
 
     public List<Company> getListPosition() {
+        listPosition.sort(Company::compareTo);
         return listPosition;
     }
 }
