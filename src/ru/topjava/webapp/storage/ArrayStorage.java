@@ -8,7 +8,7 @@ import ru.topjava.webapp.model.Resume;
 public class ArrayStorage extends AbstractArrayStorage {
 
     @Override
-    protected Object findKey(String uuid) {
+    protected Integer findKey(String uuid) {
         for (int index = 0; index < size; index++) {
             if (uuid.equals(storage[index].getUuid())) {
                 return index;

@@ -14,12 +14,12 @@ public abstract class AbstractArrayStorageTest extends AbstractStorageTest {
     public void saveOverFlow() {
         try {
             for (int i = storage.size() + 1; i <= AbstractArrayStorage.STORAGE_LIMIT; i++) {
-                storage.save(new Resume(String.format("uuid%d", i)));
+                storage.save(new Resume(String.format("Name%d", i)));
             }
         } catch (StorageException e) {
             Assert.fail("Переполнение произошло до нужной проверки");
         }
-        storage.save(new Resume(String.format("uuid%d", AbstractArrayStorage.STORAGE_LIMIT + 1)));
+        storage.save(new Resume(String.format("Name%d", AbstractArrayStorage.STORAGE_LIMIT + 1)));
     }
 
 }
