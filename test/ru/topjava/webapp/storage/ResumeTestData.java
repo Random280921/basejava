@@ -45,15 +45,13 @@ public class ResumeTestData {
                 printConsole.append("   ").append(((SectionText) element.getValue()).getBlockPosition()).append("\n");
             if (key == 2 || key == 3) {
                 listString = ((SectionText) element.getValue()).getListPosition();
-                for (String text : listString
-                ) {
+                for (String text : listString) {
                     printConsole.append("   * ").append(text).append("\n");
                 }
             }
             if (key > 3) {
                 listCompany = ((SectionCompany) element.getValue()).getListPosition();
-                for (Company company : listCompany
-                ) {
+                for (Company company : listCompany) {
                     printConsole.append("\n   ").append(company.toString());
                 }
             }
