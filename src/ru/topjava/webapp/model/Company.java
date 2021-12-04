@@ -55,7 +55,7 @@ public class Company implements Comparable<Company> {
     }
 
     /**
-     * Sorted: last date in Company to first, dateTo null is first position
+     * Sorted: last date in Company to first, dateTo NOW is first position
      */
     @Override
     public int compareTo(Company o) {
