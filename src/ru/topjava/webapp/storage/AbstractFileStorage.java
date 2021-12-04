@@ -39,8 +39,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     @Override
     protected void saveResume(Resume resume, File file) {
         try {
-            if (file.createNewFile())
-                writeResume(resume, file);
+            if (file.createNewFile()) writeResume(resume, file);
         } catch (IOException e) {
             throw new StorageException("IO error saveResume", file.getName(), e);
         }
@@ -63,15 +62,14 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     protected List<Resume> convertToList() {
-        List<Resume> listResume = new ArrayList<>();
+        List<Resume> listResume = new ArrayList<>(size());
         listFiles = directory.listFiles();
-        if (listFiles != null) {
-            for (File file : listFiles) {
-                try {
-                    listResume.add(readResume(file));
-                } catch (IOException e) {
-                    throw new StorageException(String.format("Do not read Resume from file %s", file.getName()), file.getName());
-                }
+        if (listFiles == null) throw new StorageException("Directory read error", null);
+        for (File file : listFiles) {
+            try {
+                listResume.add(readResume(file));
+            } catch (IOException e) {
+                throw new StorageException(String.format("Do not read Resume from file %s", file.getName()), file.getName());
             }
         }
         return listResume;
@@ -80,12 +78,10 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     @Override
     public void clear() {
         listFiles = directory.listFiles();
-        if (listFiles != null) {
-            for (File file : listFiles) {
-                if (file.isFile()) {
-                    if (!file.delete())
-                        throw new StorageException(String.format("Don't clear directory. File %s don't delete", file.getName()), file.getName());
-                }
+        if (listFiles == null) throw new StorageException("Directory read error", null);
+        for (File file : listFiles) {
+            if (file.isFile()) {
+                deleteResume(file);
             }
         }
     }
@@ -93,7 +89,8 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     @Override
     public int size() {
         listFiles = directory.listFiles();
-        return (listFiles == null) ? 0 : listFiles.length;
+        if (listFiles == null) throw new StorageException("Directory read error", null);
+        return listFiles.length;
     }
 
     /**

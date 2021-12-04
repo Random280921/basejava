@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.TreeSet;
 
 import static java.util.Objects.requireNonNull;
+import static ru.topjava.webapp.util.DateUtil.NOW;
 
 public class Company implements Comparable<Company> {
     private final Contact companyName;
@@ -36,13 +37,17 @@ public class Company implements Comparable<Company> {
     }
 
     public void addExperience(LocalDate dateFrom, LocalDate dateTo, String positionTitle, String positionText) {
-        if (!getExperienceSet().isEmpty() && getExperienceSet().first().getDateTo() == null)
-            requireNonNull(dateTo, "The null Experience.dateTo field allready exist");
+        if (!getExperienceSet().isEmpty() && NOW.equals(getExperienceSet().first().getDateTo()))
+            requireNonNull(dateTo, "The NOW Experience.dateTo field allready exist");
         getExperienceSet().add(new Experience(dateFrom, dateTo, positionTitle, positionText));
     }
 
     public void addExperience(LocalDate dateFrom, LocalDate dateTo, String positionTitle) {
         addExperience(dateFrom, dateTo, positionTitle, null);
+    }
+
+    public void addExperience(LocalDate dateFrom, String positionTitle, String positionText) {
+        addExperience(dateFrom, NOW, positionTitle, positionText);
     }
 
     public void removeExperience(LocalDate fistDate) {
@@ -54,13 +59,9 @@ public class Company implements Comparable<Company> {
      */
     @Override
     public int compareTo(Company o) {
-        int compareResult = o.getExperienceSet().first().getDateFrom().compareTo(getExperienceSet().first().getDateFrom());
-        final LocalDate thisDateTo = getExperienceSet().first().getDateTo();
-        final LocalDate otherDateTo = o.getExperienceSet().first().getDateTo();
-        if (thisDateTo == null && otherDateTo == null) return compareResult;
-        if (thisDateTo == null) return -1;
-        if (otherDateTo == null) return 1;
-        return compareResult;
+        int compareResultFrom = o.getExperienceSet().first().getDateFrom().compareTo(getExperienceSet().first().getDateFrom());
+        int compareResultTo = o.getExperienceSet().first().getDateTo().compareTo(getExperienceSet().first().getDateTo());
+        return (compareResultTo != 0) ? compareResultTo : compareResultFrom;
     }
 
     @Override

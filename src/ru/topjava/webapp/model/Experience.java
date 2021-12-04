@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import static java.util.Objects.requireNonNull;
+import static ru.topjava.webapp.util.DateUtil.NOW;
 
 public class Experience implements Comparable<Experience> {
 
@@ -14,8 +15,9 @@ public class Experience implements Comparable<Experience> {
 
     private final DateTimeFormatter PATTERN_DATE = DateTimeFormatter.ofPattern("MM/yyyy");
 
-    public Experience(LocalDate dateFrom, LocalDate dateTo, String positionTitle, String positionText) {
+    Experience(LocalDate dateFrom, LocalDate dateTo, String positionTitle, String positionText) {
         requireNonNull(dateFrom, "Experience.dateFrom must not be null");
+        requireNonNull(dateTo, "Experience.dateTo must not be null");
         requireNonNull(positionTitle, "Experience.positionTitle must not be null");
         this.dateFrom = dateFrom;
         this.dateTo = dateTo;
@@ -42,7 +44,7 @@ public class Experience implements Comparable<Experience> {
     public String getPeriod() {
         return String.format("%s - %s",
                 getDateFrom().format(PATTERN_DATE),
-                (getDateTo() == null) ? "Сейчас" : getDateTo().format(PATTERN_DATE));
+                (NOW.equals(getDateTo())) ? "Сейчас" : getDateTo().format(PATTERN_DATE));
     }
 
     @Override
