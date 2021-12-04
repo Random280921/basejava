@@ -43,9 +43,8 @@ public class MainFile {
 
     public static void recursiveSearch(String pathname) throws IOException {
         File file = new File(pathname);
-        if (file.exists()) {
-            System.out.println(file.getCanonicalPath());
-        }
+        if (file.exists())
+            System.out.printf("%s%s%n", (file.isDirectory()) ? "Directory: " : "File: ", file.getName());
         File[] listFiles = file.listFiles();
         if (listFiles != null) {
             for (File file1 : listFiles) {
