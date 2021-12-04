@@ -1,6 +1,6 @@
 package ru.topjava.webapp.model;
 
-public enum ContactType {
+public enum TypeContact {
     PHONE_DEFAULT("Тел.: "),
     PHONE_ADD1("Тел. 2: "),
     PHONE_ADD2("Тел. 3: "),
@@ -15,7 +15,7 @@ public enum ContactType {
 
     private final String title;
 
-    ContactType(String title) {
+    TypeContact(String title) {
         this.title = title;
     }
 

@@ -1,6 +1,6 @@
 package ru.topjava.webapp;
 
-import ru.topjava.webapp.model.SectionType;
+import ru.topjava.webapp.model.TypeSection;
 
 public final class TestSingleton {
     private static TestSingleton instance;
@@ -20,7 +20,7 @@ public final class TestSingleton {
         Singleton instance = Singleton.valueOf("INSTANCE");
         System.out.println(instance.ordinal());
 
-        for (SectionType type : SectionType.values()) {
+        for (TypeSection type : TypeSection.values()) {
             System.out.println(type.getTitle());
         }
     }

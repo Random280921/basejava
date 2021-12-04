@@ -3,7 +3,7 @@ package ru.topjava.webapp.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SectionText extends AbstractSection<String> {
+public class TextSection extends AbstractSection<String> {
     private String blockPosition;
     protected List<String> listPosition = new ArrayList<>();
 

@@ -10,14 +10,14 @@ public class Resume implements Comparable<Resume> {
     private final String uuid;
     private final String fullName;
 
-    private final Map<ContactType, Contact> header = new EnumMap<>(ContactType.class);
-    private final Map<SectionType, Section> body = new EnumMap<>(SectionType.class);
+    private final Map<TypeContact, Contact> header = new EnumMap<>(TypeContact.class);
+    private final Map<TypeSection, Section> body = new EnumMap<>(TypeSection.class);
 
     {
         Section s;
-        for (SectionType bodyType :
-                SectionType.values()) {
-            s = (bodyType.ordinal() < 4) ? new SectionText() : new SectionCompany();
+        for (TypeSection bodyType :
+                TypeSection.values()) {
+            s = (bodyType.ordinal() < 4) ? new TextSection() : new CompanySection();
             body.put(bodyType, s);
         }
     }
@@ -41,15 +41,15 @@ public class Resume implements Comparable<Resume> {
         return fullName;
     }
 
-    public Map<ContactType, Contact> getHeader() {
+    public Map<TypeContact, Contact> getHeader() {
         return header;
     }
 
-    public Map<SectionType, Section> getBody() {
+    public Map<TypeSection, Section> getBody() {
         return body;
     }
 
-    public void addContact(ContactType type, Contact contact) {
+    public void addContact(TypeContact type, Contact contact) {
         header.put(type, contact);
     }
 

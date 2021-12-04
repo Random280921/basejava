@@ -1,6 +1,6 @@
 package ru.topjava.webapp.model;
 
-public enum SectionType {
+public enum TypeSection {
     OBJECTIVE("Позиция"),
     PERSONAL("Личные качества"),
     ACHIEVEMENT("Достижения"),
@@ -10,7 +10,7 @@ public enum SectionType {
 
     private final String title;
 
-    SectionType(String title) {
+    TypeSection(String title) {
         this.title = title;
     }
 

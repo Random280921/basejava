@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static ru.topjava.webapp.storage.ResumeTestData.createResumeTest;
+import static ru.topjava.webapp.ResumeTestData.createResumeTest;
 
 public abstract class AbstractStorageTest {
 
