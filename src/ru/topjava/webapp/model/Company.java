@@ -1,12 +1,16 @@
 package ru.topjava.webapp.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.TreeSet;
 
 import static java.util.Objects.requireNonNull;
 import static ru.topjava.webapp.util.DateUtil.NOW;
 
-public class Company implements Comparable<Company> {
+public class Company implements Comparable<Company>, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final Contact companyName;
     private TreeSet<Experience> experienceSet = new TreeSet<>();
 
@@ -77,4 +81,16 @@ public class Company implements Comparable<Company> {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Company company = (Company) o;
+        return companyName.equals(company.companyName) && Objects.equals(experienceSet, company.experienceSet);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(companyName, experienceSet);
+    }
 }

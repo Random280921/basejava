@@ -1,4 +1,6 @@
 package ru.topjava.webapp.model;
 
-public interface Section {
+import java.io.Serializable;
+
+public interface Section extends Serializable {
 }

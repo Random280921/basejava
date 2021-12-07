@@ -3,8 +3,8 @@ package ru.topjava.webapp.storage;
 import ru.topjava.webapp.exception.StorageException;
 import ru.topjava.webapp.model.Resume;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -26,8 +26,8 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     protected Resume getResume(File file) {
-        try {
-            return readResume(file);
+        try (InputStream is = Files.newInputStream(file.toPath())) {
+            return readResume(is);
         } catch (IOException e) {
             throw new StorageException(String.format("Error read Resume from file %s", file.getAbsolutePath()), file.getName());
         }
@@ -35,11 +35,13 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     protected File findKey(String uuid) {
-        return new File(directory.getAbsolutePath(), uuid);
+        File keyFile = new File(directory.getAbsolutePath(), uuid);
+        return (keyFile.exists()) ? keyFile : null;
     }
 
     @Override
     protected void saveResume(Resume resume, File file) {
+        file = new File(directory.getAbsolutePath(), resume.getUuid());
         try {
             if (file.createNewFile()) updateResume(resume, file);
         } catch (IOException e) {
@@ -49,8 +51,8 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     protected void updateResume(Resume resume, File file) {
-        try {
-            writeResume(resume, file);
+        try (OutputStream os = Files.newOutputStream(file.toPath())) {
+            writeResume(resume, os);
         } catch (IOException e) {
             throw new StorageException(String.format("Could not write Resume to file %s /updateResume", file.getAbsolutePath()), file.getName(), e);
         }
@@ -95,11 +97,11 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * Cохраняет резюме в файл
      */
-    protected abstract void writeResume(Resume resume, File file) throws IOException;
+    protected abstract void writeResume(Resume resume, OutputStream os) throws IOException;
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * Читает резюме из файла
      */
-    protected abstract Resume readResume(File file) throws IOException;
+    protected abstract Resume readResume(InputStream is) throws IOException;
 }

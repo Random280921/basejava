@@ -1,19 +1,21 @@
 package ru.topjava.webapp.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 import static ru.topjava.webapp.util.DateUtil.NOW;
 
-public class Experience implements Comparable<Experience> {
+public class Experience implements Comparable<Experience>, Serializable {
+    private static final long serialVersionUID = 1L;
+    private static final DateTimeFormatter PATTERN_DATE = DateTimeFormatter.ofPattern("MM/yyyy");
 
     private final LocalDate dateFrom;
     private final LocalDate dateTo;
     private final String positionTitle;
     private final String positionText;
-
-    private final DateTimeFormatter PATTERN_DATE = DateTimeFormatter.ofPattern("MM/yyyy");
 
     Experience(LocalDate dateFrom, LocalDate dateTo, String positionTitle, String positionText) {
         requireNonNull(dateFrom, "Experience.dateFrom must not be null");
@@ -67,5 +69,18 @@ public class Experience implements Comparable<Experience> {
     @Override
     public int compareTo(Experience o) {
         return o.getDateFrom().compareTo(getDateFrom());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Experience that = (Experience) o;
+        return dateFrom.equals(that.dateFrom) && dateTo.equals(that.dateTo) && positionTitle.equals(that.positionTitle) && Objects.equals(positionText, that.positionText);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dateFrom, dateTo, positionTitle, positionText);
     }
 }
