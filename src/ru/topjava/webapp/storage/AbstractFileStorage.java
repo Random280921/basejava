@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Objects;
 
 public abstract class AbstractFileStorage extends AbstractStorage<File> {
-    protected final File directory;
-    protected File[] listFiles;
+    private final File directory;
+    private File[] listFiles;
 
     protected AbstractFileStorage(File directory) {
         Objects.requireNonNull(directory, "directory must not be null");
@@ -29,7 +29,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         try (InputStream is = Files.newInputStream(file.toPath())) {
             return readResume(is);
         } catch (IOException e) {
-            throw new StorageException(String.format("Error read Resume from file %s", file.getAbsolutePath()), file.getName());
+            throw new StorageException(String.format("Error read Resume from file %s", file.getAbsolutePath()), file.getName(),e);
         }
     }
 
@@ -41,7 +41,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     protected void saveResume(Resume resume, File file) {
-        file = new File(directory.getAbsolutePath(), resume.getUuid());
+        if (file == null) file = new File(directory.getAbsolutePath(), resume.getUuid());
         try {
             if (file.createNewFile()) updateResume(resume, file);
         } catch (IOException e) {
