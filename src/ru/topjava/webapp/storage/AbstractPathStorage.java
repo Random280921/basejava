@@ -4,6 +4,8 @@ import ru.topjava.webapp.exception.StorageException;
 import ru.topjava.webapp.model.Resume;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,8 +26,8 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> {
 
     @Override
     protected Resume getResume(Path path) {
-        try {
-            return readResume(path);
+        try  (InputStream is = Files.newInputStream(path)) {
+            return readResume(is);
         } catch (IOException e) {
             throw new StorageException(String.format("Error read Resume from file %s", path), path.getFileName().toString());
         }
@@ -49,8 +51,8 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> {
 
     @Override
     protected void updateResume(Resume resume, Path path) {
-        try {
-            writeResume(resume, path);
+        try(OutputStream os = Files.newOutputStream(path)) {
+            writeResume(resume, os);
         } catch (IOException e) {
             throw new StorageException(String.format("Could not write Resume to file %s /updateResume", path), path.getFileName().toString(), e);
         }
@@ -96,11 +98,11 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> {
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * Cохраняет резюме в файл
      */
-    protected abstract void writeResume(Resume resume, Path path) throws IOException;
+    protected abstract void writeResume(Resume resume, OutputStream os) throws IOException;
 
     /**
      * Вспомогательный метод, чтобы убрать дублирование кода в методах
      * Читает резюме из файла
      */
-    protected abstract Resume readResume(Path path) throws IOException;
+    protected abstract Resume readResume(InputStream is) throws IOException;
 }
