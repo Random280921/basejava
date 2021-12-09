@@ -5,21 +5,16 @@ import ru.topjava.webapp.model.Resume;
 
 import java.io.*;
 
-public class ObjectStreamPathStorage extends AbstractPathStorage {
-
-    protected ObjectStreamPathStorage(String dir) {
-        super(dir);
-    }
-
+public class ObjectStrategySerialize implements StrategySerialize {
     @Override
-    protected void writeResume(Resume resume, OutputStream os) throws IOException {
+    public void writeResume(Resume resume, OutputStream os) throws IOException {
         try (ObjectOutputStream oos = new ObjectOutputStream(os)) {
             oos.writeObject(resume);
         }
     }
 
     @Override
-    protected Resume readResume(InputStream is) throws IOException {
+    public Resume readResume(InputStream is) throws IOException {
         try (ObjectInputStream ois = new ObjectInputStream(is)) {
             return (Resume) ois.readObject();
         } catch (ClassNotFoundException e) {

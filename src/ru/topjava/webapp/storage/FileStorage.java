@@ -9,12 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class AbstractFileStorage extends AbstractStorage<File> {
+public class FileStorage extends AbstractStorage<File> {
     private final File directory;
+    private final StrategySerialize strategySerialize;
     private File[] listFiles;
 
-    protected AbstractFileStorage(File directory) {
-        Objects.requireNonNull(directory, "directory must not be null");
+    protected FileStorage(File directory, StrategySerialize strategySerialize) {
+        Objects.requireNonNull(directory, "directory");
+        Objects.requireNonNull(strategySerialize,"strategySerialize must not be null");
         if (!directory.isDirectory()) {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not directory");
         }
@@ -22,12 +24,13 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not readable/writable");
         }
         this.directory = directory;
+        this.strategySerialize = strategySerialize;
     }
 
     @Override
     protected Resume getResume(File file) {
         try (InputStream is = Files.newInputStream(file.toPath())) {
-            return readResume(is);
+            return strategySerialize.readResume(is);
         } catch (IOException e) {
             throw new StorageException(String.format("Error read Resume from file %s", file.getAbsolutePath()), file.getName(),e);
         }
@@ -52,7 +55,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     @Override
     protected void updateResume(Resume resume, File file) {
         try (OutputStream os = Files.newOutputStream(file.toPath())) {
-            writeResume(resume, os);
+            strategySerialize.writeResume(resume, os);
         } catch (IOException e) {
             throw new StorageException(String.format("Could not write Resume to file %s /updateResume", file.getAbsolutePath()), file.getName(), e);
         }
@@ -92,16 +95,4 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         if (namesFiles == null) throw new StorageException("Directory read error", null);
         return namesFiles.length;
     }
-
-    /**
-     * Вспомогательный метод, чтобы убрать дублирование кода в методах
-     * Cохраняет резюме в файл
-     */
-    protected abstract void writeResume(Resume resume, OutputStream os) throws IOException;
-
-    /**
-     * Вспомогательный метод, чтобы убрать дублирование кода в методах
-     * Читает резюме из файла
-     */
-    protected abstract Resume readResume(InputStream is) throws IOException;
 }
