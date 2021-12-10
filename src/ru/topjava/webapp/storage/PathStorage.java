@@ -21,7 +21,7 @@ public class PathStorage extends AbstractStorage<Path> {
 
     protected PathStorage(String dirName, Strategy strategy) {
         Objects.requireNonNull(dirName, "dirName must not be null");
-        Objects.requireNonNull(strategy, "strategySerialize must not be null");
+        Objects.requireNonNull(strategy, "strategy must not be null");
         this.directory = Paths.get(dirName);
         this.strategy = strategy;
         if (!Files.isDirectory(directory) || !Files.isWritable(directory)) {

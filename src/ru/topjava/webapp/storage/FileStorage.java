@@ -14,8 +14,8 @@ public class FileStorage extends AbstractStorage<File> {
     private final Strategy strategy;
 
     protected FileStorage(File directory, Strategy strategy) {
-        Objects.requireNonNull(directory, "directory");
-        Objects.requireNonNull(strategy, "strategySerialize must not be null");
+        Objects.requireNonNull(directory, "directory must not be null");
+        Objects.requireNonNull(strategy, "strategy must not be null");
         if (!directory.isDirectory()) {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not directory");
         }
