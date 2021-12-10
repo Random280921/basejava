@@ -4,9 +4,9 @@ import ru.topjava.webapp.exception.StorageException;
 import ru.topjava.webapp.model.Resume;
 import ru.topjava.webapp.storage.serialize.Strategy;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,8 +31,8 @@ public class PathStorage extends AbstractStorage<Path> {
 
     @Override
     protected Resume getResume(Path path) {
-        try (InputStream is = Files.newInputStream(path)) {
-            return strategy.readResume(is);
+        try {
+            return strategy.readResume(new BufferedInputStream(Files.newInputStream(path)));
         } catch (IOException e) {
             throw new StorageException(String.format("Error read Resume from file %s", path), path.getFileName().toString());
         }
@@ -56,8 +56,8 @@ public class PathStorage extends AbstractStorage<Path> {
 
     @Override
     protected void updateResume(Resume resume, Path path) {
-        try (OutputStream os = Files.newOutputStream(path)) {
-            strategy.writeResume(resume, os);
+        try {
+            strategy.writeResume(resume, new BufferedOutputStream(Files.newOutputStream(path)));
         } catch (IOException e) {
             throw new StorageException(String.format("Could not write Resume to file %s /updateResume", path), path.getFileName().toString(), e);
         }
