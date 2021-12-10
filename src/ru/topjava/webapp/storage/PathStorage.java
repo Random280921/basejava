@@ -2,6 +2,7 @@ package ru.topjava.webapp.storage;
 
 import ru.topjava.webapp.exception.StorageException;
 import ru.topjava.webapp.model.Resume;
+import ru.topjava.webapp.storage.serialize.Strategy;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,16 +13,17 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PathStorage extends AbstractStorage<Path> {
     private final Path directory;
-    private final StrategySerialize strategySerialize;
+    private final Strategy strategy;
 
-    protected PathStorage(String dirName, StrategySerialize strategySerialize) {
+    protected PathStorage(String dirName, Strategy strategy) {
         Objects.requireNonNull(dirName, "dirName must not be null");
-        Objects.requireNonNull(strategySerialize, "strategySerialize must not be null");
+        Objects.requireNonNull(strategy, "strategySerialize must not be null");
         this.directory = Paths.get(dirName);
-        this.strategySerialize = strategySerialize;
+        this.strategy = strategy;
         if (!Files.isDirectory(directory) || !Files.isWritable(directory)) {
             throw new IllegalArgumentException(dirName + " is not directory or is not writable");
         }
@@ -30,7 +32,7 @@ public class PathStorage extends AbstractStorage<Path> {
     @Override
     protected Resume getResume(Path path) {
         try (InputStream is = Files.newInputStream(path)) {
-            return strategySerialize.readResume(is);
+            return strategy.readResume(is);
         } catch (IOException e) {
             throw new StorageException(String.format("Error read Resume from file %s", path), path.getFileName().toString());
         }
@@ -55,7 +57,7 @@ public class PathStorage extends AbstractStorage<Path> {
     @Override
     protected void updateResume(Resume resume, Path path) {
         try (OutputStream os = Files.newOutputStream(path)) {
-            strategySerialize.writeResume(resume, os);
+            strategy.writeResume(resume, os);
         } catch (IOException e) {
             throw new StorageException(String.format("Could not write Resume to file %s /updateResume", path), path.getFileName().toString(), e);
         }
@@ -72,26 +74,26 @@ public class PathStorage extends AbstractStorage<Path> {
 
     @Override
     protected List<Resume> convertToList() {
-        try {
-            return Files.list(directory).map(this::getResume).collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new StorageException("Path convert to List error", null, e);
-        }
+        return getFiles(directory).map(this::getResume).collect(Collectors.toList());
     }
 
     @Override
     public void clear() {
-        try {
-            Files.list(directory).forEach(this::deleteResume);
-        } catch (IOException e) {
-            throw new StorageException("Path delete error", null, e);
-        }
+        getFiles(directory).forEach(this::deleteResume);
     }
 
     @Override
     public int size() {
+        return (int) getFiles(directory).count();
+    }
+
+    /**
+     * Вспомогательный метод, для сокращения общего кода в методах
+     * Возвращает стрим файлов директории
+     */
+    private Stream<Path> getFiles(Path directory) {
         try {
-            return (int) Files.list(directory).count();
+            return Files.list(directory);
         } catch (IOException e) {
             throw new StorageException("Directory read error", null);
         }

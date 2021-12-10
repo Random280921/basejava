@@ -2,21 +2,20 @@ package ru.topjava.webapp.storage;
 
 import ru.topjava.webapp.exception.StorageException;
 import ru.topjava.webapp.model.Resume;
+import ru.topjava.webapp.storage.serialize.Strategy;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class FileStorage extends AbstractStorage<File> {
     private final File directory;
-    private final StrategySerialize strategySerialize;
-    private File[] listFiles;
+    private final Strategy strategy;
 
-    protected FileStorage(File directory, StrategySerialize strategySerialize) {
+    protected FileStorage(File directory, Strategy strategy) {
         Objects.requireNonNull(directory, "directory");
-        Objects.requireNonNull(strategySerialize,"strategySerialize must not be null");
+        Objects.requireNonNull(strategy, "strategySerialize must not be null");
         if (!directory.isDirectory()) {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not directory");
         }
@@ -24,15 +23,15 @@ public class FileStorage extends AbstractStorage<File> {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not readable/writable");
         }
         this.directory = directory;
-        this.strategySerialize = strategySerialize;
+        this.strategy = strategy;
     }
 
     @Override
     protected Resume getResume(File file) {
-        try (InputStream is = Files.newInputStream(file.toPath())) {
-            return strategySerialize.readResume(is);
+        try {
+            return strategy.readResume(new BufferedInputStream(new FileInputStream(file)));
         } catch (IOException e) {
-            throw new StorageException(String.format("Error read Resume from file %s", file.getAbsolutePath()), file.getName(),e);
+            throw new StorageException(String.format("Error read Resume from file %s", file.getAbsolutePath()), file.getName(), e);
         }
     }
 
@@ -45,17 +44,20 @@ public class FileStorage extends AbstractStorage<File> {
     @Override
     protected void saveResume(Resume resume, File file) {
         if (file == null) file = new File(directory.getAbsolutePath(), resume.getUuid());
+        boolean b;
         try {
-            if (file.createNewFile()) updateResume(resume, file);
+            b = file.createNewFile();
         } catch (IOException e) {
             throw new StorageException(String.format("Could not create file %s /saveResume", file.getAbsolutePath()), file.getName(), e);
         }
+        if (!b) LOG.info(String.format("File %s exists!", file.getAbsolutePath()));
+        updateResume(resume, file);
     }
 
     @Override
     protected void updateResume(Resume resume, File file) {
-        try (OutputStream os = Files.newOutputStream(file.toPath())) {
-            strategySerialize.writeResume(resume, os);
+        try {
+            strategy.writeResume(resume, new BufferedOutputStream(new FileOutputStream(file)));
         } catch (IOException e) {
             throw new StorageException(String.format("Could not write Resume to file %s /updateResume", file.getAbsolutePath()), file.getName(), e);
         }
@@ -70,9 +72,7 @@ public class FileStorage extends AbstractStorage<File> {
     @Override
     protected List<Resume> convertToList() {
         List<Resume> listResume = new ArrayList<>(size());
-        listFiles = directory.listFiles();
-        if (listFiles == null) throw new StorageException("Directory read error", null);
-        for (File file : listFiles) {
+        for (File file : getFiles(directory)) {
             listResume.add(getResume(file));
         }
         return listResume;
@@ -80,9 +80,7 @@ public class FileStorage extends AbstractStorage<File> {
 
     @Override
     public void clear() {
-        listFiles = directory.listFiles();
-        if (listFiles == null) throw new StorageException("Directory read error", null);
-        for (File file : listFiles) {
+        for (File file : getFiles(directory)) {
             if (file.isFile()) {
                 deleteResume(file);
             }
@@ -91,8 +89,16 @@ public class FileStorage extends AbstractStorage<File> {
 
     @Override
     public int size() {
-        String[] namesFiles = directory.list();
-        if (namesFiles == null) throw new StorageException("Directory read error", null);
-        return namesFiles.length;
+        return getFiles(directory).length;
+    }
+
+    /**
+     * Вспомогательный метод, для сокращения общего кода в методах
+     * Возвращает массив файлов директории
+     */
+    private File[] getFiles(File directory) {
+        File[] files = directory.listFiles();
+        if (files == null) throw new StorageException("Directory read error", null);
+        return files;
     }
 }

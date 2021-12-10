@@ -1,11 +1,11 @@
-package ru.topjava.webapp.storage;
+package ru.topjava.webapp.storage.serialize;
 
 import ru.topjava.webapp.exception.StorageException;
 import ru.topjava.webapp.model.Resume;
 
 import java.io.*;
 
-public class ObjectStrategySerialize implements StrategySerialize {
+public class ObjectStrategy implements Strategy {
     @Override
     public void writeResume(Resume resume, OutputStream os) throws IOException {
         try (ObjectOutputStream oos = new ObjectOutputStream(os)) {
