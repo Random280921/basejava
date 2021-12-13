@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class TextSection extends AbstractSection<String> {
+public class TextSection extends AbstractSection {
     private static final long serialVersionUID = 1L;
 
     private String blockPosition;
     protected List<String> listPosition = new ArrayList<>();
+
+    public TextSection() {
+    }
 
     public void addBlockPosition(String blockPosition) {
         this.blockPosition = blockPosition;

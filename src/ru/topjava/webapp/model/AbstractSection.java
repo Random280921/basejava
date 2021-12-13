@@ -1,11 +1,9 @@
 package ru.topjava.webapp.model;
 
-import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import java.io.Serializable;
 
-public abstract class AbstractSection<POS> implements Section {
-    protected List<POS> listPosition;
-
-    protected abstract void addListPosition(POS position);
-
-    protected abstract List<POS> getListPosition();
+@XmlAccessorType(XmlAccessType.FIELD)
+public abstract class AbstractSection implements Serializable {
 }

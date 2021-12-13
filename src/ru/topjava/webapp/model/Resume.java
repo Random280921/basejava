@@ -1,27 +1,39 @@
 package ru.topjava.webapp.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
-import java.util.*;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Initial resume class
  */
+
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Resume implements Comparable<Resume>, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final String uuid;
-    private final String fullName;
+    private String uuid;
+    private String fullName;
 
     private final Map<ContactType, Contact> header = new EnumMap<>(ContactType.class);
-    private final Map<SectionType, Section> body = new EnumMap<>(SectionType.class);
+    private final Map<SectionType, AbstractSection> body = new EnumMap<>(SectionType.class);
 
     {
-        Section s;
+        AbstractSection s;
         for (SectionType bodyType :
                 SectionType.values()) {
             s = (bodyType.ordinal() < 4) ? new TextSection() : new CompanySection();
             body.put(bodyType, s);
         }
+    }
+
+    public Resume() {
     }
 
     public Resume(String fullName) {
@@ -47,7 +59,7 @@ public class Resume implements Comparable<Resume>, Serializable {
         return header;
     }
 
-    public Map<SectionType, Section> getBody() {
+    public Map<SectionType, AbstractSection> getBody() {
         return body;
     }
 

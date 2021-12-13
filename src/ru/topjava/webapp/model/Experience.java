@@ -1,5 +1,10 @@
 package ru.topjava.webapp.model;
 
+import ru.topjava.webapp.util.LocalDateAdapter;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -8,14 +13,20 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import static ru.topjava.webapp.util.DateUtil.NOW;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Experience implements Comparable<Experience>, Serializable {
     private static final long serialVersionUID = 1L;
     private static final DateTimeFormatter PATTERN_DATE = DateTimeFormatter.ofPattern("MM/yyyy");
 
-    private final LocalDate dateFrom;
-    private final LocalDate dateTo;
-    private final String positionTitle;
-    private final String positionText;
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
+    private LocalDate dateFrom;
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
+    private LocalDate dateTo;
+    private String positionTitle;
+    private String positionText;
+
+    public Experience() {
+    }
 
     Experience(LocalDate dateFrom, LocalDate dateTo, String positionTitle, String positionText) {
         requireNonNull(dateFrom, "Experience.dateFrom must not be null");

@@ -1,5 +1,7 @@
 package ru.topjava.webapp.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -8,11 +10,15 @@ import java.util.TreeSet;
 import static java.util.Objects.requireNonNull;
 import static ru.topjava.webapp.util.DateUtil.NOW;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Company implements Comparable<Company>, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final Contact companyName;
+    private Contact companyName;
     private TreeSet<Experience> experienceSet = new TreeSet<>();
+
+    public Company() {
+    }
 
     public Company(String value, String url) {
         this.companyName = new Contact(value, url);

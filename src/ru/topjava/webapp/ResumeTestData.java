@@ -37,7 +37,7 @@ public class ResumeTestData {
         }
         List<String> listString;
         List<Company> listCompany;
-        for (Map.Entry<SectionType, Section> element :
+        for (Map.Entry<SectionType, AbstractSection> element :
                 resumeModelTest.getBody().entrySet()) {
             key = element.getKey().ordinal();
             printConsole.append("\n").append(element.getKey().getTitle()).append("\n");
