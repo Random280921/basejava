@@ -1,8 +1,13 @@
 package ru.topjava.webapp.model;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 import static java.util.Objects.requireNonNull;
 
-public class Contact {
+public class Contact implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final String value;
 
     private String url;
@@ -27,5 +32,18 @@ public class Contact {
 
     public String getUrl() {
         return url;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Contact contact = (Contact) o;
+        return value.equals(contact.value) && Objects.equals(url, contact.url);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value, url);
     }
 }

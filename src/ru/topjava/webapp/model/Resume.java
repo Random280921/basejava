@@ -1,22 +1,24 @@
 package ru.topjava.webapp.model;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * Initial resume class
  */
-public class Resume implements Comparable<Resume> {
+public class Resume implements Comparable<Resume>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final String uuid;
     private final String fullName;
 
-    private final Map<TypeContact, Contact> header = new EnumMap<>(TypeContact.class);
-    private final Map<TypeSection, Section> body = new EnumMap<>(TypeSection.class);
+    private final Map<ContactType, Contact> header = new EnumMap<>(ContactType.class);
+    private final Map<SectionType, Section> body = new EnumMap<>(SectionType.class);
 
     {
         Section s;
-        for (TypeSection bodyType :
-                TypeSection.values()) {
+        for (SectionType bodyType :
+                SectionType.values()) {
             s = (bodyType.ordinal() < 4) ? new TextSection() : new CompanySection();
             body.put(bodyType, s);
         }
@@ -41,15 +43,15 @@ public class Resume implements Comparable<Resume> {
         return fullName;
     }
 
-    public Map<TypeContact, Contact> getHeader() {
+    public Map<ContactType, Contact> getHeader() {
         return header;
     }
 
-    public Map<TypeSection, Section> getBody() {
+    public Map<SectionType, Section> getBody() {
         return body;
     }
 
-    public void addContact(TypeContact type, Contact contact) {
+    public void addContact(ContactType type, Contact contact) {
         header.put(type, contact);
     }
 

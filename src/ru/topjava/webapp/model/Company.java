@@ -1,11 +1,16 @@
 package ru.topjava.webapp.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.TreeSet;
 
 import static java.util.Objects.requireNonNull;
+import static ru.topjava.webapp.util.DateUtil.NOW;
 
-public class Company implements Comparable<Company> {
+public class Company implements Comparable<Company>, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final Contact companyName;
     private TreeSet<Experience> experienceSet = new TreeSet<>();
 
@@ -36,8 +41,8 @@ public class Company implements Comparable<Company> {
     }
 
     public void addExperience(LocalDate dateFrom, LocalDate dateTo, String positionTitle, String positionText) {
-        if (!getExperienceSet().isEmpty() && getExperienceSet().first().getDateTo() == null)
-            requireNonNull(dateTo, "The null Experience.dateTo field allready exist");
+        if (!getExperienceSet().isEmpty() && NOW.equals(getExperienceSet().first().getDateTo()))
+            requireNonNull(dateTo, "The NOW Experience.dateTo field allready exist");
         getExperienceSet().add(new Experience(dateFrom, dateTo, positionTitle, positionText));
     }
 
@@ -45,22 +50,22 @@ public class Company implements Comparable<Company> {
         addExperience(dateFrom, dateTo, positionTitle, null);
     }
 
+    public void addExperience(LocalDate dateFrom, String positionTitle, String positionText) {
+        addExperience(dateFrom, NOW, positionTitle, positionText);
+    }
+
     public void removeExperience(LocalDate fistDate) {
         getExperienceSet().removeIf(experience -> experience.getDateFrom().equals(fistDate));
     }
 
     /**
-     * Sorted: last date in Company to first, dateTo null is first position
+     * Sorted: last date in Company to first, dateTo NOW is first position
      */
     @Override
     public int compareTo(Company o) {
-        int compareResult = o.getExperienceSet().first().getDateFrom().compareTo(getExperienceSet().first().getDateFrom());
-        final LocalDate thisDateTo = getExperienceSet().first().getDateTo();
-        final LocalDate otherDateTo = o.getExperienceSet().first().getDateTo();
-        if (thisDateTo == null && otherDateTo == null) return compareResult;
-        if (thisDateTo == null) return -1;
-        if (otherDateTo == null) return 1;
-        return compareResult;
+        int compareResultFrom = o.getExperienceSet().first().getDateFrom().compareTo(getExperienceSet().first().getDateFrom());
+        int compareResultTo = o.getExperienceSet().first().getDateTo().compareTo(getExperienceSet().first().getDateTo());
+        return (compareResultTo != 0) ? compareResultTo : compareResultFrom;
     }
 
     @Override
@@ -76,4 +81,16 @@ public class Company implements Comparable<Company> {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Company company = (Company) o;
+        return companyName.equals(company.companyName) && Objects.equals(experienceSet, company.experienceSet);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(companyName, experienceSet);
+    }
 }
