@@ -45,8 +45,10 @@ public class DataStrategy implements Strategy {
         try (DataInputStream dis = new DataInputStream(is)) {
             Resume resume = new Resume(dis.readUTF(), dis.readUTF());
             int size = dis.readInt();
-            for (int i = 0; i < size; i++) {
-                resume.addContact(ContactType.valueOf(dis.readUTF()), readContact(dis.readUTF(), dis.readUTF()));
+            if (size > 0) {
+                for (int i = 0; i < size; i++) {
+                    resume.addContact(ContactType.valueOf(dis.readUTF()), readContact(dis.readUTF(), dis.readUTF()));
+                }
             }
             size = dis.readInt();
             for (int i = 0; i < size; i++) {
@@ -79,8 +81,10 @@ public class DataStrategy implements Strategy {
      */
     private void writeSection(SectionType sectionType, AbstractSection section, DataOutputStream dos) throws IOException {
         int numSect = sectionType.ordinal();
-        if (numSect < 2) dos.writeUTF(((TextSection) section).getBlockPosition());
-        else if (numSect < 4) writeTextList(section, dos);
+        if (numSect < 2) {
+            String blockPosition = ((TextSection) section).getBlockPosition();
+            dos.writeUTF((blockPosition == null) ? "NULL" : blockPosition);
+        } else if (numSect < 4) writeTextList(section, dos);
         else writeCompanyList(section, dos);
     }
 
@@ -90,8 +94,11 @@ public class DataStrategy implements Strategy {
      */
     private void readSection(SectionType sectionType, Resume resume, DataInputStream dis) throws IOException {
         int numSect = sectionType.ordinal();
-        if (numSect < 2) ((TextSection) resume.getBody().get(sectionType)).addBlockPosition(dis.readUTF());
-        else if (numSect < 4) readTextList(sectionType, resume, dis);
+        if (numSect < 2) {
+            String blockPosition = dis.readUTF();
+            if (!"NULL".equals(blockPosition))
+                ((TextSection) resume.getBody().get(sectionType)).addBlockPosition(blockPosition);
+        } else if (numSect < 4) readTextList(sectionType, resume, dis);
         else readCompanyList(sectionType, resume, dis);
     }
 
@@ -113,8 +120,10 @@ public class DataStrategy implements Strategy {
      */
     private void readTextList(SectionType sectionType, Resume resume, DataInputStream dis) throws IOException {
         int cnt = dis.readInt();
-        for (int i = 0; i < cnt; i++) {
-            ((TextSection) resume.getBody().get(sectionType)).addListPosition(dis.readUTF());
+        if (cnt > 0) {
+            for (int i = 0; i < cnt; i++) {
+                ((TextSection) resume.getBody().get(sectionType)).addListPosition(dis.readUTF());
+            }
         }
     }
 
@@ -144,19 +153,23 @@ public class DataStrategy implements Strategy {
      */
     private void readCompanyList(SectionType sectionType, Resume resume, DataInputStream dis) throws IOException {
         int cnt = dis.readInt();
-        int cntEx;
-        for (int i = 0; i < cnt; i++) {
-            Contact contact = readContact(dis.readUTF(), dis.readUTF());
-            Company company = new Company(contact.getValue(), contact.getUrl());
-            cntEx = dis.readInt();
-            for (int j = 0; j < cntEx; j++) {
-                LocalDate dateFrom = LocalDate.parse(dis.readUTF(), PATTERN_DATE);
-                LocalDate dateTo = LocalDate.parse(dis.readUTF(), PATTERN_DATE);
-                String posTitle = dis.readUTF();
-                String posText = dis.readUTF();
-                company.addExperience(dateFrom, dateTo, posTitle, ("NULL".equals(posText)) ? null : posText);
+        if (cnt > 0) {
+            int cntEx;
+            for (int i = 0; i < cnt; i++) {
+                Contact contact = readContact(dis.readUTF(), dis.readUTF());
+                Company company = new Company(contact.getValue(), contact.getUrl());
+                cntEx = dis.readInt();
+                if (cntEx > 0) {
+                    for (int j = 0; j < cntEx; j++) {
+                        LocalDate dateFrom = LocalDate.parse(dis.readUTF(), PATTERN_DATE);
+                        LocalDate dateTo = LocalDate.parse(dis.readUTF(), PATTERN_DATE);
+                        String posTitle = dis.readUTF();
+                        String posText = dis.readUTF();
+                        company.addExperience(dateFrom, dateTo, posTitle, ("NULL".equals(posText)) ? null : posText);
+                    }
+                }
+                ((CompanySection) resume.getBody().get(sectionType)).addListPosition(company);
             }
-            ((CompanySection) resume.getBody().get(sectionType)).addListPosition(company);
         }
     }
 }
