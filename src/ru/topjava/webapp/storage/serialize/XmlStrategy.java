@@ -18,7 +18,7 @@ public class XmlStrategy implements Strategy {
 
     public XmlStrategy() {
         xmlParser = new XmlParser(
-                Resume.class, Contact.class, Experience.class, ContactType.class,
+                Resume.class, Contact.class, Company.Experience.class, ContactType.class,
                 CompanySection.class, TextSection.class, SectionType.class, Company.class);
     }
 

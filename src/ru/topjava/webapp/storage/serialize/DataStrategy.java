@@ -25,12 +25,12 @@ public class DataStrategy implements Strategy {
             dos.writeUTF(resume.getUuid());
             dos.writeUTF(resume.getFullName());
             Map<ContactType, Contact> contacts = resume.getHeader();
-            Map<SectionType, AbstractSection> sections = resume.getBody();
             dos.writeInt(contacts.size());
             for (Map.Entry<ContactType, Contact> entry : contacts.entrySet()) {
                 dos.writeUTF(entry.getKey().name());
                 writeContact(entry.getValue(), dos);
             }
+            Map<SectionType, AbstractSection> sections = resume.getBody();
             dos.writeInt(sections.size());
             for (Map.Entry<SectionType, AbstractSection> entry : sections.entrySet()) {
                 SectionType typeSect = entry.getKey();
@@ -45,10 +45,8 @@ public class DataStrategy implements Strategy {
         try (DataInputStream dis = new DataInputStream(is)) {
             Resume resume = new Resume(dis.readUTF(), dis.readUTF());
             int size = dis.readInt();
-            if (size > 0) {
-                for (int i = 0; i < size; i++) {
-                    resume.addContact(ContactType.valueOf(dis.readUTF()), readContact(dis.readUTF(), dis.readUTF()));
-                }
+            for (int i = 0; i < size; i++) {
+                resume.addContact(ContactType.valueOf(dis.readUTF()), readContact(dis.readUTF(), dis.readUTF()));
             }
             size = dis.readInt();
             for (int i = 0; i < size; i++) {
@@ -80,12 +78,22 @@ public class DataStrategy implements Strategy {
      * запись секции
      */
     private void writeSection(SectionType sectionType, AbstractSection section, DataOutputStream dos) throws IOException {
-        int numSect = sectionType.ordinal();
-        if (numSect < 2) {
-            String blockPosition = ((TextSection) section).getBlockPosition();
-            dos.writeUTF((blockPosition == null) ? "NULL" : blockPosition);
-        } else if (numSect < 4) writeTextList(section, dos);
-        else writeCompanyList(section, dos);
+        switch (sectionType) {
+            case OBJECTIVE:
+            case PERSONAL:
+                String blockPosition = ((TextSection) section).getBlockPosition();
+                dos.writeUTF((blockPosition == null) ? "NULL" : blockPosition);
+                break;
+            case ACHIEVEMENT:
+            case QUALIFICATIONS:
+                writeTextList(section, dos);
+                break;
+            case EXPERIENCE:
+            case EDUCATION: {
+                writeCompanyList(section, dos);
+                break;
+            }
+        }
     }
 
     /**
@@ -93,13 +101,23 @@ public class DataStrategy implements Strategy {
      * чтение секции
      */
     private void readSection(SectionType sectionType, Resume resume, DataInputStream dis) throws IOException {
-        int numSect = sectionType.ordinal();
-        if (numSect < 2) {
-            String blockPosition = dis.readUTF();
-            if (!"NULL".equals(blockPosition))
-                ((TextSection) resume.getBody().get(sectionType)).addBlockPosition(blockPosition);
-        } else if (numSect < 4) readTextList(sectionType, resume, dis);
-        else readCompanyList(sectionType, resume, dis);
+        switch (sectionType) {
+            case OBJECTIVE:
+            case PERSONAL:
+                String blockPosition = dis.readUTF();
+                if (!"NULL".equals(blockPosition))
+                    ((TextSection) resume.getBody().get(sectionType)).addBlockPosition(blockPosition);
+                break;
+            case ACHIEVEMENT:
+            case QUALIFICATIONS:
+                readTextList(sectionType, resume, dis);
+                break;
+            case EXPERIENCE:
+            case EDUCATION: {
+                readCompanyList(sectionType, resume, dis);
+                break;
+            }
+        }
     }
 
     /**
@@ -136,9 +154,9 @@ public class DataStrategy implements Strategy {
         dos.writeInt(list.size());
         for (Company company : list) {
             writeContact(company.getCompanyName(), dos);
-            TreeSet<Experience> setExp = company.getExperienceSet();
+            TreeSet<Company.Experience> setExp = company.getExperienceSet();
             dos.writeInt(setExp.size());
-            for (Experience exp : setExp) {
+            for (Company.Experience exp : setExp) {
                 dos.writeUTF(exp.getDateFrom().format(PATTERN_DATE));
                 dos.writeUTF(exp.getDateTo().format(PATTERN_DATE));
                 dos.writeUTF(exp.getPositionTitle());
