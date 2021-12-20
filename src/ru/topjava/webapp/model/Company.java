@@ -108,7 +108,6 @@ public class Company implements Comparable<Company>, Serializable {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class Experience implements Comparable<Experience>, Serializable {
         private static final long serialVersionUID = 1L;
-        private static final DateTimeFormatter PATTERN_DATE = DateTimeFormatter.ofPattern("MM/yyyy");
 
         @XmlJavaTypeAdapter(LocalDateAdapter.class)
         private LocalDate dateFrom;
@@ -143,10 +142,11 @@ public class Company implements Comparable<Company>, Serializable {
         }
 
         public String getPositionText() {
-            return (positionText == null) ? "" : positionText;
+            return positionText;
         }
 
         public String getPeriod() {
+            DateTimeFormatter PATTERN_DATE = DateTimeFormatter.ofPattern("MM/yyyy");
             return String.format("%s - %s",
                     getDateFrom().format(PATTERN_DATE),
                     (NOW.equals(getDateTo())) ? "Сейчас" : getDateTo().format(PATTERN_DATE));
@@ -154,7 +154,7 @@ public class Company implements Comparable<Company>, Serializable {
 
         @Override
         public String toString() {
-            return ("".equals(getPositionText()))
+            return (getPositionText() == null)
                     ?
                     String.format("%s    %s\n",
                             getPeriod(),
