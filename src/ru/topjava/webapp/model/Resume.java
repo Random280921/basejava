@@ -4,10 +4,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Initial resume class
@@ -23,15 +20,6 @@ public class Resume implements Comparable<Resume>, Serializable {
 
     private final Map<ContactType, Contact> header = new EnumMap<>(ContactType.class);
     private final Map<SectionType, AbstractSection> body = new EnumMap<>(SectionType.class);
-
-    {
-        AbstractSection s;
-        for (SectionType bodyType :
-                SectionType.values()) {
-            s = (bodyType.ordinal() < 4) ? new TextSection() : new CompanySection();
-            body.put(bodyType, s);
-        }
-    }
 
     public Resume() {
     }
@@ -67,6 +55,10 @@ public class Resume implements Comparable<Resume>, Serializable {
         header.put(type, contact);
     }
 
+    public void addSection(SectionType type, AbstractSection section) {
+        body.put(type, section);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -82,7 +74,37 @@ public class Resume implements Comparable<Resume>, Serializable {
 
     @Override
     public String toString() {
-        return "ФИО: " + fullName + "; UUID: " + uuid;
+        StringBuilder resumeStr = new StringBuilder("ФИО: ").append(fullName).append("; UUID: ").append(uuid).append("\n");
+        for (Map.Entry<ContactType, Contact> entry : getHeader().entrySet()) {
+            resumeStr.append(entry.getKey()).append(" |= val: ").append(entry.getValue().getValue())
+                    .append("; url:").append(entry.getValue().getUrl()).append("\n");
+        }
+        for (Map.Entry<SectionType, AbstractSection> entry : getBody().entrySet()) {
+            SectionType type = entry.getKey();
+            resumeStr.append("\n").append(type).append(" |= ");
+            switch (type) {
+                case OBJECTIVE:
+                case PERSONAL:
+                    resumeStr.append("\n").append(((TextBlockSection) entry.getValue()).getBlockPosition());
+                    break;
+                case ACHIEVEMENT:
+                case QUALIFICATIONS:
+                    List<String> listString = ((TextListSection) entry.getValue()).getListPosition();
+                    for (String text : listString) {
+                        resumeStr.append("\n").append(text);
+                    }
+                    break;
+                case EXPERIENCE:
+                case EDUCATION: {
+                    List<Company> listCompany = ((CompanySection) entry.getValue()).getListPosition();
+                    for (Company company : listCompany) {
+                        resumeStr.append("\n").append(company.toString());
+                    }
+                    break;
+                }
+            }
+        }
+        return resumeStr.toString();
     }
 
     @Override

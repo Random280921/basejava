@@ -19,7 +19,7 @@ public class XmlStrategy implements Strategy {
     public XmlStrategy() {
         xmlParser = new XmlParser(
                 Resume.class, Contact.class, Company.Experience.class, ContactType.class,
-                CompanySection.class, TextSection.class, SectionType.class, Company.class);
+                CompanySection.class, TextBlockSection.class, TextListSection.class, SectionType.class, Company.class);
     }
 
     @Override

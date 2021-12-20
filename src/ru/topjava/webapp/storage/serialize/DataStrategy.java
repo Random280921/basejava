@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 
 /**
  * Класс  DataStrategy -- стратегия сериализации DataStream
@@ -81,8 +80,7 @@ public class DataStrategy implements Strategy {
         switch (sectionType) {
             case OBJECTIVE:
             case PERSONAL:
-                String blockPosition = ((TextSection) section).getBlockPosition();
-                dos.writeUTF((blockPosition == null) ? "NULL" : blockPosition);
+                writeTextBlock(section, dos);
                 break;
             case ACHIEVEMENT:
             case QUALIFICATIONS:
@@ -104,9 +102,7 @@ public class DataStrategy implements Strategy {
         switch (sectionType) {
             case OBJECTIVE:
             case PERSONAL:
-                String blockPosition = dis.readUTF();
-                if (!"NULL".equals(blockPosition))
-                    ((TextSection) resume.getBody().get(sectionType)).addBlockPosition(blockPosition);
+                readTextBlock(sectionType, resume, dis);
                 break;
             case ACHIEVEMENT:
             case QUALIFICATIONS:
@@ -124,8 +120,28 @@ public class DataStrategy implements Strategy {
      * вспомогательный метод для сокращения кода
      * запись списка текста
      */
+    private void writeTextBlock(AbstractSection section, DataOutputStream dos) throws IOException {
+        String blockPosition = ((TextBlockSection) section).getBlockPosition();
+        dos.writeUTF((blockPosition == null) ? "NULL" : blockPosition);
+    }
+
+    /**
+     * вспомогательный метод для сокращения кода
+     * чтение списка текста
+     */
+    private void readTextBlock(SectionType sectionType, Resume resume, DataInputStream dis) throws IOException {
+        resume.addSection(sectionType, new TextBlockSection());
+        String blockPosition = dis.readUTF();
+        if (!"NULL".equals(blockPosition))
+            ((TextBlockSection) resume.getBody().get(sectionType)).addBlockPosition(blockPosition);
+    }
+
+    /**
+     * вспомогательный метод для сокращения кода
+     * запись списка текста
+     */
     private void writeTextList(AbstractSection section, DataOutputStream dos) throws IOException {
-        List<String> list = ((TextSection) section).getListPosition();
+        List<String> list = ((TextListSection) section).getListPosition();
         dos.writeInt(list.size());
         for (String s : list) {
             dos.writeUTF(s);
@@ -139,8 +155,9 @@ public class DataStrategy implements Strategy {
     private void readTextList(SectionType sectionType, Resume resume, DataInputStream dis) throws IOException {
         int cnt = dis.readInt();
         if (cnt > 0) {
+            resume.addSection(sectionType, new TextListSection());
             for (int i = 0; i < cnt; i++) {
-                ((TextSection) resume.getBody().get(sectionType)).addListPosition(dis.readUTF());
+                ((TextListSection) resume.getBody().get(sectionType)).addListPosition(dis.readUTF());
             }
         }
     }
@@ -154,7 +171,7 @@ public class DataStrategy implements Strategy {
         dos.writeInt(list.size());
         for (Company company : list) {
             writeContact(company.getCompanyName(), dos);
-            TreeSet<Company.Experience> setExp = company.getExperienceSet();
+            List<Company.Experience> setExp = company.getExperienceList();
             dos.writeInt(setExp.size());
             for (Company.Experience exp : setExp) {
                 dos.writeUTF(exp.getDateFrom().format(PATTERN_DATE));
@@ -173,6 +190,7 @@ public class DataStrategy implements Strategy {
         int cnt = dis.readInt();
         if (cnt > 0) {
             int cntEx;
+            resume.addSection(sectionType, new CompanySection());
             for (int i = 0; i < cnt; i++) {
                 Contact contact = readContact(dis.readUTF(), dis.readUTF());
                 Company company = new Company(contact.getValue(), contact.getUrl());
