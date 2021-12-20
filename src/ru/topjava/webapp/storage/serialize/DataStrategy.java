@@ -87,10 +87,9 @@ public class DataStrategy implements Strategy {
                 writeTextList(section, dos);
                 break;
             case EXPERIENCE:
-            case EDUCATION: {
+            case EDUCATION:
                 writeCompanyList(section, dos);
                 break;
-            }
         }
     }
 
@@ -109,10 +108,9 @@ public class DataStrategy implements Strategy {
                 readTextList(sectionType, resume, dis);
                 break;
             case EXPERIENCE:
-            case EDUCATION: {
+            case EDUCATION:
                 readCompanyList(sectionType, resume, dis);
                 break;
-            }
         }
     }
 
@@ -195,7 +193,6 @@ public class DataStrategy implements Strategy {
                 Contact contact = readContact(dis.readUTF(), dis.readUTF());
                 Company company = new Company(contact.getValue(), contact.getUrl());
                 cntEx = dis.readInt();
-                if (cntEx > 0) {
                     for (int j = 0; j < cntEx; j++) {
                         LocalDate dateFrom = LocalDate.parse(dis.readUTF(), PATTERN_DATE);
                         LocalDate dateTo = LocalDate.parse(dis.readUTF(), PATTERN_DATE);
@@ -203,7 +200,6 @@ public class DataStrategy implements Strategy {
                         String posText = dis.readUTF();
                         company.addExperience(dateFrom, dateTo, posTitle, ("NULL".equals(posText)) ? null : posText);
                     }
-                }
                 ((CompanySection) resume.getBody().get(sectionType)).addListPosition(company);
             }
         }

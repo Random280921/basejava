@@ -11,14 +11,12 @@ public class CompanySection extends AbstractSection {
 
     public void addListPosition(Company position) {
         listPosition.add(position);
-        listPosition.sort(Company::compareTo);
     }
 
     public CompanySection() {
     }
 
     public List<Company> getListPosition() {
-        listPosition.sort(Company::compareTo);
         return listPosition;
     }
 

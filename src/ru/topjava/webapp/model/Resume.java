@@ -74,37 +74,7 @@ public class Resume implements Comparable<Resume>, Serializable {
 
     @Override
     public String toString() {
-        StringBuilder resumeStr = new StringBuilder("ФИО: ").append(fullName).append("; UUID: ").append(uuid).append("\n");
-        for (Map.Entry<ContactType, Contact> entry : getHeader().entrySet()) {
-            resumeStr.append(entry.getKey()).append(" |= val: ").append(entry.getValue().getValue())
-                    .append("; url:").append(entry.getValue().getUrl()).append("\n");
-        }
-        for (Map.Entry<SectionType, AbstractSection> entry : getBody().entrySet()) {
-            SectionType type = entry.getKey();
-            resumeStr.append("\n").append(type).append(" |= ");
-            switch (type) {
-                case OBJECTIVE:
-                case PERSONAL:
-                    resumeStr.append("\n").append(((TextBlockSection) entry.getValue()).getBlockPosition());
-                    break;
-                case ACHIEVEMENT:
-                case QUALIFICATIONS:
-                    List<String> listString = ((TextListSection) entry.getValue()).getListPosition();
-                    for (String text : listString) {
-                        resumeStr.append("\n").append(text);
-                    }
-                    break;
-                case EXPERIENCE:
-                case EDUCATION: {
-                    List<Company> listCompany = ((CompanySection) entry.getValue()).getListPosition();
-                    for (Company company : listCompany) {
-                        resumeStr.append("\n").append(company.toString());
-                    }
-                    break;
-                }
-            }
-        }
-        return resumeStr.toString();
+        return "ФИО: " + fullName + "; UUID: " + uuid;
     }
 
     @Override
