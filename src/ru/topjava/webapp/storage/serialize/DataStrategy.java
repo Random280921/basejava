@@ -61,7 +61,8 @@ public class DataStrategy implements Strategy {
      */
     private void writeContact(Contact contact, DataOutputStream dos) throws IOException {
         dos.writeUTF(contact.getValue());
-        dos.writeUTF((contact.getUrl() == null) ? "NULL" : contact.getUrl());
+        String url = contact.getUrl();
+        dos.writeUTF((url == null) ? "NULL" : url);
     }
 
     /**
@@ -120,7 +121,7 @@ public class DataStrategy implements Strategy {
      */
     private void writeTextBlock(AbstractSection section, DataOutputStream dos) throws IOException {
         String blockPosition = ((TextBlockSection) section).getBlockPosition();
-        dos.writeUTF((blockPosition == null) ? "NULL" : blockPosition);
+        dos.writeUTF(blockPosition);
     }
 
     /**
@@ -129,9 +130,7 @@ public class DataStrategy implements Strategy {
      */
     private void readTextBlock(SectionType sectionType, Resume resume, DataInputStream dis) throws IOException {
         resume.addSection(sectionType, new TextBlockSection());
-        String blockPosition = dis.readUTF();
-        if (!"NULL".equals(blockPosition))
-            ((TextBlockSection) resume.getBody().get(sectionType)).addBlockPosition(blockPosition);
+        ((TextBlockSection) resume.getBody().get(sectionType)).addBlockPosition(dis.readUTF());
     }
 
     /**
@@ -172,12 +171,21 @@ public class DataStrategy implements Strategy {
             List<Company.Experience> setExp = company.getExperienceList();
             dos.writeInt(setExp.size());
             for (Company.Experience exp : setExp) {
-                dos.writeUTF(exp.getDateFrom().format(PATTERN_DATE));
-                dos.writeUTF(exp.getDateTo().format(PATTERN_DATE));
+                writeDate(dos, exp.getDateFrom());
+                writeDate(dos, exp.getDateTo());
                 dos.writeUTF(exp.getPositionTitle());
-                dos.writeUTF((exp.getPositionText() == null) ? "NULL" : exp.getPositionText());
+                String positionText = exp.getPositionText();
+                dos.writeUTF((positionText == null) ? "NULL" : positionText);
             }
         }
+    }
+
+    /**
+     * вспомогательный метод для уникальности кода
+     * запись даты
+     */
+    private void writeDate(DataOutputStream dos, LocalDate dt) throws IOException {
+        dos.writeUTF(dt.format(PATTERN_DATE));
     }
 
     /**
@@ -193,15 +201,23 @@ public class DataStrategy implements Strategy {
                 Contact contact = readContact(dis.readUTF(), dis.readUTF());
                 Company company = new Company(contact.getValue(), contact.getUrl());
                 cntEx = dis.readInt();
-                    for (int j = 0; j < cntEx; j++) {
-                        LocalDate dateFrom = LocalDate.parse(dis.readUTF(), PATTERN_DATE);
-                        LocalDate dateTo = LocalDate.parse(dis.readUTF(), PATTERN_DATE);
-                        String posTitle = dis.readUTF();
-                        String posText = dis.readUTF();
-                        company.addExperience(dateFrom, dateTo, posTitle, ("NULL".equals(posText)) ? null : posText);
-                    }
+                for (int j = 0; j < cntEx; j++) {
+                    LocalDate dateFrom = readDate(dis.readUTF());
+                    LocalDate dateTo = readDate(dis.readUTF());
+                    String posTitle = dis.readUTF();
+                    String posText = dis.readUTF();
+                    company.addExperience(dateFrom, dateTo, posTitle, ("NULL".equals(posText)) ? null : posText);
+                }
                 ((CompanySection) resume.getBody().get(sectionType)).addListPosition(company);
             }
         }
+    }
+
+    /**
+     * вспомогательный метод для уникальности кода
+     * конвертация строки в дату
+     */
+    private LocalDate readDate(String read) {
+        return LocalDate.parse(read, PATTERN_DATE);
     }
 }
