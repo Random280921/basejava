@@ -92,14 +92,15 @@ public class DataStrategy implements Strategy {
                         dos,
                         company -> {
                             writeContact(company.getCompanyName(), dos);
-                            WriteConsumer<Company.Experience> consumerExperience = exp -> {
-                                writeDate(dos, exp.getDateFrom());
-                                writeDate(dos, exp.getDateTo());
-                                dos.writeUTF(exp.getPositionTitle());
-                                String positionText = exp.getPositionText();
-                                dos.writeUTF((positionText == null) ? "NULL" : positionText);
-                            };
-                            writeWithException(company.getExperienceList(), dos, consumerExperience);
+                            writeWithException(company.getExperienceList(),
+                                    dos,
+                                    exp -> {
+                                        writeDate(dos, exp.getDateFrom());
+                                        writeDate(dos, exp.getDateTo());
+                                        dos.writeUTF(exp.getPositionTitle());
+                                        String positionText = exp.getPositionText();
+                                        dos.writeUTF((positionText == null) ? "NULL" : positionText);
+                                    });
                         });
                 break;
         }
