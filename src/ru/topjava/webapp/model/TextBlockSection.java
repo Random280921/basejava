@@ -10,6 +10,10 @@ public class TextBlockSection extends AbstractSection {
     public TextBlockSection() {
     }
 
+    public TextBlockSection(String blockPosition) {
+        this.blockPosition = blockPosition;
+    }
+
     public void addBlockPosition(String blockPosition) {
         this.blockPosition = blockPosition;
     }

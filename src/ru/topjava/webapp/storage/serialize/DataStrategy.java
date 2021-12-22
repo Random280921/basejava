@@ -5,8 +5,7 @@ import ru.topjava.webapp.model.*;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Класс  DataStrategy -- стратегия сериализации DataStream
@@ -81,15 +80,27 @@ public class DataStrategy implements Strategy {
         switch (sectionType) {
             case OBJECTIVE:
             case PERSONAL:
-                writeTextBlock(section, dos);
+                dos.writeUTF(((TextBlockSection) section).getBlockPosition());
                 break;
             case ACHIEVEMENT:
             case QUALIFICATIONS:
-                writeTextList(section, dos);
+                writeWithException(((TextListSection) section).getListPosition(), dos, dos::writeUTF);
                 break;
             case EXPERIENCE:
             case EDUCATION:
-                writeCompanyList(section, dos);
+                writeWithException(((CompanySection) section).getListPosition(),
+                        dos,
+                        company -> {
+                            writeContact(company.getCompanyName(), dos);
+                            WriteConsumer<Company.Experience> consumerExperience = exp -> {
+                                writeDate(dos, exp.getDateFrom());
+                                writeDate(dos, exp.getDateTo());
+                                dos.writeUTF(exp.getPositionTitle());
+                                String positionText = exp.getPositionText();
+                                dos.writeUTF((positionText == null) ? "NULL" : positionText);
+                            };
+                            writeWithException(company.getExperienceList(), dos, consumerExperience);
+                        });
                 break;
         }
     }
@@ -102,81 +113,34 @@ public class DataStrategy implements Strategy {
         switch (sectionType) {
             case OBJECTIVE:
             case PERSONAL:
-                readTextBlock(sectionType, resume, dis);
+                resume.addSection(sectionType, new TextBlockSection(dis.readUTF()));
                 break;
             case ACHIEVEMENT:
             case QUALIFICATIONS:
-                readTextList(sectionType, resume, dis);
+                readWithException(dis,
+                        () -> resume.addSection(sectionType, new TextListSection()),
+                        () -> ((TextListSection) resume.getBody().get(sectionType)).addListPosition(dis.readUTF()));
                 break;
             case EXPERIENCE:
             case EDUCATION:
-                readCompanyList(sectionType, resume, dis);
+                readWithException(dis,
+                        () -> resume.addSection(sectionType, new CompanySection()),
+                        () -> {
+                            Contact contact = readContact(dis.readUTF(), dis.readUTF());
+                            Company company = new Company(contact.getValue(), contact.getUrl());
+                            readWithException(dis,
+                                    () -> {
+                                    },
+                                    () -> {
+                                        LocalDate dateFrom = readDate(dis.readUTF());
+                                        LocalDate dateTo = readDate(dis.readUTF());
+                                        String posTitle = dis.readUTF();
+                                        String posText = dis.readUTF();
+                                        company.addExperience(dateFrom, dateTo, posTitle, ("NULL".equals(posText)) ? null : posText);
+                                    });
+                            ((CompanySection) resume.getBody().get(sectionType)).addListPosition(company);
+                        });
                 break;
-        }
-    }
-
-    /**
-     * вспомогательный метод для сокращения кода
-     * запись списка текста
-     */
-    private void writeTextBlock(AbstractSection section, DataOutputStream dos) throws IOException {
-        String blockPosition = ((TextBlockSection) section).getBlockPosition();
-        dos.writeUTF(blockPosition);
-    }
-
-    /**
-     * вспомогательный метод для сокращения кода
-     * чтение списка текста
-     */
-    private void readTextBlock(SectionType sectionType, Resume resume, DataInputStream dis) throws IOException {
-        resume.addSection(sectionType, new TextBlockSection());
-        ((TextBlockSection) resume.getBody().get(sectionType)).addBlockPosition(dis.readUTF());
-    }
-
-    /**
-     * вспомогательный метод для сокращения кода
-     * запись списка текста
-     */
-    private void writeTextList(AbstractSection section, DataOutputStream dos) throws IOException {
-        List<String> list = ((TextListSection) section).getListPosition();
-        dos.writeInt(list.size());
-        for (String s : list) {
-            dos.writeUTF(s);
-        }
-    }
-
-    /**
-     * вспомогательный метод для сокращения кода
-     * чтение списка текста
-     */
-    private void readTextList(SectionType sectionType, Resume resume, DataInputStream dis) throws IOException {
-        int cnt = dis.readInt();
-        if (cnt > 0) {
-            resume.addSection(sectionType, new TextListSection());
-            for (int i = 0; i < cnt; i++) {
-                ((TextListSection) resume.getBody().get(sectionType)).addListPosition(dis.readUTF());
-            }
-        }
-    }
-
-    /**
-     * вспомогательный метод для сокращения кода
-     * запись списка компаний
-     */
-    private void writeCompanyList(AbstractSection section, DataOutputStream dos) throws IOException {
-        List<Company> list = ((CompanySection) section).getListPosition();
-        dos.writeInt(list.size());
-        for (Company company : list) {
-            writeContact(company.getCompanyName(), dos);
-            List<Company.Experience> setExp = company.getExperienceList();
-            dos.writeInt(setExp.size());
-            for (Company.Experience exp : setExp) {
-                writeDate(dos, exp.getDateFrom());
-                writeDate(dos, exp.getDateTo());
-                dos.writeUTF(exp.getPositionTitle());
-                String positionText = exp.getPositionText();
-                dos.writeUTF((positionText == null) ? "NULL" : positionText);
-            }
         }
     }
 
@@ -189,35 +153,45 @@ public class DataStrategy implements Strategy {
     }
 
     /**
-     * вспомогательный метод для сокращения кода
-     * чтение списка компаний
-     */
-    private void readCompanyList(SectionType sectionType, Resume resume, DataInputStream dis) throws IOException {
-        int cnt = dis.readInt();
-        if (cnt > 0) {
-            int cntEx;
-            resume.addSection(sectionType, new CompanySection());
-            for (int i = 0; i < cnt; i++) {
-                Contact contact = readContact(dis.readUTF(), dis.readUTF());
-                Company company = new Company(contact.getValue(), contact.getUrl());
-                cntEx = dis.readInt();
-                for (int j = 0; j < cntEx; j++) {
-                    LocalDate dateFrom = readDate(dis.readUTF());
-                    LocalDate dateTo = readDate(dis.readUTF());
-                    String posTitle = dis.readUTF();
-                    String posText = dis.readUTF();
-                    company.addExperience(dateFrom, dateTo, posTitle, ("NULL".equals(posText)) ? null : posText);
-                }
-                ((CompanySection) resume.getBody().get(sectionType)).addListPosition(company);
-            }
-        }
-    }
-
-    /**
      * вспомогательный метод для уникальности кода
      * конвертация строки в дату
      */
     private LocalDate readDate(String read) {
         return LocalDate.parse(read, PATTERN_DATE);
+    }
+
+    @FunctionalInterface
+    private interface WriteConsumer<T> {
+        void accept(T t) throws IOException;
+    }
+
+    @FunctionalInterface
+    private interface ReadConsumer {
+        void apply() throws IOException;
+    }
+
+    private <T> void writeWithException(Collection<T> collection,
+                                        DataOutputStream dos,
+                                        WriteConsumer<T> writeConsumer) throws IOException {
+        Objects.requireNonNull(collection);
+        Objects.requireNonNull(writeConsumer);
+        dos.writeInt(collection.size());
+        for (T t : collection) {
+            writeConsumer.accept(t);
+        }
+    }
+
+    private void readWithException(DataInputStream dis,
+                                   ReadConsumer readConsumer1,
+                                   ReadConsumer readConsumer2) throws IOException {
+        Objects.requireNonNull(readConsumer1);
+        Objects.requireNonNull(readConsumer2);
+        int cnt = dis.readInt();
+        if (cnt > 0) {
+            readConsumer1.apply();
+            for (int i = 0; i < cnt; i++) {
+                readConsumer2.apply();
+            }
+        }
     }
 }
