@@ -6,6 +6,7 @@ import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Класс  DataStrategy -- стратегия сериализации DataStream
@@ -17,24 +18,36 @@ import java.util.*;
 public class DataStrategy implements Strategy {
     private static final DateTimeFormatter PATTERN_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
+    private static class ObjectData<K, V> {
+        private final K key;
+        private final V val;
+
+        private ObjectData(K key, V val) {
+            this.key = key;
+            this.val = val;
+        }
+    }
+
+    private <K, V> List<ObjectData> getListObjectData(Map<K, V> map) {
+        return map.entrySet().stream().map(m -> new ObjectData(m.getKey(), m.getValue())).collect(Collectors.toList());
+    }
+
     @Override
     public void writeResume(Resume resume, OutputStream os) throws IOException {
         try (DataOutputStream dos = new DataOutputStream(os)) {
             dos.writeUTF(resume.getUuid());
             dos.writeUTF(resume.getFullName());
-            Map<ContactType, Contact> contacts = resume.getHeader();
-            dos.writeInt(contacts.size());
-            for (Map.Entry<ContactType, Contact> entry : contacts.entrySet()) {
-                dos.writeUTF(entry.getKey().name());
-                writeContact(entry.getValue(), dos);
-            }
-            Map<SectionType, AbstractSection> sections = resume.getBody();
-            dos.writeInt(sections.size());
-            for (Map.Entry<SectionType, AbstractSection> entry : sections.entrySet()) {
-                SectionType typeSect = entry.getKey();
+            List<ObjectData> contacts = getListObjectData(resume.getHeader());
+            writeWithException(contacts, dos, entry -> {
+                dos.writeUTF(((ContactType) entry.key).name());
+                writeContact(((Contact) entry.val), dos);
+            });
+            List<ObjectData> sections = getListObjectData(resume.getBody());
+            writeWithException(sections, dos, entry -> {
+                SectionType typeSect = (SectionType) entry.key;
                 dos.writeUTF(typeSect.name());
-                writeSection(typeSect, entry.getValue(), dos);
-            }
+                writeSection(typeSect, ((AbstractSection) entry.val), dos);
+            });
         }
     }
 
@@ -42,14 +55,14 @@ public class DataStrategy implements Strategy {
     public Resume readResume(InputStream is) throws IOException {
         try (DataInputStream dis = new DataInputStream(is)) {
             Resume resume = new Resume(dis.readUTF(), dis.readUTF());
-            int size = dis.readInt();
-            for (int i = 0; i < size; i++) {
-                resume.addContact(ContactType.valueOf(dis.readUTF()), readContact(dis.readUTF(), dis.readUTF()));
-            }
-            size = dis.readInt();
-            for (int i = 0; i < size; i++) {
-                readSection(SectionType.valueOf(dis.readUTF()), resume, dis);
-            }
+            readWithException(dis,
+                    () -> {
+                    },
+                    () -> resume.addContact(ContactType.valueOf(dis.readUTF()), readContact(dis.readUTF(), dis.readUTF())));
+            readWithException(dis,
+                    () -> {
+                    },
+                    () -> readSection(SectionType.valueOf(dis.readUTF()), resume, dis));
             return resume;
         }
     }
@@ -88,20 +101,16 @@ public class DataStrategy implements Strategy {
                 break;
             case EXPERIENCE:
             case EDUCATION:
-                writeWithException(((CompanySection) section).getListPosition(),
-                        dos,
-                        company -> {
-                            writeContact(company.getCompanyName(), dos);
-                            writeWithException(company.getExperienceList(),
-                                    dos,
-                                    exp -> {
-                                        writeDate(dos, exp.getDateFrom());
-                                        writeDate(dos, exp.getDateTo());
-                                        dos.writeUTF(exp.getPositionTitle());
-                                        String positionText = exp.getPositionText();
-                                        dos.writeUTF((positionText == null) ? "NULL" : positionText);
-                                    });
-                        });
+                writeWithException(((CompanySection) section).getListPosition(), dos, company -> {
+                    writeContact(company.getCompanyName(), dos);
+                    writeWithException(company.getExperienceList(), dos, exp -> {
+                        writeDate(dos, exp.getDateFrom());
+                        writeDate(dos, exp.getDateTo());
+                        dos.writeUTF(exp.getPositionTitle());
+                        String positionText = exp.getPositionText();
+                        dos.writeUTF((positionText == null) ? "NULL" : positionText);
+                    });
+                });
                 break;
         }
     }
@@ -118,29 +127,23 @@ public class DataStrategy implements Strategy {
                 break;
             case ACHIEVEMENT:
             case QUALIFICATIONS:
-                readWithException(dis,
-                        () -> resume.addSection(sectionType, new TextListSection()),
-                        () -> ((TextListSection) resume.getBody().get(sectionType)).addListPosition(dis.readUTF()));
+                readWithException(dis, () -> resume.addSection(sectionType, new TextListSection()), () -> ((TextListSection) resume.getBody().get(sectionType)).addListPosition(dis.readUTF()));
                 break;
             case EXPERIENCE:
             case EDUCATION:
-                readWithException(dis,
-                        () -> resume.addSection(sectionType, new CompanySection()),
-                        () -> {
-                            Contact contact = readContact(dis.readUTF(), dis.readUTF());
-                            Company company = new Company(contact.getValue(), contact.getUrl());
-                            readWithException(dis,
-                                    () -> {
-                                    },
-                                    () -> {
-                                        LocalDate dateFrom = readDate(dis.readUTF());
-                                        LocalDate dateTo = readDate(dis.readUTF());
-                                        String posTitle = dis.readUTF();
-                                        String posText = dis.readUTF();
-                                        company.addExperience(dateFrom, dateTo, posTitle, ("NULL".equals(posText)) ? null : posText);
-                                    });
-                            ((CompanySection) resume.getBody().get(sectionType)).addListPosition(company);
-                        });
+                readWithException(dis, () -> resume.addSection(sectionType, new CompanySection()), () -> {
+                    Contact contact = readContact(dis.readUTF(), dis.readUTF());
+                    Company company = new Company(contact.getValue(), contact.getUrl());
+                    readWithException(dis, () -> {
+                    }, () -> {
+                        LocalDate dateFrom = readDate(dis.readUTF());
+                        LocalDate dateTo = readDate(dis.readUTF());
+                        String posTitle = dis.readUTF();
+                        String posText = dis.readUTF();
+                        company.addExperience(dateFrom, dateTo, posTitle, ("NULL".equals(posText)) ? null : posText);
+                    });
+                    ((CompanySection) resume.getBody().get(sectionType)).addListPosition(company);
+                });
                 break;
         }
     }
@@ -171,9 +174,7 @@ public class DataStrategy implements Strategy {
         void apply() throws IOException;
     }
 
-    private <T> void writeWithException(Collection<T> collection,
-                                        DataOutputStream dos,
-                                        WriteConsumer<T> writeConsumer) throws IOException {
+    private <T> void writeWithException(Collection<T> collection, DataOutputStream dos, WriteConsumer<T> writeConsumer) throws IOException {
         Objects.requireNonNull(collection);
         Objects.requireNonNull(writeConsumer);
         dos.writeInt(collection.size());
@@ -182,9 +183,7 @@ public class DataStrategy implements Strategy {
         }
     }
 
-    private void readWithException(DataInputStream dis,
-                                   ReadConsumer readConsumer1,
-                                   ReadConsumer readConsumer2) throws IOException {
+    private void readWithException(DataInputStream dis, ReadConsumer readConsumer1, ReadConsumer readConsumer2) throws IOException {
         Objects.requireNonNull(readConsumer1);
         Objects.requireNonNull(readConsumer2);
         int cnt = dis.readInt();
