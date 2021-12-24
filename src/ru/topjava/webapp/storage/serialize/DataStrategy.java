@@ -5,48 +5,34 @@ import ru.topjava.webapp.model.*;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Класс  DataStrategy -- стратегия сериализации DataStream
  *
  * @author KAIvanov
  * created by 15.12.2021 21:10
- * @version 1.0
+ * @version 2.0
  */
 public class DataStrategy implements Strategy {
     private static final DateTimeFormatter PATTERN_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-    private static class ObjectData<K, V> {
-        private final K key;
-        private final V val;
-
-        private ObjectData(K key, V val) {
-            this.key = key;
-            this.val = val;
-        }
-    }
-
-    private <K, V> List<ObjectData> getListObjectData(Map<K, V> map) {
-        return map.entrySet().stream().map(m -> new ObjectData(m.getKey(), m.getValue())).collect(Collectors.toList());
-    }
 
     @Override
     public void writeResume(Resume resume, OutputStream os) throws IOException {
         try (DataOutputStream dos = new DataOutputStream(os)) {
             dos.writeUTF(resume.getUuid());
             dos.writeUTF(resume.getFullName());
-            List<ObjectData> contacts = getListObjectData(resume.getHeader());
-            writeWithException(contacts, dos, entry -> {
-                dos.writeUTF(((ContactType) entry.key).name());
-                writeContact(((Contact) entry.val), dos);
+            Map<ContactType, Contact> contacts = resume.getHeader();
+            writeWithException(contacts, dos, (k, v) -> {
+                dos.writeUTF(k.name());
+                writeContact(v, dos);
             });
-            List<ObjectData> sections = getListObjectData(resume.getBody());
-            writeWithException(sections, dos, entry -> {
-                SectionType typeSect = (SectionType) entry.key;
-                dos.writeUTF(typeSect.name());
-                writeSection(typeSect, ((AbstractSection) entry.val), dos);
+            Map<SectionType, AbstractSection> sections = resume.getBody();
+            writeWithException(sections, dos, (k, v) -> {
+                dos.writeUTF(k.name());
+                writeSection(k, v, dos);
             });
         }
     }
@@ -55,20 +41,15 @@ public class DataStrategy implements Strategy {
     public Resume readResume(InputStream is) throws IOException {
         try (DataInputStream dis = new DataInputStream(is)) {
             Resume resume = new Resume(dis.readUTF(), dis.readUTF());
-            readWithException(dis,
-                    () -> {
-                    },
-                    () -> resume.addContact(ContactType.valueOf(dis.readUTF()), readContact(dis.readUTF(), dis.readUTF())));
-            readWithException(dis,
-                    () -> {
-                    },
-                    () -> readSection(SectionType.valueOf(dis.readUTF()), resume, dis));
+            readWithException(dis, () -> {
+            }, () -> resume.addContact(ContactType.valueOf(dis.readUTF()), readContact(dis.readUTF(), dis.readUTF())));
+            readWithException(dis, () -> {
+            }, () -> readSection(SectionType.valueOf(dis.readUTF()), resume, dis));
             return resume;
         }
     }
 
     /**
-     * вспомогательный метод для сокращения кода
      * запись контакта
      */
     private void writeContact(Contact contact, DataOutputStream dos) throws IOException {
@@ -78,7 +59,6 @@ public class DataStrategy implements Strategy {
     }
 
     /**
-     * вспомогательный метод для сокращения кода
      * чтение контакта
      */
     private Contact readContact(String contact, String url) {
@@ -86,7 +66,6 @@ public class DataStrategy implements Strategy {
     }
 
     /**
-     * вспомогательный метод для сокращения кода
      * запись секции
      */
     private void writeSection(SectionType sectionType, AbstractSection section, DataOutputStream dos) throws IOException {
@@ -116,7 +95,6 @@ public class DataStrategy implements Strategy {
     }
 
     /**
-     * вспомогательный метод для сокращения кода
      * чтение секции
      */
     private void readSection(SectionType sectionType, Resume resume, DataInputStream dis) throws IOException {
@@ -149,7 +127,6 @@ public class DataStrategy implements Strategy {
     }
 
     /**
-     * вспомогательный метод для уникальности кода
      * запись даты
      */
     private void writeDate(DataOutputStream dos, LocalDate dt) throws IOException {
@@ -157,7 +134,6 @@ public class DataStrategy implements Strategy {
     }
 
     /**
-     * вспомогательный метод для уникальности кода
      * конвертация строки в дату
      */
     private LocalDate readDate(String read) {
@@ -165,8 +141,13 @@ public class DataStrategy implements Strategy {
     }
 
     @FunctionalInterface
-    private interface WriteConsumer<T> {
+    private interface ConsumerCollection<T> {
         void accept(T t) throws IOException;
+    }
+
+    @FunctionalInterface
+    private interface ConsumerMap<K, V> {
+        void accept(K k, V v) throws IOException;
     }
 
     @FunctionalInterface
@@ -174,12 +155,21 @@ public class DataStrategy implements Strategy {
         void apply() throws IOException;
     }
 
-    private <T> void writeWithException(Collection<T> collection, DataOutputStream dos, WriteConsumer<T> writeConsumer) throws IOException {
+    private <T> void writeWithException(Collection<T> collection, DataOutputStream dos, ConsumerCollection<T> consumerCollection) throws IOException {
         Objects.requireNonNull(collection);
-        Objects.requireNonNull(writeConsumer);
+        Objects.requireNonNull(consumerCollection);
         dos.writeInt(collection.size());
         for (T t : collection) {
-            writeConsumer.accept(t);
+            consumerCollection.accept(t);
+        }
+    }
+
+    private <K, V> void writeWithException(Map<K, V> map, DataOutputStream dos, ConsumerMap<K, V> consumerMap) throws IOException {
+        Objects.requireNonNull(map);
+        Objects.requireNonNull(consumerMap);
+        dos.writeInt(map.size());
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            consumerMap.accept(entry.getKey(), entry.getValue());
         }
     }
 
