@@ -43,7 +43,7 @@ public class MainLesson11HW {
     private static class Lock {
         String name;
 
-        public Lock(String name) {
+        private Lock(String name) {
             this.name = name;
         }
     }
