@@ -1,16 +1,21 @@
 package ru.topjava.webapp.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.Serializable;
 import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Contact implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final String value;
-
+    private String value;
     private String url;
+
+    public Contact() {
+    }
 
     public Contact(String value) {
         this(value, null);

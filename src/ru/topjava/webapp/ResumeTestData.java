@@ -37,22 +37,28 @@ public class ResumeTestData {
         }
         List<String> listString;
         List<Company> listCompany;
-        for (Map.Entry<SectionType, Section> element :
+        for (Map.Entry<SectionType, AbstractSection> element :
                 resumeModelTest.getBody().entrySet()) {
-            key = element.getKey().ordinal();
             printConsole.append("\n").append(element.getKey().getTitle()).append("\n");
-            if (key < 2)
-                printConsole.append("   ").append(((TextSection) element.getValue()).getBlockPosition()).append("\n");
-            if (key == 2 || key == 3) {
-                listString = ((TextSection) element.getValue()).getListPosition();
-                for (String text : listString) {
-                    printConsole.append("   * ").append(text).append("\n");
-                }
-            }
-            if (key > 3) {
-                listCompany = ((CompanySection) element.getValue()).getListPosition();
-                for (Company company : listCompany) {
-                    printConsole.append("\n   ").append(company.toString());
+            switch (element.getKey()) {
+                case OBJECTIVE:
+                case PERSONAL:
+                    printConsole.append("   ").append(((TextBlockSection) element.getValue()).getBlockPosition()).append("\n");
+                    break;
+                case ACHIEVEMENT:
+                case QUALIFICATIONS:
+                    listString = ((TextListSection) element.getValue()).getListPosition();
+                    for (String text : listString) {
+                        printConsole.append("   * ").append(text).append("\n");
+                    }
+                    break;
+                case EXPERIENCE:
+                case EDUCATION: {
+                    listCompany = ((CompanySection) element.getValue()).getListPosition();
+                    for (Company company : listCompany) {
+                        printConsole.append("\n   ").append(company.toString());
+                    }
+                    break;
                 }
             }
         }
@@ -70,35 +76,40 @@ public class ResumeTestData {
         resumeModelTest.addContact(ContactType.SITE, new Contact("Домашняя страница", "gkislin.ru"));
 
         // Заполняем Позиция и Личные качества
-        ((TextSection) resumeModelTest.getBody().get(SectionType.OBJECTIVE)).addBlockPosition("Ведущий стажировок и корпоративного обучения по Java Web и Enterprise технологиям");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.PERSONAL)).addBlockPosition("Аналитический склад ума, сильная логика, креативность, инициативность. Пурист кода и архитектуры.");
+        resumeModelTest.addSection(SectionType.OBJECTIVE, new TextBlockSection());
+        ((TextBlockSection) resumeModelTest.getBody().get(SectionType.OBJECTIVE)).addBlockPosition("Ведущий стажировок и корпоративного обучения по Java Web и Enterprise технологиям");
+        resumeModelTest.addSection(SectionType.PERSONAL, new TextBlockSection());
+        ((TextBlockSection) resumeModelTest.getBody().get(SectionType.PERSONAL)).addBlockPosition("Аналитический склад ума, сильная логика, креативность, инициативность. Пурист кода и архитектуры.");
 
         // Заполняем Достижения и Квалификация
-        ((TextSection) resumeModelTest.getBody().get(SectionType.ACHIEVEMENT)).addListPosition("С 2013 года: разработка проектов \"Разработка Web приложения\",\"Java Enterprise\", \"Многомодульный maven. Многопоточность. XML (JAXB/StAX). Веб сервисы (JAX-RS/SOAP). Удаленное взаимодействие (JMS/AKKA)\". Организация онлайн стажировок и ведение проектов. Более 1000 выпускников.");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.ACHIEVEMENT)).addListPosition("Реализация двухфакторной аутентификации для онлайн платформы управления проектами Wrike. Интеграция с Twilio, DuoSecurity, Google Authenticator, Jira, Zendesk.");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.ACHIEVEMENT)).addListPosition("Налаживание процесса разработки и непрерывной интеграции ERP системы River BPM. Интеграция с 1С, Bonita BPM, CMIS, LDAP. Разработка приложения управления окружением на стеке: Scala/Play/Anorm/JQuery. Разработка SSO аутентификации и авторизации различных ERP модулей, интеграция CIFS/SMB java сервера.");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.ACHIEVEMENT)).addListPosition("Реализация c нуля Rich Internet Application приложения на стеке технологий JPA, Spring, Spring-MVC, GWT, ExtGWT (GXT), Commet, HTML5, Highstock для алгоритмического трейдинга.");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.ACHIEVEMENT)).addListPosition("Создание JavaEE фреймворка для отказоустойчивого взаимодействия слабо-связанных сервисов (SOA-base архитектура, JAX-WS, JMS, AS Glassfish). Сбор статистики сервисов и информации о состоянии через систему мониторинга Nagios. Реализация онлайн клиента для администрирования и мониторинга системы по JMX (Jython/ Django).");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.ACHIEVEMENT)).addListPosition("Реализация протоколов по приему платежей всех основных платежных системы России (Cyberplat, Eport, Chronopay, Сбербанк), Белоруcсии(Erip, Osmp) и Никарагуа.");
+        resumeModelTest.addSection(SectionType.ACHIEVEMENT, new TextListSection());
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.ACHIEVEMENT)).addListPosition("С 2013 года: разработка проектов \"Разработка Web приложения\",\"Java Enterprise\", \"Многомодульный maven. Многопоточность. XML (JAXB/StAX). Веб сервисы (JAX-RS/SOAP). Удаленное взаимодействие (JMS/AKKA)\". Организация онлайн стажировок и ведение проектов. Более 1000 выпускников.");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.ACHIEVEMENT)).addListPosition("Реализация двухфакторной аутентификации для онлайн платформы управления проектами Wrike. Интеграция с Twilio, DuoSecurity, Google Authenticator, Jira, Zendesk.");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.ACHIEVEMENT)).addListPosition("Налаживание процесса разработки и непрерывной интеграции ERP системы River BPM. Интеграция с 1С, Bonita BPM, CMIS, LDAP. Разработка приложения управления окружением на стеке: Scala/Play/Anorm/JQuery. Разработка SSO аутентификации и авторизации различных ERP модулей, интеграция CIFS/SMB java сервера.");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.ACHIEVEMENT)).addListPosition("Реализация c нуля Rich Internet Application приложения на стеке технологий JPA, Spring, Spring-MVC, GWT, ExtGWT (GXT), Commet, HTML5, Highstock для алгоритмического трейдинга.");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.ACHIEVEMENT)).addListPosition("Создание JavaEE фреймворка для отказоустойчивого взаимодействия слабо-связанных сервисов (SOA-base архитектура, JAX-WS, JMS, AS Glassfish). Сбор статистики сервисов и информации о состоянии через систему мониторинга Nagios. Реализация онлайн клиента для администрирования и мониторинга системы по JMX (Jython/ Django).");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.ACHIEVEMENT)).addListPosition("Реализация протоколов по приему платежей всех основных платежных системы России (Cyberplat, Eport, Chronopay, Сбербанк), Белоруcсии(Erip, Osmp) и Никарагуа.");
 
-        ((TextSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("JEE AS: GlassFish (v2.1, v3), OC4J, JBoss, Tomcat, Jetty, WebLogic, WSO2");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Version control: Subversion, Git, Mercury, ClearCase, Perforce");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("DB: PostgreSQL(наследование, pgplsql, PL/Python), Redis (Jedis), H2, Oracle,");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("MySQL, SQLite, MS SQL, HSQLDB");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Languages: Java, Scala, Python/Jython/PL-Python, JavaScript, Groovy,");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("XML/XSD/XSLT, SQL, C/C++, Unix shell scripts,");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Java Frameworks: Java 8 (Time API, Streams), Guava, Java Executor, MyBatis, Spring (MVC, Security, Data, Clouds, Boot), JPA (Hibernate, EclipseLink), Guice, GWT(SmartGWT, ExtGWT/GXT), Vaadin, Jasperreports, Apache Commons, Eclipse SWT, JUnit, Selenium (htmlelements).");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Python: Django.");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("JavaScript: jQuery, ExtJS, Bootstrap.js, underscore.js");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Scala: SBT, Play2, Specs2, Anorm, Spray, Akka");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Технологии: Servlet, JSP/JSTL, JAX-WS, REST, EJB, RMI, JMS, JavaMail, JAXB, StAX, SAX, DOM, XSLT, MDB, JMX, JDBC, JPA, JNDI, JAAS, SOAP, AJAX, Commet, HTML5, ESB, CMIS, BPMN2, LDAP, OAuth1, OAuth2, JWT.");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Инструменты: Maven + plugin development, Gradle, настройка Ngnix,");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("администрирование Hudson/Jenkins, Ant + custom task, SoapUI, JPublisher, Flyway, Nagios, iReport, OpenCmis, Bonita, pgBouncer.");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Отличное знание и опыт применения концепций ООП, SOA, шаблонов проектрирования, архитектурных шаблонов, UML, функционального программирования");
-        ((TextSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Родной русский, английский \"upper intermediate\"");
+        resumeModelTest.addSection(SectionType.QUALIFICATIONS, new TextListSection());
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("JEE AS: GlassFish (v2.1, v3), OC4J, JBoss, Tomcat, Jetty, WebLogic, WSO2");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Version control: Subversion, Git, Mercury, ClearCase, Perforce");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("DB: PostgreSQL(наследование, pgplsql, PL/Python), Redis (Jedis), H2, Oracle,");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("MySQL, SQLite, MS SQL, HSQLDB");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Languages: Java, Scala, Python/Jython/PL-Python, JavaScript, Groovy,");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("XML/XSD/XSLT, SQL, C/C++, Unix shell scripts,");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Java Frameworks: Java 8 (Time API, Streams), Guava, Java Executor, MyBatis, Spring (MVC, Security, Data, Clouds, Boot), JPA (Hibernate, EclipseLink), Guice, GWT(SmartGWT, ExtGWT/GXT), Vaadin, Jasperreports, Apache Commons, Eclipse SWT, JUnit, Selenium (htmlelements).");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Python: Django.");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("JavaScript: jQuery, ExtJS, Bootstrap.js, underscore.js");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Scala: SBT, Play2, Specs2, Anorm, Spray, Akka");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Технологии: Servlet, JSP/JSTL, JAX-WS, REST, EJB, RMI, JMS, JavaMail, JAXB, StAX, SAX, DOM, XSLT, MDB, JMX, JDBC, JPA, JNDI, JAAS, SOAP, AJAX, Commet, HTML5, ESB, CMIS, BPMN2, LDAP, OAuth1, OAuth2, JWT.");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Инструменты: Maven + plugin development, Gradle, настройка Ngnix,");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("администрирование Hudson/Jenkins, Ant + custom task, SoapUI, JPublisher, Flyway, Nagios, iReport, OpenCmis, Bonita, pgBouncer.");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Отличное знание и опыт применения концепций ООП, SOA, шаблонов проектрирования, архитектурных шаблонов, UML, функционального программирования");
+        ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Родной русский, английский \"upper intermediate\"");
 
         // Заполняем Опыт работы и Образование
         // Опыт работы
+        resumeModelTest.addSection(SectionType.EXPERIENCE, new CompanySection());
         Company org = new Company("RIT Center");
 //        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         org.addExperience(DateUtil.of(2012, Month.APRIL), DateUtil.of(2014, Month.OCTOBER),
@@ -153,6 +164,7 @@ public class ResumeTestData {
         ((CompanySection) resumeModelTest.getBody().get(SectionType.EXPERIENCE)).addListPosition(org);
 
         // Образование
+        resumeModelTest.addSection(SectionType.EDUCATION, new CompanySection());
         org = new Company("Coursera", "www.coursera.org/course/progfun");
         org.addExperience(DateUtil.of(2013, Month.MARCH), DateUtil.of(2013, Month.MAY),
                 "\"Functional Programming Principles in Scala\" by Martin Odersky"
@@ -179,11 +191,11 @@ public class ResumeTestData {
 
         org = new Company("Санкт-Петербургский национальный исследовательский университет информационных технологий, механики и оптики",
                 "www.ifmo.ru");
-        org.addExperience(DateUtil.of(1993, Month.SEPTEMBER), DateUtil.of(1996, Month.JULY),
-                "Аспирантура (программист С, С++)"
-        );
         org.addExperience(DateUtil.of(1987, Month.SEPTEMBER), DateUtil.of(1993, Month.JULY),
                 "Инженер (программист Fortran, C)"
+        );
+        org.addExperience(DateUtil.of(1993, Month.SEPTEMBER), DateUtil.of(1996, Month.JULY),
+                "Аспирантура (программист С, С++)"
         );
         ((CompanySection) resumeModelTest.getBody().get(SectionType.EDUCATION)).addListPosition(org);
 

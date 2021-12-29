@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CompanySection extends AbstractSection<Company> {
+public class CompanySection extends AbstractSection {
     private static final long serialVersionUID = 1L;
 
     protected List<Company> listPosition = new ArrayList<>();
 
     public void addListPosition(Company position) {
         listPosition.add(position);
+    }
+
+    public CompanySection() {
     }
 
     public List<Company> getListPosition() {

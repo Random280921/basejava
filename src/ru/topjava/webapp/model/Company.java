@@ -1,18 +1,29 @@
 package ru.topjava.webapp.model;
 
+import ru.topjava.webapp.util.LocalDateAdapter;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.TreeSet;
 
 import static java.util.Objects.requireNonNull;
 import static ru.topjava.webapp.util.DateUtil.NOW;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Company implements Comparable<Company>, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final Contact companyName;
-    private TreeSet<Experience> experienceSet = new TreeSet<>();
+    private Contact companyName;
+    private List<Experience> experienceList = new ArrayList<>();
+
+    public Company() {
+    }
 
     public Company(String value, String url) {
         this.companyName = new Contact(value, url);
@@ -23,17 +34,17 @@ public class Company implements Comparable<Company>, Serializable {
     }
 
     public Company(Contact companyName,
-                   TreeSet<Experience> experienceSet) {
+                   List<Experience> experienceList) {
         this.companyName = companyName;
-        this.experienceSet = experienceSet;
+        this.experienceList = experienceList;
     }
 
     public Contact getCompanyName() {
         return companyName;
     }
 
-    public TreeSet<Experience> getExperienceSet() {
-        return experienceSet;
+    public List<Experience> getExperienceList() {
+        return experienceList;
     }
 
     public void addUrl(String url) {
@@ -41,9 +52,7 @@ public class Company implements Comparable<Company>, Serializable {
     }
 
     public void addExperience(LocalDate dateFrom, LocalDate dateTo, String positionTitle, String positionText) {
-        if (!getExperienceSet().isEmpty() && NOW.equals(getExperienceSet().first().getDateTo()))
-            requireNonNull(dateTo, "The NOW Experience.dateTo field allready exist");
-        getExperienceSet().add(new Experience(dateFrom, dateTo, positionTitle, positionText));
+        getExperienceList().add(new Experience(dateFrom, dateTo, positionTitle, positionText));
     }
 
     public void addExperience(LocalDate dateFrom, LocalDate dateTo, String positionTitle) {
@@ -55,7 +64,7 @@ public class Company implements Comparable<Company>, Serializable {
     }
 
     public void removeExperience(LocalDate fistDate) {
-        getExperienceSet().removeIf(experience -> experience.getDateFrom().equals(fistDate));
+        getExperienceList().removeIf(experience -> experience.getDateFrom().equals(fistDate));
     }
 
     /**
@@ -63,8 +72,10 @@ public class Company implements Comparable<Company>, Serializable {
      */
     @Override
     public int compareTo(Company o) {
-        int compareResultFrom = o.getExperienceSet().first().getDateFrom().compareTo(getExperienceSet().first().getDateFrom());
-        int compareResultTo = o.getExperienceSet().first().getDateTo().compareTo(getExperienceSet().first().getDateTo());
+        o.getExperienceList().sort(Experience::compareTo);
+        getExperienceList().sort(Experience::compareTo);
+        int compareResultFrom = o.getExperienceList().get(0).getDateFrom().compareTo(getExperienceList().get(0).getDateFrom());
+        int compareResultTo = o.getExperienceList().get(0).getDateTo().compareTo(getExperienceList().get(0).getDateTo());
         return (compareResultTo != 0) ? compareResultTo : compareResultFrom;
     }
 
@@ -74,7 +85,7 @@ public class Company implements Comparable<Company>, Serializable {
         StringBuilder companyDescription = new StringBuilder(String.format("%s (%s)\n",
                 getCompanyName().getValue(),
                 (url == null) ? "url not exist" : url));
-        for (Experience experience : getExperienceSet()) {
+        for (Experience experience : getExperienceList()) {
             companyDescription.append("   ").append(experience.toString());
         }
         return companyDescription.toString();
@@ -86,11 +97,94 @@ public class Company implements Comparable<Company>, Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Company company = (Company) o;
-        return companyName.equals(company.companyName) && Objects.equals(experienceSet, company.experienceSet);
+        return companyName.equals(company.companyName) && Objects.equals(experienceList, company.experienceList);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(companyName, experienceSet);
+        return Objects.hash(companyName, experienceList);
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class Experience implements Comparable<Experience>, Serializable {
+        private static final long serialVersionUID = 1L;
+
+        @XmlJavaTypeAdapter(LocalDateAdapter.class)
+        private LocalDate dateFrom;
+        @XmlJavaTypeAdapter(LocalDateAdapter.class)
+        private LocalDate dateTo;
+        private String positionTitle;
+        private String positionText;
+
+        public Experience() {
+        }
+
+        Experience(LocalDate dateFrom, LocalDate dateTo, String positionTitle, String positionText) {
+            requireNonNull(dateFrom, "Experience.dateFrom must not be null");
+            requireNonNull(dateTo, "Experience.dateTo must not be null");
+            requireNonNull(positionTitle, "Experience.positionTitle must not be null");
+            this.dateFrom = dateFrom;
+            this.dateTo = dateTo;
+            this.positionTitle = positionTitle;
+            this.positionText = positionText;
+        }
+
+        public LocalDate getDateFrom() {
+            return dateFrom;
+        }
+
+        public LocalDate getDateTo() {
+            return dateTo;
+        }
+
+        public String getPositionTitle() {
+            return positionTitle;
+        }
+
+        public String getPositionText() {
+            return positionText;
+        }
+
+        public String getPeriod() {
+            DateTimeFormatter PATTERN_DATE = DateTimeFormatter.ofPattern("MM/yyyy");
+            return String.format("%s - %s",
+                    getDateFrom().format(PATTERN_DATE),
+                    (NOW.equals(getDateTo())) ? "Сейчас" : getDateTo().format(PATTERN_DATE));
+        }
+
+        @Override
+        public String toString() {
+            return (getPositionText() == null)
+                    ?
+                    String.format("%s    %s\n",
+                            getPeriod(),
+                            getPositionTitle())
+                    :
+                    String.format("%s    %s\n                      %s\n",
+                            getPeriod(),
+                            getPositionTitle(),
+                            getPositionText());
+        }
+
+        /**
+         * Sorted: last date experience to first
+         */
+        @Override
+        public int compareTo(Experience o) {
+            return o.getDateFrom().compareTo(getDateFrom());
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Experience that = (Experience) o;
+            return dateFrom.equals(that.dateFrom) && dateTo.equals(that.dateTo) && positionTitle.equals(that.positionTitle) && Objects.equals(positionText, that.positionText);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(dateFrom, dateTo, positionTitle, positionText);
+        }
     }
 }
