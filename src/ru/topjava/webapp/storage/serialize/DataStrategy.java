@@ -25,14 +25,14 @@ public class DataStrategy implements Strategy {
             dos.writeUTF(resume.getUuid());
             dos.writeUTF(resume.getFullName());
             Map<ContactType, Contact> contacts = resume.getHeader();
-            writeWithException(contacts, dos, (k, v) -> {
-                dos.writeUTF(k.name());
-                writeContact(v, dos);
+            writeWithException(contacts.entrySet(), dos, entry -> {
+                dos.writeUTF(entry.getKey().name());
+                writeContact(entry.getValue(), dos);
             });
             Map<SectionType, AbstractSection> sections = resume.getBody();
-            writeWithException(sections, dos, (k, v) -> {
-                dos.writeUTF(k.name());
-                writeSection(k, v, dos);
+            writeWithException(sections.entrySet(), dos, entry -> {
+                dos.writeUTF(entry.getKey().name());
+                writeSection(entry.getKey(), entry.getValue(), dos);
             });
         }
     }
@@ -146,11 +146,6 @@ public class DataStrategy implements Strategy {
     }
 
     @FunctionalInterface
-    private interface ConsumerMap<K, V> {
-        void accept(K k, V v) throws IOException;
-    }
-
-    @FunctionalInterface
     private interface ReadConsumer {
         void apply() throws IOException;
     }
@@ -161,15 +156,6 @@ public class DataStrategy implements Strategy {
         dos.writeInt(collection.size());
         for (T t : collection) {
             consumerCollection.accept(t);
-        }
-    }
-
-    private <K, V> void writeWithException(Map<K, V> map, DataOutputStream dos, ConsumerMap<K, V> consumerMap) throws IOException {
-        Objects.requireNonNull(map);
-        Objects.requireNonNull(consumerMap);
-        dos.writeInt(map.size());
-        for (Map.Entry<K, V> entry : map.entrySet()) {
-            consumerMap.accept(entry.getKey(), entry.getValue());
         }
     }
 
