@@ -16,10 +16,10 @@ import java.util.stream.Collectors;
  */
 public class MainStream {
     public static void main(String[] args) {
-        int[] arr = {2, 3, 6, 1, 4, 1, 6, 8, 2, 3};
+        int[] arr = {2, 3, 6, 6, 4, 6, 6, 8, 2, 3};
         System.out.println(minValue(arr));
 
-        List<Integer> beginning = Arrays.asList(1, 6, 4, 7, 8, 5, 9);
+        List<Integer> beginning = Arrays.asList(2, 6, 4, 7, 8, 5, 9);
         System.out.println("Сумма элементов: " + beginning.stream().reduce(0, Integer::sum));
         List<Integer> ending = oddOrEven(beginning);
         for (Integer integer : ending) System.out.println(integer);
@@ -31,9 +31,8 @@ public class MainStream {
                 .boxed()
                 .distinct()
                 .sorted(Comparator.reverseOrder())
-                .mapToDouble(Integer::doubleValue)
                 .map(x -> x * (Math.pow(10, cnt.incrementAndGet())))
-                .mapToInt(x -> (int) x)
+                .mapToInt(Double::intValue)
                 .sum();
     }
 
