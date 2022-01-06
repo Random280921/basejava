@@ -1,7 +1,6 @@
 package ru.javaonline.basejava.storage.serialize;
 
 import ru.javaonline.basejava.model.*;
-import ru.topjava.webapp.model.*;
 import ru.javaonline.basejava.util.XmlParser;
 
 import java.io.*;
