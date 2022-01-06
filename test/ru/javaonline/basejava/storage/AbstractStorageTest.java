@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static ru.javaonline.basejava.ResumeTestData.createResumeTest;
-
 public abstract class AbstractStorageTest {
     protected static final File STORAGE_DIR = Config.get().getStorageDir();
 
@@ -31,10 +29,15 @@ public abstract class AbstractStorageTest {
     private static final Resume RESUME_4;
 
     static {
-        RESUME_1 = createResumeTest(UUID_1, "Пётр Петров");
+        /*RESUME_1 = createResumeTest(UUID_1, "Пётр Петров");
         RESUME_2 = createResumeTest(UUID_2, "Иван Иванов");
         RESUME_3 = createResumeTest(UUID_3, "Николай Николаев");
-        RESUME_4 = createResumeTest(UUID_4, "Армен Арменов");
+        RESUME_4 = createResumeTest(UUID_4, "Армен Арменов");*/
+
+        RESUME_1 = new Resume(UUID_1, "Пётр Петров");
+        RESUME_2 = new Resume(UUID_2, "Иван Иванов");
+        RESUME_3 = new Resume(UUID_3, "Николай Николаев");
+        RESUME_4 = new Resume(UUID_4, "Армен Арменов");
     }
 
     protected AbstractStorageTest(Storage storage) {
