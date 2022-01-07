@@ -3,7 +3,7 @@ drop table if exists resume;
 
 create table resume
 (
-    uuid      char(36) not null
+    uuid      varchar(36) not null
         constraint resume_pk
             primary key,
     full_name text     not null
@@ -17,7 +17,7 @@ create table contact
     id          serial
         constraint contact_pk
             primary key,
-    resume_uuid char(36)    not null
+    resume_uuid varchar(36)    not null
         constraint contact_resume_uuid_fk
             references resume (uuid)
             on delete cascade,

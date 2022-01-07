@@ -20,7 +20,8 @@ public class SqlHelper {
         T get(PreparedStatement ps) throws SQLException;
     }
 
-    public <T> T sqlExecutor(String sql, ConnectionFactory connectionFactory, SqlSupplier<T> sqlSupplier) {
+    public <T> T sqlExecutor(String sql, ConnectionFactory connectionFactory, String checkNull, SqlSupplier<T> sqlSupplier) {
+        if (checkNull == null) throw new NullPointerException();
         try (Connection conn = connectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             return sqlSupplier.get(ps);

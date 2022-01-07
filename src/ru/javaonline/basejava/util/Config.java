@@ -33,8 +33,16 @@ public class Config {
         }
     }
 
-    public Properties getProperties() {
-        return properties;
+    public String getDbUrl() {
+        return properties.getProperty("db.url");
+    }
+
+    public String getDbUser() {
+        return properties.getProperty("db.user");
+    }
+
+    public String getDbPassword() {
+        return properties.getProperty("db.password");
     }
 
     public File getStorageDir() {
