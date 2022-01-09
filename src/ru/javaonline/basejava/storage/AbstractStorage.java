@@ -5,11 +5,8 @@ import ru.javaonline.basejava.exception.NotExistStorageException;
 import ru.javaonline.basejava.model.Resume;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 public abstract class AbstractStorage<SK> implements Storage {
-
-    protected static final Logger LOG = Logger.getLogger(AbstractStorage.class.getName());
 
     public final Resume get(String uuid) {
         logCheckToNull("Get", uuid, "uuid");
@@ -36,21 +33,6 @@ public abstract class AbstractStorage<SK> implements Storage {
         List<Resume> list = convertToList();
         list.sort(Resume::compareTo);
         return list;
-    }
-
-    /**
-     * Вспомогательный метод, для сокращения общего кода в методах
-     * Проверяет входной параметр на null и логирует
-     */
-    private void logCheckToNull(String operation, Object object, String objectName) {
-        LOG.info(operation + " " + ((object == null) ? "null"
-                : ((object instanceof Resume) ?
-                "Resume: uuid= " + ((Resume) object).getUuid()
-                : "uuid= " + object)));
-        if (object == null) {
-            LOG.severe(objectName + " is not be null!");
-            throw new NullPointerException();
-        }
     }
 
     /**

@@ -1,10 +1,13 @@
 package ru.javaonline.basejava.sql;
 
+import ru.javaonline.basejava.exception.ExistStorageException;
 import ru.javaonline.basejava.exception.StorageException;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.logging.Logger;
 
 /**
  * Класс - утилита для обслуживания SQL
@@ -14,19 +17,26 @@ import java.sql.SQLException;
  * @version 1.0
  */
 public class SqlHelper {
+    private final ConnectionFactory connectionFactory;
+
+    public SqlHelper(String dbUrl, String dbUser, String dbPassword) {
+        connectionFactory = () -> DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+    }
 
     @FunctionalInterface
     public interface SqlSupplier<T> {
-        T get(PreparedStatement ps) throws SQLException;
+        T get(PreparedStatement statement) throws SQLException;
     }
 
-    public <T> T sqlExecutor(String sql, ConnectionFactory connectionFactory, String checkNull, SqlSupplier<T> sqlSupplier) {
-        if (checkNull == null) throw new NullPointerException();
-        try (Connection conn = connectionFactory.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            return sqlSupplier.get(ps);
-        } catch (SQLException e) {
-            throw new StorageException(e);
+    public <T> T sqlExecutor(String sql, Logger logger, SqlSupplier<T> sqlSupplier) {
+        try (Connection connection = connectionFactory.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            return sqlSupplier.get(statement);
+        } catch (SQLException sqlException) {
+            logger.severe(sqlException.getMessage());
+            throw (Integer.parseInt(sqlException.getSQLState()) == 23505)
+                    ? new ExistStorageException(sqlException)
+                    : new StorageException(sqlException);
         }
     }
 }

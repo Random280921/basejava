@@ -1,5 +1,7 @@
 package ru.javaonline.basejava.util;
 
+import ru.javaonline.basejava.storage.SqlStorage;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,6 +21,7 @@ public class Config {
 
     private final Properties properties = new Properties();
     private final File storageDir;
+    private static SqlStorage sqlStorage;
 
     public static Config get() {
         return INSTANCE;
@@ -28,6 +31,7 @@ public class Config {
         try (InputStream is = new FileInputStream(PROPS)) {
             properties.load(is);
             storageDir = new File(properties.getProperty("storage.dir"));
+            sqlStorage = new SqlStorage(getDbUrl(), getDbUser(), getDbPassword());
         } catch (IOException e) {
             throw new IllegalStateException("Invalid config file " + PROPS.getAbsolutePath());
         }
@@ -47,5 +51,9 @@ public class Config {
 
     public File getStorageDir() {
         return storageDir;
+    }
+
+    public SqlStorage getSqlStorage() {
+        return sqlStorage;
     }
 }

@@ -2,6 +2,7 @@ package ru.javaonline.basejava;
 
 import ru.javaonline.basejava.model.Resume;
 import ru.javaonline.basejava.storage.SqlStorage;
+import ru.javaonline.basejava.util.Config;
 
 /**
  * Класс для ручных проверок SQl
@@ -11,7 +12,7 @@ import ru.javaonline.basejava.storage.SqlStorage;
  * @version 1.0
  */
 public class MainSql {
-    static SqlStorage sqlStorage = new SqlStorage();
+    static SqlStorage sqlStorage = Config.get().getSqlStorage();
 
     public static void main(String[] args) {
         Resume resume = new Resume("uuid0", "Пётр Петров");
