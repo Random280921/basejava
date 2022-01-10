@@ -1,8 +1,5 @@
 package ru.javaonline.basejava.sql;
 
-import ru.javaonline.basejava.exception.ExistStorageException;
-import ru.javaonline.basejava.exception.StorageException;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -24,19 +21,21 @@ public class SqlHelper {
     }
 
     @FunctionalInterface
-    public interface SqlSupplier<T> {
-        T get(PreparedStatement statement) throws SQLException;
+    public interface SqlExecutor<T> {
+        T execute(PreparedStatement statement) throws SQLException;
     }
 
-    public <T> T sqlExecutor(String sql, Logger logger, SqlSupplier<T> sqlSupplier) {
+    public void execute(String sql, Logger logger) {
+        execute(sql, logger, PreparedStatement::execute);
+    }
+
+    public <T> T execute(String sql, Logger logger, SqlExecutor<T> sqlExecutor) {
         try (Connection connection = connectionFactory.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            return sqlSupplier.get(statement);
+            return sqlExecutor.execute(statement);
         } catch (SQLException sqlException) {
             logger.severe(sqlException.getMessage());
-            throw ("23505".equals(sqlException.getSQLState()))
-                    ? new ExistStorageException(sqlException)
-                    : new StorageException(sqlException);
+            throw ExceptionUtil.convertException(sqlException);
         }
     }
 }

@@ -19,7 +19,6 @@ public class Config {
     private static final File PROPS = new File("config/resumes.properties");
     private static final Config INSTANCE = new Config();
 
-    private final Properties properties = new Properties();
     private final File storageDir;
     private static SqlStorage sqlStorage;
 
@@ -29,24 +28,15 @@ public class Config {
 
     private Config() {
         try (InputStream is = new FileInputStream(PROPS)) {
+            Properties properties = new Properties();
             properties.load(is);
             storageDir = new File(properties.getProperty("storage.dir"));
-            sqlStorage = new SqlStorage(getDbUrl(), getDbUser(), getDbPassword());
+            sqlStorage = new SqlStorage(properties.getProperty("db.url"),
+                    properties.getProperty("db.user"),
+                    properties.getProperty("db.password"));
         } catch (IOException e) {
             throw new IllegalStateException("Invalid config file " + PROPS.getAbsolutePath());
         }
-    }
-
-    public String getDbUrl() {
-        return properties.getProperty("db.url");
-    }
-
-    public String getDbUser() {
-        return properties.getProperty("db.user");
-    }
-
-    public String getDbPassword() {
-        return properties.getProperty("db.password");
     }
 
     public File getStorageDir() {
