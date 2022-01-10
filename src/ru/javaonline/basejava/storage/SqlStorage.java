@@ -36,11 +36,10 @@ public class SqlStorage implements Storage {
     @Override
     public void save(Resume resume) {
         logCheckToNull("Save", resume, "Resume");
-        String uuid = resume.getUuid();
         sqlHelper.sqlExecutor("INSERT INTO resume (uuid, full_name) VALUES (?,?)",
                 LOG,
                 ps -> {
-                    ps.setString(1, uuid);
+                    ps.setString(1, resume.getUuid());
                     ps.setString(2, resume.getFullName());
                     ps.execute();
                     return null;
@@ -50,10 +49,10 @@ public class SqlStorage implements Storage {
     @Override
     public void update(Resume resume) {
         logCheckToNull("Update", resume, "Resume");
-        String uuid = resume.getUuid();
         sqlHelper.sqlExecutor("UPDATE resume SET full_name=? WHERE uuid = ?",
                 LOG,
                 ps -> {
+                    String uuid = resume.getUuid();
                     ps.setString(1, resume.getFullName());
                     ps.setString(2, uuid);
                     if (ps.executeUpdate() == 0) {
@@ -95,10 +94,10 @@ public class SqlStorage implements Storage {
     @Override
     public List<Resume> getAllSorted() {
         LOG.info("getAllSorted");
-        List<Resume> resumeList = new ArrayList<>();
         return sqlHelper.sqlExecutor("SELECT * FROM resume ORDER BY full_name, uuid",
                 LOG,
                 ps -> {
+                    List<Resume> resumeList = new ArrayList<>();
                     ResultSet rs = ps.executeQuery();
                     while (rs.next()) {
                         resumeList.add(new Resume(rs.getString("uuid"), rs.getString("full_name")));

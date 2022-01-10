@@ -34,7 +34,7 @@ public class SqlHelper {
             return sqlSupplier.get(statement);
         } catch (SQLException sqlException) {
             logger.severe(sqlException.getMessage());
-            throw (Integer.parseInt(sqlException.getSQLState()) == 23505)
+            throw ("23505".equals(sqlException.getSQLState()))
                     ? new ExistStorageException(sqlException)
                     : new StorageException(sqlException);
         }
