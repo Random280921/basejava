@@ -1,12 +1,15 @@
 package ru.javaonline.basejava.storage;
 
 import ru.javaonline.basejava.exception.NotExistStorageException;
+import ru.javaonline.basejava.model.Contact;
+import ru.javaonline.basejava.model.ContactType;
 import ru.javaonline.basejava.model.Resume;
 import ru.javaonline.basejava.sql.SqlHelper;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Класс - реализация хранилища в БД
@@ -37,6 +40,15 @@ public class SqlStorage implements Storage {
             ps.execute();
             return null;
         });
+        for (Map.Entry<ContactType, Contact> e : resume.getHeader().entrySet()) {
+            sqlHelper.execute("INSERT INTO contact (resume_uuid, type, value, url) VALUES (?,?,?,?)", LOG, ps -> {
+                ps.setString(1, resume.getUuid());
+                ps.setString(2, e.getKey().name());
+                ps.setString(3, e.getValue().getValue());
+                ps.setString(4, e.getValue().getUrl());
+                return null;
+            });
+        }
     }
 
     @Override
@@ -56,13 +68,23 @@ public class SqlStorage implements Storage {
     @Override
     public Resume get(String uuid) {
         logCheckToNull("Get", uuid, "uuid");
-        return sqlHelper.execute("SELECT * FROM resume r WHERE r.uuid =?", LOG, ps -> {
+        return sqlHelper.execute(" SELECT r.full_name, c.type, c.value, c.url" +
+                " FROM resume r" +
+                " LEFT JOIN contact c ON r.uuid = c.resume_uuid" +
+                " WHERE r.uuid= ?", LOG, ps -> {
             ps.setString(1, uuid);
             ResultSet rs = ps.executeQuery();
             if (!rs.next()) {
                 throw new NotExistStorageException(uuid);
             }
-            return new Resume(uuid, rs.getString("full_name"));
+            Resume resume = new Resume(uuid, rs.getString("full_name"));
+            do {
+                ContactType type = ContactType.valueOf(rs.getString("type"));
+                resume.addContact(type,
+                        new Contact(rs.getString("value"),
+                                rs.getString("url")));
+            } while (rs.next());
+            return resume;
         });
     }
 
@@ -94,7 +116,7 @@ public class SqlStorage implements Storage {
     @Override
     public int size() {
         LOG.info("size");
-        return sqlHelper.execute("SELECT COUNT(uuid) as CNT FROM resume", LOG, ps -> {
+        return sqlHelper.execute("SELECT COUNT(uuid) AS CNT FROM resume", LOG, ps -> {
             ResultSet rs = ps.executeQuery();
             return rs.next() ? rs.getInt(1) : 0;
         });
