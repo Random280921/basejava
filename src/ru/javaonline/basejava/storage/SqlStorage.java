@@ -7,6 +7,7 @@ import ru.javaonline.basejava.model.Resume;
 import ru.javaonline.basejava.sql.SqlHelper;
 import ru.javaonline.basejava.util.Config;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,22 +36,24 @@ public class SqlStorage implements Storage {
     @Override
     public void save(Resume resume) {
         logCheckToNull("Save", resume, "Resume");
-        sqlHelper.execute("INSERT INTO resume (uuid, full_name) VALUES (?,?)", LOG, ps -> {
-            ps.setString(1, resume.getUuid());
-            ps.setString(2, resume.getFullName());
-            ps.execute();
+        sqlHelper.transactionalExecute(LOG, conn -> {
+            try (PreparedStatement ps = conn.prepareStatement("INSERT INTO resume (uuid, full_name) VALUES (?,?)")) {
+                ps.setString(1, resume.getUuid());
+                ps.setString(2, resume.getFullName());
+                ps.execute();
+            }
+            try (PreparedStatement ps = conn.prepareStatement("INSERT INTO contact (resume_uuid, type, value, url) VALUES (?,?,?,?)")) {
+                for (Map.Entry<ContactType, Contact> e : resume.getHeader().entrySet()) {
+                    ps.setString(1, resume.getUuid());
+                    ps.setString(2, e.getKey().name());
+                    ps.setString(3, e.getValue().getValue());
+                    ps.setString(4, e.getValue().getUrl());
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
             return null;
         });
-        for (Map.Entry<ContactType, Contact> e : resume.getHeader().entrySet()) {
-            sqlHelper.execute("INSERT INTO contact (resume_uuid, type, value, url) VALUES (?,?,?,?)", LOG, ps -> {
-                ps.setString(1, resume.getUuid());
-                ps.setString(2, e.getKey().name());
-                ps.setString(3, e.getValue().getValue());
-                ps.setString(4, e.getValue().getUrl());
-                ps.execute();
-                return null;
-            });
-        }
     }
 
     @Override

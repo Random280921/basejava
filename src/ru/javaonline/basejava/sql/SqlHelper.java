@@ -25,6 +25,11 @@ public class SqlHelper {
         T execute(PreparedStatement statement) throws SQLException;
     }
 
+    @FunctionalInterface
+    public interface SqlTransaction<T> {
+        T execute(Connection conn) throws SQLException;
+    }
+
     public void execute(String sql, Logger logger) {
         execute(sql, logger, PreparedStatement::execute);
     }
@@ -33,9 +38,26 @@ public class SqlHelper {
         try (Connection connection = connectionFactory.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             return sqlExecutor.execute(statement);
-        } catch (SQLException sqlException) {
-            logger.severe(sqlException.getMessage());
-            throw ExceptionUtil.convertException(sqlException);
+        } catch (SQLException e) {
+            logger.severe(e.getMessage());
+            throw ExceptionUtil.convertException(e);
+        }
+    }
+
+    public <T> T transactionalExecute(Logger logger, SqlTransaction<T> executor) {
+        try (Connection connection = connectionFactory.getConnection()) {
+            try {
+                connection.setAutoCommit(false);
+                T result = executor.execute(connection);
+                connection.commit();
+                return result;
+            } catch (SQLException e) {
+                connection.rollback();
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.severe(e.getMessage());
+            throw ExceptionUtil.convertException(e);
         }
     }
 }
