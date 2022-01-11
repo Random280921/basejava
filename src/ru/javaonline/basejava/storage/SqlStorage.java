@@ -46,6 +46,7 @@ public class SqlStorage implements Storage {
                 ps.setString(2, e.getKey().name());
                 ps.setString(3, e.getValue().getValue());
                 ps.setString(4, e.getValue().getUrl());
+                ps.execute();
                 return null;
             });
         }

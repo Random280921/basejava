@@ -1,9 +1,7 @@
 package ru.javaonline.basejava;
 
 import ru.javaonline.basejava.model.*;
-import ru.javaonline.basejava.util.DateUtil;
 
-import java.time.Month;
 import java.util.List;
 import java.util.Map;
 
@@ -76,7 +74,8 @@ public class ResumeTestData {
         resumeModelTest.addContact(ContactType.SITE, new Contact("Домашняя страница", "gkislin.ru"));
 
         // Заполняем Позиция и Личные качества
-        resumeModelTest.addSection(SectionType.OBJECTIVE, new TextBlockSection());
+       /*
+       resumeModelTest.addSection(SectionType.OBJECTIVE, new TextBlockSection());
         ((TextBlockSection) resumeModelTest.getBody().get(SectionType.OBJECTIVE)).addBlockPosition("Ведущий стажировок и корпоративного обучения по Java Web и Enterprise технологиям");
         resumeModelTest.addSection(SectionType.PERSONAL, new TextBlockSection());
         ((TextBlockSection) resumeModelTest.getBody().get(SectionType.PERSONAL)).addBlockPosition("Аналитический склад ума, сильная логика, креативность, инициативность. Пурист кода и архитектуры.");
@@ -205,5 +204,6 @@ public class ResumeTestData {
                 "Аспирантура (программист С, С++)"
         );
         ((CompanySection) resumeModelTest.getBody().get(SectionType.EDUCATION)).addListPosition(org);
+        */
     }
 }
