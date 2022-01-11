@@ -1,1 +1,0 @@
-SELECT COUNT(uuid) AS CNT FROM resume;

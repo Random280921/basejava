@@ -1,9 +1,6 @@
 package ru.javaonline.basejava.sql;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.logging.Logger;
 
 /**
@@ -30,13 +27,20 @@ public class SqlHelper {
         T execute(Connection conn) throws SQLException;
     }
 
+    @FunctionalInterface
+    public interface SqlFunction<T, R> {
+        R apply(T t) throws SQLException;
+    }
+
     public void execute(String sql, Logger logger) {
         execute(sql, logger, PreparedStatement::execute);
     }
 
     public <T> T execute(String sql, Logger logger, SqlExecutor<T> sqlExecutor) {
         try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement = connection.prepareStatement(sql,
+                     ResultSet.TYPE_SCROLL_INSENSITIVE,
+                     ResultSet.CONCUR_UPDATABLE)) {
             return sqlExecutor.execute(statement);
         } catch (SQLException e) {
             logger.severe(e.getMessage());

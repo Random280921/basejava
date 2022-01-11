@@ -36,11 +36,6 @@ public abstract class AbstractStorageTest {
         RESUME_2 = createResumeTest(UUID_2, "Иван Иванов");
         RESUME_3 = createResumeTest(UUID_3, "Николай Николаев");
         RESUME_4 = createResumeTest(UUID_4, "Армен Арменов");
-/*
-        RESUME_1 = new Resume(UUID_1, "Пётр Петров");
-        RESUME_2 = new Resume(UUID_2, "Иван Иванов");
-        RESUME_3 = new Resume(UUID_3, "Николай Николаев");
-        RESUME_4 = new Resume(UUID_4, "Армен Арменов");*/
     }
 
     protected AbstractStorageTest(Storage storage) {

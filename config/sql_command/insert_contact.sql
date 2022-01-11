@@ -1,1 +1,0 @@
-INSERT INTO contact (c_type, c_value, c_url, resume_uuid) VALUES (?,?,?,?);
