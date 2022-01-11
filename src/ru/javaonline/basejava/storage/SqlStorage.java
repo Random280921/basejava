@@ -5,6 +5,7 @@ import ru.javaonline.basejava.model.Contact;
 import ru.javaonline.basejava.model.ContactType;
 import ru.javaonline.basejava.model.Resume;
 import ru.javaonline.basejava.sql.SqlHelper;
+import ru.javaonline.basejava.util.Config;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -69,10 +70,7 @@ public class SqlStorage implements Storage {
     @Override
     public Resume get(String uuid) {
         logCheckToNull("Get", uuid, "uuid");
-        return sqlHelper.execute(" SELECT r.full_name, c.type, c.value, c.url" +
-                " FROM resume r" +
-                " LEFT JOIN contact c ON r.uuid = c.resume_uuid" +
-                " WHERE r.uuid= ?", LOG, ps -> {
+        return sqlHelper.execute(Config.get().getSqlCommands().get("get.sql"), LOG, ps -> {
             ps.setString(1, uuid);
             ResultSet rs = ps.executeQuery();
             if (!rs.next()) {

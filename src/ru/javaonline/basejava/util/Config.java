@@ -6,6 +6,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -17,10 +20,12 @@ import java.util.Properties;
  */
 public class Config {
     private static final File PROPS = new File("config/resumes.properties");
+    private static final File SQL_COMMAND_DIR = new File("config/sql_command");
     private static final Config INSTANCE = new Config();
 
     private final File storageDir;
-    private static SqlStorage sqlStorage;
+    private final SqlStorage sqlStorage;
+    private final Map<String, String> sqlCommands = new HashMap<>();
 
     public static Config get() {
         return INSTANCE;
@@ -34,6 +39,12 @@ public class Config {
             sqlStorage = new SqlStorage(properties.getProperty("db.url"),
                     properties.getProperty("db.user"),
                     properties.getProperty("db.password"));
+            File[] listFiles = SQL_COMMAND_DIR.listFiles();
+            if (listFiles != null) {
+                for (File file : listFiles) {
+                    sqlCommands.put(file.getName(), new String(Files.readAllBytes(file.toPath())));
+                }
+            }
         } catch (IOException e) {
             throw new IllegalStateException("Invalid config file " + PROPS.getAbsolutePath());
         }
@@ -45,5 +56,9 @@ public class Config {
 
     public SqlStorage getSqlStorage() {
         return sqlStorage;
+    }
+
+    public Map<String, String> getSqlCommands() {
+        return sqlCommands;
     }
 }

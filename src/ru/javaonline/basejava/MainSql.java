@@ -1,6 +1,5 @@
 package ru.javaonline.basejava;
 
-import ru.javaonline.basejava.model.Resume;
 import ru.javaonline.basejava.storage.SqlStorage;
 import ru.javaonline.basejava.util.Config;
 
@@ -15,8 +14,14 @@ public class MainSql {
     static SqlStorage sqlStorage = Config.get().getSqlStorage();
 
     public static void main(String[] args) {
-        Resume resume = new Resume("uuid0", "Пётр Петров");
-        sqlStorage.save(resume);
-        System.out.println(sqlStorage.size());
+//        Resume resume = new Resume("uuid0", "Пётр Петров");
+//        sqlStorage.save(resume);
+//        System.out.println(sqlStorage.size());
+//        for (Map.Entry<String,String> e:
+//                Config.get().getSqlCommands().entrySet()) {
+//            System.out.println(e.getKey());
+//            System.out.println(e.getValue());
+//        }
+        System.out.println(Config.get().getSqlCommands().get("get.sql"));
     }
 }
