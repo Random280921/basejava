@@ -42,7 +42,8 @@ public class Config {
             File[] listFiles = SQL_COMMAND_DIR.listFiles();
             if (listFiles != null) {
                 for (File file : listFiles) {
-                    sqlCommands.put(file.getName(), new String(Files.readAllBytes(file.toPath())));
+                    sqlCommands.put(file.getName().replace(".sql", ""),
+                            new String(Files.readAllBytes(file.toPath())));
                 }
             }
         } catch (IOException e) {
@@ -58,7 +59,7 @@ public class Config {
         return sqlStorage;
     }
 
-    public Map<String, String> getSqlCommands() {
-        return sqlCommands;
+    public String getSqlCommand(String command) {
+        return sqlCommands.get(command);
     }
 }

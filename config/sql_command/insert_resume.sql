@@ -1,0 +1,1 @@
+INSERT INTO resume (full_name, uuid) VALUES (?,?);

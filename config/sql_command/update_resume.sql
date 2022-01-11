@@ -1,0 +1,1 @@
+UPDATE resume SET full_name=? WHERE uuid = ?;

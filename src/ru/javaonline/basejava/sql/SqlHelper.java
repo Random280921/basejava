@@ -44,11 +44,11 @@ public class SqlHelper {
         }
     }
 
-    public <T> T transactionalExecute(Logger logger, SqlTransaction<T> executor) {
+    public <T> T transactionalExecute(Logger logger, SqlTransaction<T> sqlTransaction) {
         try (Connection connection = connectionFactory.getConnection()) {
             try {
                 connection.setAutoCommit(false);
-                T result = executor.execute(connection);
+                T result = sqlTransaction.execute(connection);
                 connection.commit();
                 return result;
             } catch (SQLException e) {

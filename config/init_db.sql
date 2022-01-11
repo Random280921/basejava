@@ -21,13 +21,13 @@ create table contact
         constraint contact_resume_uuid_fk
             references resume (uuid)
             on delete cascade,
-    type        varchar(32) not null,
-    value       text        not null,
-    url         text
+    c_type        varchar(32) not null,
+    c_value       text        not null,
+    c_url         text
 );
 
 create unique index contact_resume_uuid_type_uq
-    on contact (resume_uuid, type);
+    on contact (resume_uuid, c_type);
 
 alter table contact
     owner to postgres;

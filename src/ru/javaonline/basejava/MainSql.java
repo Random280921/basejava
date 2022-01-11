@@ -22,6 +22,7 @@ public class MainSql {
 //            System.out.println(e.getKey());
 //            System.out.println(e.getValue());
 //        }
-        System.out.println(Config.get().getSqlCommands().get("get.sql"));
+        System.out.println(Config.get().getSqlCommand("clear"));
+        sqlStorage.clear();
     }
 }
