@@ -164,11 +164,13 @@ public class SqlStorage implements Storage {
                                  T argument,
                                  SqlHelper.SqlFunction<T, Resume> function) throws SQLException {
         while (resultSet.next()) {
-            convertResume(argument, function).addContact(
-                    ContactType.valueOf(resultSet.getString("c_type")),
-                    new Contact(resultSet.getString("c_value"),
-                            resultSet.getString("c_url"))
-            );
+            String c_type = resultSet.getString("c_type");
+            if (c_type != null)
+                convertResume(argument, function).addContact(
+                        ContactType.valueOf(c_type),
+                        new Contact(resultSet.getString("c_value"),
+                                resultSet.getString("c_url"))
+                );
         }
     }
 
