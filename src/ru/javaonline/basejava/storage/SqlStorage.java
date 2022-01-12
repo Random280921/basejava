@@ -164,7 +164,7 @@ public class SqlStorage implements Storage {
                                  T argument,
                                  SqlHelper.SqlFunction<T, Resume> function) throws SQLException {
         while (resultSet.next()) {
-            converterResume(argument, function).addContact(
+            convertResume(argument, function).addContact(
                     ContactType.valueOf(resultSet.getString("c_type")),
                     new Contact(resultSet.getString("c_value"),
                             resultSet.getString("c_url"))
@@ -176,7 +176,7 @@ public class SqlStorage implements Storage {
      * вспомогательный метод для сокращения кода
      * конвертер объектов в Resume
      */
-    public <T> Resume converterResume(T argument, SqlHelper.SqlFunction<T, Resume> sqlFunction) {
+    public <T> Resume convertResume(T argument, SqlHelper.SqlFunction<T, Resume> sqlFunction) {
         try {
             return sqlFunction.apply(argument);
         } catch (SQLException e) {
