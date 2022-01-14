@@ -41,7 +41,7 @@ public class SqlStorage implements Storage {
         logCheckToNull("Save", resume, "Resume");
         sqlHelper.transactionalExecute(LOG, conn -> {
             modifyResume(conn, "INSERT INTO resume (full_name, uuid) VALUES (?,?);", resume);
-            modifyContact(conn, resume);
+            insertContact(conn, resume);
             return null;
         });
     }
@@ -51,7 +51,8 @@ public class SqlStorage implements Storage {
         logCheckToNull("Update", resume, "Resume");
         sqlHelper.transactionalExecute(LOG, conn -> {
             modifyResume(conn, "UPDATE resume SET full_name=? WHERE uuid = ?;", resume);
-            modifyContact(conn, resume);
+            deleteTable(conn, resume.getUuid(), "DELETE FROM Contact WHERE resume_uuid=?;");
+            insertContact(conn, resume);
             return null;
         });
     }
@@ -59,24 +60,16 @@ public class SqlStorage implements Storage {
     @Override
     public Resume get(String uuid) {
         logCheckToNull("Get", uuid, "uuid");
-        return sqlHelper.execute("SELECT r.uuid," +
-                " r.full_name," +
-                " c.c_type," +
-                " c.c_value," +
-                " c.c_url" +
-                " FROM resume r" +
-                " LEFT JOIN contact C ON r.uuid = C.resume_uuid" +
-                " WHERE r.uuid = ?;", LOG, ps -> {
-            ps.setString(1, uuid);
-            ResultSet rs = ps.executeQuery();
-            if (!rs.next()) {
-                throw new NotExistStorageException(uuid);
+        List<Resume> resumeList = sqlHelper.transactionalExecute(LOG, conn -> {
+            try (PreparedStatement psResume = conn.prepareStatement("SELECT * FROM resume WHERE uuid = ?;");
+                 PreparedStatement psContact = conn.prepareStatement(
+                         "SELECT resume_uuid AS uuid, c_type, c_value, c_url FROM contact WHERE resume_uuid=?;")) {
+                psResume.setString(1, uuid);
+                psContact.setString(1, uuid);
+                return buildResumes(1, psResume, psContact);
             }
-            Resume resume = new Resume(uuid, rs.getString("full_name"));
-            rs.beforeFirst();
-            readContact(rs, resume, r -> resume);
-            return resume;
         });
+        return resumeList.get(0);
     }
 
     @Override
@@ -95,17 +88,11 @@ public class SqlStorage implements Storage {
     public List<Resume> getAllSorted() {
         LOG.info("getAllSorted");
         return sqlHelper.transactionalExecute(LOG, conn -> {
-            try (PreparedStatement psResume = conn.prepareStatement("SELECT * FROM resume ORDER BY full_name, uuid;");
-                 PreparedStatement psContact = conn.prepareStatement("SELECT resume_uuid AS uuid, c_type, c_value, c_url FROM contact;")) {
-                Map<String, Resume> resumeMap = new LinkedHashMap<>();
-                ResultSet rsResume = psResume.executeQuery();
-                ResultSet rsContact = psContact.executeQuery();
-                while (rsResume.next()) {
-                    String uuid = rsResume.getString("uuid");
-                    resumeMap.put(uuid, new Resume(uuid, rsResume.getString("full_name")));
-                }
-                readContact(rsContact, resumeMap, map -> map.get(rsContact.getString("uuid")));
-                return new ArrayList<>(resumeMap.values());
+            try (PreparedStatement psResume = conn.prepareStatement(
+                    "SELECT * FROM resume ORDER BY full_name, uuid;");
+                 PreparedStatement psContact = conn.prepareStatement(
+                         "SELECT resume_uuid AS uuid, c_type, c_value, c_url FROM contact;")) {
+                return buildResumes(0, psResume, psContact);
             }
         });
     }
@@ -121,9 +108,32 @@ public class SqlStorage implements Storage {
 
     /**
      * вспомогательный метод для сокращения кода
+     * сборка резюме из всех таблиц
+     */
+    private List<Resume> buildResumes(int checkExist,
+                                      PreparedStatement psResume,
+                                      PreparedStatement psContact) throws SQLException {
+        Map<String, Resume> resumeMap = new LinkedHashMap<>();
+        ResultSet rsResume = psResume.executeQuery();
+        ResultSet rsContact = psContact.executeQuery();
+        while (rsResume.next()) {
+            String uuid = rsResume.getString("uuid");
+            resumeMap.put(uuid, new Resume(uuid, rsResume.getString("full_name")));
+        }
+        if (resumeMap.size() == 0 & checkExist == 1) {
+            throw new NotExistStorageException("");
+        }
+        readContact(rsContact, resumeMap, map -> map.get(rsContact.getString("uuid")));
+        return new ArrayList<>(resumeMap.values());
+    }
+
+    /**
+     * вспомогательный метод для сокращения кода
      * модификация таблицы resume
      */
-    private void modifyResume(Connection connection, String sql, Resume resume) throws SQLException {
+    private void modifyResume(Connection connection,
+                              String sql,
+                              Resume resume) throws SQLException {
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             String uuid = resume.getUuid();
             ps.setString(1, resume.getFullName());
@@ -136,24 +146,46 @@ public class SqlStorage implements Storage {
 
     /**
      * вспомогательный метод для сокращения кода
-     * модификация таблицы contact
+     * insert в таблицу параметров резюме
      */
-    private void modifyContact(Connection connection, Resume resume) throws SQLException {
-        try (PreparedStatement psDel = connection.prepareStatement(
-                "DELETE FROM contact WHERE resume_uuid=?;");
-             PreparedStatement psIns = connection.prepareStatement(
-                     "INSERT INTO contact (c_type, c_value, c_url, resume_uuid) VALUES (?,?,?,?);")) {
-            psDel.setString(1, resume.getUuid());
-            psDel.execute();
-            for (Map.Entry<ContactType, Contact> e : resume.getHeader().entrySet()) {
-                psIns.setString(1, e.getKey().name());
-                psIns.setString(2, e.getValue().getValue());
-                psIns.setString(3, e.getValue().getUrl());
-                psIns.setString(4, resume.getUuid());
+    private <K, V> void insertTable(Connection connection,
+                                    Map<K, V> map,
+                                    String sql,
+                                    SqlHelper.SqlConsumer<K, V> sqlConsumer) throws SQLException {
+        try (PreparedStatement psIns = connection.prepareStatement(sql)) {
+            for (Map.Entry<K, V> e : map.entrySet()) {
+                sqlConsumer.accept(psIns, e.getKey(), e.getValue());
                 psIns.addBatch();
             }
             psIns.executeBatch();
         }
+    }
+
+    /**
+     * вспомогательный метод для сокращения кода
+     * delete из таблицы параметров резюме
+     */
+    private void deleteTable(Connection connection, String uuid, String sql) throws SQLException {
+        try (PreparedStatement psDel = connection.prepareStatement(sql)) {
+            psDel.setString(1, uuid);
+            psDel.execute();
+        }
+    }
+
+    /**
+     * вспомогательный метод для сокращения кода
+     * insert в таблицу контактов
+     */
+    private void insertContact(Connection conn, Resume resume) throws SQLException {
+        insertTable(conn,
+                resume.getHeader(),
+                "INSERT INTO contact (c_type, c_value, c_url, resume_uuid) VALUES (?,?,?,?);",
+                (p, k, v) -> {
+                    p.setString(1, k.name());
+                    p.setString(2, v.getValue());
+                    p.setString(3, v.getUrl());
+                    p.setString(4, resume.getUuid());
+                });
     }
 
     /**
@@ -166,11 +198,9 @@ public class SqlStorage implements Storage {
         while (resultSet.next()) {
             String c_type = resultSet.getString("c_type");
             if (c_type != null)
-                convertResume(argument, function).addContact(
-                        ContactType.valueOf(c_type),
+                convertResume(argument, function).addContact(ContactType.valueOf(c_type),
                         new Contact(resultSet.getString("c_value"),
-                                resultSet.getString("c_url"))
-                );
+                                resultSet.getString("c_url")));
         }
     }
 

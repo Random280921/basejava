@@ -32,6 +32,11 @@ public class SqlHelper {
         R apply(T t) throws SQLException;
     }
 
+    @FunctionalInterface
+    public interface SqlConsumer<K, V> {
+        void accept(PreparedStatement statement, K k, V v) throws SQLException;
+    }
+
     public void execute(String sql, Logger logger) {
         execute(sql, logger, PreparedStatement::execute);
     }
