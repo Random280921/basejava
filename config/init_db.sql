@@ -31,3 +31,22 @@ create unique index contact_resume_uuid_type_uq
 
 alter table contact
     owner to postgres;
+
+create table sectiontext
+(
+    id          serial
+        constraint text_pk
+            primary key,
+    resume_uuid varchar(36)    not null
+        constraint text_resume_uuid_fk
+            references resume (uuid)
+            on delete cascade,
+    t_type        varchar(32) not null,
+    t_value       text
+);
+
+create unique index text_resume_uuid_type_uq
+    on sectiontext (resume_uuid, t_type);
+
+alter table sectiontext
+    owner to postgres;
