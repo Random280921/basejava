@@ -14,6 +14,11 @@ public class SqlHelper {
     private final ConnectionFactory connectionFactory;
 
     public SqlHelper(String dbUrl, String dbUser, String dbPassword) {
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
         connectionFactory = () -> DriverManager.getConnection(dbUrl, dbUser, dbPassword);
     }
 
@@ -25,11 +30,6 @@ public class SqlHelper {
     @FunctionalInterface
     public interface SqlTransaction<T> {
         T execute(Connection conn) throws SQLException;
-    }
-
-    @FunctionalInterface
-    public interface SqlFunction<T, R> {
-        R apply(T t) throws SQLException;
     }
 
     @FunctionalInterface

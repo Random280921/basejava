@@ -16,6 +16,7 @@ import java.util.Properties;
  * @version 1.0
  */
 public class Config {
+    //    Для запуска Tomcat нужно указывать абсолютный путь к resumes.properties
     private static final File PROPS = new File("config/resumes.properties");
     private static final Config INSTANCE = new Config();
 
