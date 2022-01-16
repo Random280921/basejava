@@ -74,7 +74,7 @@ public class ResumeTestData {
         resumeModelTest.addContact(ContactType.SITE, new Contact("Домашняя страница", "gkislin.ru"));
 
         // Заполняем Позиция и Личные качества
-       /*
+
        resumeModelTest.addSection(SectionType.OBJECTIVE, new TextBlockSection());
         ((TextBlockSection) resumeModelTest.getBody().get(SectionType.OBJECTIVE)).addBlockPosition("Ведущий стажировок и корпоративного обучения по Java Web и Enterprise технологиям");
         resumeModelTest.addSection(SectionType.PERSONAL, new TextBlockSection());
@@ -105,7 +105,7 @@ public class ResumeTestData {
         ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("администрирование Hudson/Jenkins, Ant + custom task, SoapUI, JPublisher, Flyway, Nagios, iReport, OpenCmis, Bonita, pgBouncer.");
         ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Отличное знание и опыт применения концепций ООП, SOA, шаблонов проектрирования, архитектурных шаблонов, UML, функционального программирования");
         ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Родной русский, английский \"upper intermediate\"");
-
+/*
         // Заполняем Опыт работы и Образование
         // Опыт работы
         resumeModelTest.addSection(SectionType.EXPERIENCE, new CompanySection());

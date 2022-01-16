@@ -1,10 +1,7 @@
 package ru.javaonline.basejava.storage;
 
 import ru.javaonline.basejava.exception.NotExistStorageException;
-import ru.javaonline.basejava.model.Contact;
-import ru.javaonline.basejava.model.ContactType;
-import ru.javaonline.basejava.model.Resume;
-import ru.javaonline.basejava.sql.ExceptionUtil;
+import ru.javaonline.basejava.model.*;
 import ru.javaonline.basejava.sql.SqlHelper;
 
 import java.sql.Connection;
@@ -42,6 +39,7 @@ public class SqlStorage implements Storage {
         sqlHelper.transactionalExecute(LOG, conn -> {
             modifyResume(conn, "INSERT INTO resume (full_name, uuid) VALUES (?,?);", resume);
             insertContact(conn, resume);
+            insertSection(conn, resume);
             return null;
         });
     }
@@ -51,8 +49,10 @@ public class SqlStorage implements Storage {
         logCheckToNull("Update", resume, "Resume");
         sqlHelper.transactionalExecute(LOG, conn -> {
             modifyResume(conn, "UPDATE resume SET full_name=? WHERE uuid = ?;", resume);
-            deleteTable(conn, resume.getUuid(), "DELETE FROM Contact WHERE resume_uuid=?;");
+            deleteTable(conn, resume.getUuid(), "DELETE FROM contact WHERE resume_uuid=?;");
             insertContact(conn, resume);
+            deleteTable(conn, resume.getUuid(), "DELETE FROM sectiontext WHERE resume_uuid=?;");
+            insertSection(conn, resume);
             return null;
         });
     }
@@ -60,16 +60,19 @@ public class SqlStorage implements Storage {
     @Override
     public Resume get(String uuid) {
         logCheckToNull("Get", uuid, "uuid");
-        List<Resume> resumeList = sqlHelper.transactionalExecute(LOG, conn -> {
+        Map<String, Resume> resumeMap = sqlHelper.transactionalExecute(LOG, conn -> {
             try (PreparedStatement psResume = conn.prepareStatement("SELECT * FROM resume WHERE uuid = ?;");
                  PreparedStatement psContact = conn.prepareStatement(
-                         "SELECT resume_uuid AS uuid, c_type, c_value, c_url FROM contact WHERE resume_uuid=?;")) {
+                         "SELECT resume_uuid AS uuid, c_type, c_value, c_url FROM contact WHERE resume_uuid=?;");
+                 PreparedStatement psSectionText = conn.prepareStatement(
+                         "SELECT resume_uuid AS uuid, t_type, t_value FROM sectiontext WHERE resume_uuid=?;")) {
                 psResume.setString(1, uuid);
                 psContact.setString(1, uuid);
-                return buildResumes(1, psResume, psContact);
+                psSectionText.setString(1, uuid);
+                return buildResumes(1, psResume, psContact, psSectionText);
             }
         });
-        return resumeList.get(0);
+        return resumeMap.get(uuid);
     }
 
     @Override
@@ -91,8 +94,10 @@ public class SqlStorage implements Storage {
             try (PreparedStatement psResume = conn.prepareStatement(
                     "SELECT * FROM resume ORDER BY full_name, uuid;");
                  PreparedStatement psContact = conn.prepareStatement(
-                         "SELECT resume_uuid AS uuid, c_type, c_value, c_url FROM contact;")) {
-                return buildResumes(0, psResume, psContact);
+                         "SELECT resume_uuid AS uuid, c_type, c_value, c_url FROM contact;");
+                 PreparedStatement psSectionText = conn.prepareStatement(
+                         "SELECT resume_uuid AS uuid, t_type, t_value FROM sectiontext;")) {
+                return new ArrayList<>(buildResumes(0, psResume, psContact, psSectionText).values());
             }
         });
     }
@@ -110,12 +115,14 @@ public class SqlStorage implements Storage {
      * вспомогательный метод для сокращения кода
      * сборка резюме из всех таблиц
      */
-    private List<Resume> buildResumes(int checkExist,
-                                      PreparedStatement psResume,
-                                      PreparedStatement psContact) throws SQLException {
+    private Map<String, Resume> buildResumes(int checkExist,
+                                             PreparedStatement psResume,
+                                             PreparedStatement psContact,
+                                             PreparedStatement psSectionText) throws SQLException {
         Map<String, Resume> resumeMap = new LinkedHashMap<>();
         ResultSet rsResume = psResume.executeQuery();
         ResultSet rsContact = psContact.executeQuery();
+        ResultSet rsSectionText = psSectionText.executeQuery();
         while (rsResume.next()) {
             String uuid = rsResume.getString("uuid");
             resumeMap.put(uuid, new Resume(uuid, rsResume.getString("full_name")));
@@ -123,8 +130,9 @@ public class SqlStorage implements Storage {
         if (resumeMap.size() == 0 & checkExist == 1) {
             throw new NotExistStorageException("");
         }
-        readContact(rsContact, resumeMap, map -> map.get(rsContact.getString("uuid")));
-        return new ArrayList<>(resumeMap.values());
+        readContact(rsContact, resumeMap);
+        readSection(rsSectionText, resumeMap);
+        return resumeMap;
     }
 
     /**
@@ -192,28 +200,73 @@ public class SqlStorage implements Storage {
      * вспомогательный метод для сокращения кода
      * чтение и наполнение контактов
      */
-    private <T> void readContact(ResultSet resultSet,
-                                 T argument,
-                                 SqlHelper.SqlFunction<T, Resume> function) throws SQLException {
+    private void readContact(ResultSet resultSet,
+                             Map<String, Resume> map) throws SQLException {
         while (resultSet.next()) {
             String c_type = resultSet.getString("c_type");
             if (c_type != null)
-                convertResume(argument, function).addContact(ContactType.valueOf(c_type),
-                        new Contact(resultSet.getString("c_value"),
-                                resultSet.getString("c_url")));
+                map.get(resultSet.getString("uuid"))
+                        .addContact(ContactType.valueOf(c_type),
+                                new Contact(resultSet.getString("c_value"),
+                                        resultSet.getString("c_url")));
         }
     }
 
     /**
      * вспомогательный метод для сокращения кода
-     * конвертер объектов в Resume
+     * insert в таблицу текстовых секций
      */
-    public <T> Resume convertResume(T argument, SqlHelper.SqlFunction<T, Resume> sqlFunction) {
-        try {
-            return sqlFunction.apply(argument);
-        } catch (SQLException e) {
-            Storage.LOG.severe(e.getMessage());
-            throw ExceptionUtil.convertException(e);
+    private void insertSection(Connection conn, Resume resume) throws SQLException {
+        insertTable(conn,
+                resume.getBody(),
+                "INSERT INTO sectiontext (t_type, t_value, resume_uuid) VALUES (?,?,?);",
+                (p, k, v) -> {
+                    switch (k) {
+                        case OBJECTIVE:
+                        case PERSONAL:
+                            p.setString(1, k.name());
+                            p.setString(2, ((TextBlockSection) v).getBlockPosition());
+                            p.setString(3, resume.getUuid());
+                            break;
+                        case ACHIEVEMENT:
+                        case QUALIFICATIONS:
+                            String listPosition = ((TextListSection) v).getListPosition().stream()
+                                    .reduce("",(acc, s) -> String.format("%s%s\n", acc, s));
+                            p.setString(1, k.name());
+                            p.setString(2, listPosition);
+                            p.setString(3, resume.getUuid());
+                            break;
+                    }
+                });
+    }
+
+    /**
+     * вспомогательный метод для сокращения кода
+     * чтение и наполнение текстовых секций
+     */
+    private void readSection(ResultSet resultSet,
+                             Map<String, Resume> map) throws SQLException {
+        while (resultSet.next()) {
+            String t_type = resultSet.getString("t_type");
+            if (t_type != null) {
+                SectionType sectionType = SectionType.valueOf(t_type);
+                switch (sectionType) {
+                    case OBJECTIVE:
+                    case PERSONAL:
+                        map.get(resultSet.getString("uuid")).addSection(sectionType,
+                                new TextBlockSection(resultSet.getString("t_value")));
+                        break;
+                    case ACHIEVEMENT:
+                    case QUALIFICATIONS:
+                        Resume resume = map.get(resultSet.getString("uuid"));
+                        resume.addSection(sectionType, new TextListSection());
+                        String[] listPosition = resultSet.getString("t_value").split("\n");
+                        for (String s : listPosition) {
+                            ((TextListSection) resume.getBody().get(sectionType)).addListPosition(s);
+                        }
+                        break;
+                }
+            }
         }
     }
 }
