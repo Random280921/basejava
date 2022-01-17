@@ -12,7 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ResumeServlet extends HttpServlet {
-    private static final SqlStorage sqlStorage = Config.get().getSqlStorage();
+    private static SqlStorage sqlStorage;
+
+    @Override
+    public void init() throws ServletException {
+        sqlStorage = Config.get().getSqlStorage();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

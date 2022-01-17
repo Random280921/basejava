@@ -12,6 +12,10 @@ public class TextListSection extends AbstractSection {
     public TextListSection() {
     }
 
+    public TextListSection(List<String> listPosition) {
+        this.listPosition = listPosition;
+    }
+
     public void addListPosition(String position) {
         listPosition.add(position);
     }
