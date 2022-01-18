@@ -16,8 +16,8 @@ import java.util.Properties;
  * @version 1.0
  */
 public class Config {
-    //    Для запуска Tomcat нужно указывать абсолютный путь к resumes.properties
-    private static final File PROPS = new File("config/resumes.properties");
+    //    Для запуска Tomcat нужно указать переменную для запуска -DhomeDir="полный путь к проекту до /config"
+    private static final File PROPS = new File(getHomeDir(), "config/resumes.properties");
     private static final Config INSTANCE = new Config();
 
     private final File storageDir;
@@ -46,5 +46,14 @@ public class Config {
 
     public SqlStorage getSqlStorage() {
         return sqlStorage;
+    }
+
+    private static File getHomeDir() {
+        String prop = System.getProperty("homeDir");
+        File homeDir = new File(prop == null ? "." : prop);
+        if (!homeDir.isDirectory()) {
+            throw new IllegalStateException(homeDir + " is not directory");
+        }
+        return homeDir;
     }
 }

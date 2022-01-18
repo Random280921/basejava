@@ -1,21 +1,26 @@
 package ru.javaonline.basejava.web;
 
 import ru.javaonline.basejava.exception.NotExistStorageException;
+import ru.javaonline.basejava.model.ContactType;
 import ru.javaonline.basejava.model.Resume;
-import ru.javaonline.basejava.storage.SqlStorage;
+import ru.javaonline.basejava.storage.Storage;
 import ru.javaonline.basejava.util.Config;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ResumeServlet extends HttpServlet {
-    private static SqlStorage sqlStorage;
+    private static Storage sqlStorage;
 
     @Override
-    public void init() throws ServletException {
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
         sqlStorage = Config.get().getSqlStorage();
     }
 
@@ -57,14 +62,14 @@ public class ResumeServlet extends HttpServlet {
         builder.append("<tr><td>" +
                 "<table align=\"left\" border=\"1\">" +
                 "<tr>" +
-                "<th>uuid</th>" +
-                "<th>FullName</th>" +
+                "<th>Имя</th>" +
+                "<th>Email</th>" +
                 "</tr>");
         for (Resume resume : resumeList) {
             builder.append("<tr><td>")
-                    .append(resume.getUuid())
+                    .append("<a href=\"resume?uuid=" + resume.getUuid() + "\">" + resume.getFullName() + "</a>")
                     .append("</td><td>")
-                    .append(resume.getFullName())
+                    .append(resume.getHeader().get(ContactType.EMAIL).getValue())
                     .append("</td></tr>");
         }
         builder.append("</table>" +
