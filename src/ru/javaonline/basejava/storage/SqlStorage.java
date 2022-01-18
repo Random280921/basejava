@@ -3,6 +3,7 @@ package ru.javaonline.basejava.storage;
 import ru.javaonline.basejava.exception.NotExistStorageException;
 import ru.javaonline.basejava.model.*;
 import ru.javaonline.basejava.sql.SqlHelper;
+import ru.javaonline.basejava.util.JsonParser;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -62,7 +63,7 @@ public class SqlStorage implements Storage {
                  PreparedStatement psContact = conn.prepareStatement(
                          "SELECT resume_uuid AS uuid, c_type, c_value, c_url FROM contact WHERE resume_uuid=?");
                  PreparedStatement psSectionText = conn.prepareStatement(
-                         "SELECT resume_uuid AS uuid, t_type, t_value FROM sectiontext WHERE resume_uuid=?")) {
+                         "SELECT resume_uuid AS uuid, t_type, t_content FROM sectiontext WHERE resume_uuid=?")) {
                 psResume.setString(1, uuid);
                 psContact.setString(1, uuid);
                 psSectionText.setString(1, uuid);
@@ -93,7 +94,7 @@ public class SqlStorage implements Storage {
                  PreparedStatement psContact = conn.prepareStatement(
                          "SELECT resume_uuid AS uuid, c_type, c_value, c_url FROM contact");
                  PreparedStatement psSectionText = conn.prepareStatement(
-                         "SELECT resume_uuid AS uuid, t_type, t_value FROM sectiontext")) {
+                         "SELECT resume_uuid AS uuid, t_type, t_content FROM sectiontext")) {
                 return new ArrayList<>(buildResumes(0, psResume, psContact, psSectionText).values());
             }
         });
@@ -216,22 +217,11 @@ public class SqlStorage implements Storage {
     private void insertSection(Connection conn, Resume resume) throws SQLException {
         insertTable(conn,
                 resume.getBody(),
-                "INSERT INTO sectiontext (t_type, t_value, resume_uuid) VALUES (?,?,?)",
+                "INSERT INTO sectiontext (t_type, t_content, resume_uuid) VALUES (?,?,?)",
                 (p, k, v) -> {
-                    switch (k) {
-                        case OBJECTIVE:
-                        case PERSONAL:
-                            p.setString(1, k.name());
-                            p.setString(2, ((TextBlockSection) v).getBlockPosition());
-                            p.setString(3, resume.getUuid());
-                            break;
-                        case ACHIEVEMENT:
-                        case QUALIFICATIONS:
-                            p.setString(1, k.name());
-                            p.setString(2, String.join("\n", ((TextListSection) v).getListPosition()));
-                            p.setString(3, resume.getUuid());
-                            break;
-                    }
+                    p.setString(1, k.name());
+                    p.setString(2, JsonParser.write(v, AbstractSection.class));
+                    p.setString(3, resume.getUuid());
                 });
     }
 
@@ -245,20 +235,8 @@ public class SqlStorage implements Storage {
             String tType = resultSet.getString("t_type");
             if (tType != null) {
                 SectionType sectionType = SectionType.valueOf(tType);
-                switch (sectionType) {
-                    case OBJECTIVE:
-                    case PERSONAL:
-                        map.get(resultSet.getString("uuid")).addSection(sectionType,
-                                new TextBlockSection(resultSet.getString("t_value")));
-                        break;
-                    case ACHIEVEMENT:
-                    case QUALIFICATIONS:
-                        Resume resume = map.get(resultSet.getString("uuid"));
-                        resume.addSection(sectionType,
-                                new TextListSection(Arrays.asList(resultSet.getString("t_value")
-                                        .split("\n"))));
-                        break;
-                }
+                map.get(resultSet.getString("uuid")).addSection(sectionType,
+                        JsonParser.read(resultSet.getString("t_content"), AbstractSection.class));
             }
         }
     }

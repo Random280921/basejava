@@ -1,4 +1,5 @@
 drop table if exists contact;
+drop table if exists sectiontext;
 drop table if exists resume;
 
 create table resume
@@ -26,7 +27,7 @@ create table contact
     c_url         text
 );
 
-create unique index contact_resume_uuid_type_uq
+create unique index contact_uuid_type_idx_uq
     on contact (resume_uuid, c_type);
 
 alter table contact
@@ -42,10 +43,10 @@ create table sectiontext
             references resume (uuid)
             on delete cascade,
     t_type        varchar(32) not null,
-    t_value       text
+    t_content       text
 );
 
-create unique index text_resume_uuid_type_uq
+create unique index text_uuid_type_idx_uq
     on sectiontext (resume_uuid, t_type);
 
 alter table sectiontext

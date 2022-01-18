@@ -12,31 +12,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
-import static ru.javaonline.basejava.ResumeTestData.createResumeTest;
+import static ru.javaonline.basejava.TestData.*;
 
 public abstract class AbstractStorageTest {
     protected static final File STORAGE_DIR = Config.get().getStorageDir();
 
     protected final Storage storage;
-
-    private static final String UUID_1 = UUID.randomUUID().toString();
-    private static final String UUID_2 = UUID.randomUUID().toString();
-    private static final String UUID_3 = UUID.randomUUID().toString();
-    private static final String UUID_4 = UUID.randomUUID().toString();
-
-    private static final Resume RESUME_1;
-    private static final Resume RESUME_2;
-    private static final Resume RESUME_3;
-    private static final Resume RESUME_4;
-
-    static {
-        RESUME_1 = createResumeTest(UUID_1, "Пётр Петров");
-        RESUME_2 = createResumeTest(UUID_2, "Иван Иванов");
-        RESUME_3 = createResumeTest(UUID_3, "Николай Николаев");
-        RESUME_4 = createResumeTest(UUID_4, "Армен Арменов");
-    }
 
     protected AbstractStorageTest(Storage storage) {
         this.storage = storage;

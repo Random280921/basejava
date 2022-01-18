@@ -1,7 +1,9 @@
 package ru.javaonline.basejava;
 
 import ru.javaonline.basejava.model.*;
+import ru.javaonline.basejava.util.DateUtil;
 
+import java.time.Month;
 import java.util.List;
 import java.util.Map;
 
@@ -105,7 +107,7 @@ public class ResumeTestData {
         ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("администрирование Hudson/Jenkins, Ant + custom task, SoapUI, JPublisher, Flyway, Nagios, iReport, OpenCmis, Bonita, pgBouncer.");
         ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Отличное знание и опыт применения концепций ООП, SOA, шаблонов проектрирования, архитектурных шаблонов, UML, функционального программирования");
         ((TextListSection) resumeModelTest.getBody().get(SectionType.QUALIFICATIONS)).addListPosition("Родной русский, английский \"upper intermediate\"");
-/*
+
         // Заполняем Опыт работы и Образование
         // Опыт работы
         resumeModelTest.addSection(SectionType.EXPERIENCE, new CompanySection());
@@ -204,6 +206,5 @@ public class ResumeTestData {
                 "Аспирантура (программист С, С++)"
         );
         ((CompanySection) resumeModelTest.getBody().get(SectionType.EDUCATION)).addListPosition(org);
-        */
     }
 }
