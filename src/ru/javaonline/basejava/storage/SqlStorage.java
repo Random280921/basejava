@@ -49,7 +49,7 @@ public class SqlStorage implements Storage {
             modifyResume(conn, "UPDATE resume SET full_name=? WHERE uuid = ?", resume);
             deleteTable(conn, resume.getUuid(), "DELETE FROM contact WHERE resume_uuid=?");
             insertContact(conn, resume);
-            deleteTable(conn, resume.getUuid(), "DELETE FROM sectiontext WHERE resume_uuid=?");
+            deleteTable(conn, resume.getUuid(), "DELETE FROM section WHERE resume_uuid=?");
             insertSection(conn, resume);
             return null;
         });
@@ -63,7 +63,7 @@ public class SqlStorage implements Storage {
                  PreparedStatement psContact = conn.prepareStatement(
                          "SELECT resume_uuid AS uuid, c_type, c_value, c_url FROM contact WHERE resume_uuid=?");
                  PreparedStatement psSectionText = conn.prepareStatement(
-                         "SELECT resume_uuid AS uuid, t_type, t_content FROM sectiontext WHERE resume_uuid=?")) {
+                         "SELECT resume_uuid AS uuid, t_type, t_content FROM section WHERE resume_uuid=?")) {
                 psResume.setString(1, uuid);
                 psContact.setString(1, uuid);
                 psSectionText.setString(1, uuid);
@@ -94,7 +94,7 @@ public class SqlStorage implements Storage {
                  PreparedStatement psContact = conn.prepareStatement(
                          "SELECT resume_uuid AS uuid, c_type, c_value, c_url FROM contact");
                  PreparedStatement psSectionText = conn.prepareStatement(
-                         "SELECT resume_uuid AS uuid, t_type, t_content FROM sectiontext")) {
+                         "SELECT resume_uuid AS uuid, t_type, t_content FROM section")) {
                 return new ArrayList<>(buildResumes(0, psResume, psContact, psSectionText).values());
             }
         });
@@ -217,7 +217,7 @@ public class SqlStorage implements Storage {
     private void insertSection(Connection conn, Resume resume) throws SQLException {
         insertTable(conn,
                 resume.getBody(),
-                "INSERT INTO sectiontext (t_type, t_content, resume_uuid) VALUES (?,?,?)",
+                "INSERT INTO section (t_type, t_content, resume_uuid) VALUES (?,?,?)",
                 (p, k, v) -> {
                     p.setString(1, k.name());
                     p.setString(2, JsonParser.write(v, AbstractSection.class));
