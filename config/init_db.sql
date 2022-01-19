@@ -1,5 +1,5 @@
 drop table if exists contact;
-drop table if exists sectiontext;
+drop table if exists section;
 drop table if exists resume;
 
 create table resume
@@ -33,7 +33,7 @@ create unique index contact_uuid_type_idx_uq
 alter table contact
     owner to postgres;
 
-create table sectiontext
+create table section
 (
     id          serial
         constraint text_pk
@@ -47,7 +47,7 @@ create table sectiontext
 );
 
 create unique index text_uuid_type_idx_uq
-    on sectiontext (resume_uuid, t_type);
+    on section (resume_uuid, t_type);
 
-alter table sectiontext
+alter table section
     owner to postgres;
