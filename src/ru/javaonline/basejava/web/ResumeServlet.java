@@ -1,5 +1,8 @@
 package ru.javaonline.basejava.web;
 
+import ru.javaonline.basejava.model.Contact;
+import ru.javaonline.basejava.model.ContactType;
+import ru.javaonline.basejava.model.Resume;
 import ru.javaonline.basejava.storage.Storage;
 import ru.javaonline.basejava.util.Config;
 
@@ -21,12 +24,49 @@ public class ResumeServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute("resumes", storage.getAllSorted());
-        request.getRequestDispatcher("/WEB-INF/jsp/list.jsp").forward(request, response);
+        String uuid = request.getParameter("uuid");
+        String action = request.getParameter("action");
+        if (action == null) {
+            request.setAttribute("resumes", storage.getAllSorted());
+            request.getRequestDispatcher("/WEB-INF/jsp/list.jsp").forward(request, response);
+            return;
+        }
+        Resume resume;
+        switch (action) {
+            case "delete":
+                storage.delete(uuid);
+                response.sendRedirect("resume");
+                return;
+            case "view":
+            case "edit":
+                resume = storage.get(uuid);
+                break;
+            default:
+                throw new IllegalArgumentException("Action " + action + " is illegal");
+        }
+        request.setAttribute("resume", resume);
+        request.getRequestDispatcher(
+                ("view".equals(action) ? "/WEB-INF/jsp/view.jsp" : "/WEB-INF/jsp/edit.jsp")
+        ).forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        request.setCharacterEncoding("UTF-8");
+        String uuid = request.getParameter("uuid");
+        String fullName = request.getParameter("fullName");
+        Resume resume = storage.get(uuid);
+        if (fullName != null && fullName.length() != 0) resume.setFullName(fullName);
+        for (ContactType type : ContactType.values()) {
+            String contactValue = request.getParameter(String.format("%s_value", type.name()));
+            String contactUrl = request.getParameter(String.format("%s_url", type.name()));
+            if (contactValue != null && contactValue.trim().length() != 0) {
+                resume.addContact(type, new Contact(contactValue, contactUrl));
+            } else {
+                resume.getHeader().remove(type);
+            }
+        }
+        storage.update(resume);
+        response.sendRedirect("resume");
     }
 }
