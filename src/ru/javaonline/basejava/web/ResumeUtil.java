@@ -11,7 +11,7 @@ import ru.javaonline.basejava.model.ContactType;
  * @version 1.0
  */
 public class ResumeUtil {
-    public static String getListWebContacts(ContactType contactType, Contact contact) {
+    public static String getWebContact(ContactType contactType, Contact contact) {
         String webContact = null;
         String typeName = contactType.name();
         String contactValue = contact.getValue();
