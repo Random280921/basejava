@@ -22,11 +22,19 @@ public class ResumeUtil {
         if ("EMAIL".equals(typeName))
             webContact = toLink(String.format("mailto:%s", contactValue), contactValue);
         if (webContact == null)
-            webContact = toLink((!"http".equals(contactUrl.substring(0, 4))) ? "http://" + contactUrl : contactUrl, contactValue);
+            webContact = getWebContact(contact);
         return webContact;
+    }
+
+    public static String getWebContact(Contact contact) {
+        String contactValue = contact.getValue();
+        String contactUrl = contact.getUrl();
+        if (contactUrl == null) return contactValue;
+        return toLink((!"http".equals(contactUrl.substring(0, 4))) ? "http://" + contactUrl : contactUrl, contactValue);
     }
 
     private static String toLink(String href, String title) {
         return "<a href='" + href + "'>" + title + "</a>";
     }
+
 }

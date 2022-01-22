@@ -6,8 +6,8 @@
 --%>
 <%@ page import="ru.javaonline.basejava.web.ResumeUtil" %>
 <%@ page import="ru.javaonline.basejava.model.TextBlockSection" %>
-<%@ page import="java.util.List" %>
 <%@ page import="ru.javaonline.basejava.model.TextListSection" %>
+<%@ page import="ru.javaonline.basejava.model.CompanySection" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
@@ -34,6 +34,7 @@
             <%=ResumeUtil.getWebContact(contacts.getKey(), contacts.getValue())%><br/>
         </c:forEach>
     </p>
+    <hr>
     <table>
         <c:forEach var="sections" items="${resume.body}">
             <jsp:useBean id="sections"
@@ -58,6 +59,37 @@
                                     <li>${position}</li>
                                 </c:forEach>
                             </ul>
+                        </c:when>
+                        <c:when test="${sectionName == \"EXPERIENCE\" || sectionName == \"EDUCATION\"}">
+                            <table>
+                                <c:forEach var="company"
+                                           items="<%=((CompanySection) sections.getValue()).getListPosition()%>">
+                                    <jsp:useBean id="company" type="ru.javaonline.basejava.model.Company"/>
+                                    <tr>
+                                        <td><%=ResumeUtil.getWebContact(company.getCompanyName())%>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table>
+                                                <c:forEach var="exp" items="<%=company.getExperienceList()%>">
+                                                    <jsp:useBean id="exp"
+                                                                 type="ru.javaonline.basejava.model.Company.Experience"/>
+                                                    <tr>
+                                                        <td width="150" valign="top">
+                                                            <%=exp.getPeriod()%>
+                                                        </td>
+                                                        <td>
+                                                            <b>${exp.positionTitle}</b><br/>
+                                                                ${exp.positionText}
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </table>
                         </c:when>
                     </c:choose>
                 </td>
