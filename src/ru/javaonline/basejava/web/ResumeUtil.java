@@ -29,7 +29,7 @@ public class ResumeUtil {
     public static String getWebContact(Contact contact) {
         String contactValue = contact.getValue();
         String contactUrl = contact.getUrl();
-        if (contactUrl == null) return contactValue;
+        if (contactUrl == null) return "<b>" + contactValue + "</b>";
         return toLink((!"http".equals(contactUrl.substring(0, 4))) ? "http://" + contactUrl : contactUrl, contactValue);
     }
 
