@@ -1,5 +1,6 @@
 package ru.javaonline.basejava.web;
 
+import ru.javaonline.basejava.exception.NotExistStorageException;
 import ru.javaonline.basejava.model.Contact;
 import ru.javaonline.basejava.model.ContactType;
 import ru.javaonline.basejava.model.Resume;
@@ -39,7 +40,11 @@ public class ResumeServlet extends HttpServlet {
                 return;
             case "view":
             case "edit":
-                resume = storage.get(uuid);
+                try {
+                    resume = storage.get(uuid);
+                } catch (NotExistStorageException e) {
+                    resume = new Resume(uuid, "");
+                }
                 break;
             default:
                 throw new IllegalArgumentException("Action " + action + " is illegal");
@@ -61,7 +66,7 @@ public class ResumeServlet extends HttpServlet {
             String contactValue = request.getParameter(String.format("%s_value", type.name()));
             String contactUrl = request.getParameter(String.format("%s_url", type.name()));
             if (contactValue != null && contactValue.trim().length() != 0) {
-                resume.addContact(type, new Contact(contactValue, contactUrl));
+                resume.addContact(type, new Contact(contactValue.trim(), contactUrl));
             } else {
                 resume.getHeader().remove(type);
             }

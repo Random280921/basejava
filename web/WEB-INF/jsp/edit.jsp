@@ -6,7 +6,7 @@
 --%>
 <%@ page import="ru.javaonline.basejava.web.ResumeUtil" %>
 <%@ page import="ru.javaonline.basejava.model.*" %>
-<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
@@ -49,43 +49,28 @@
         <h3>Разделы резюме:</h3>
         <c:forEach var="sectionType" items="<%=SectionType.values()%>">
             <jsp:useBean id="sectionType" type="ru.javaonline.basejava.model.SectionType"/>
-            <c:set var="sectionName" value="${sectionType.name()}"/>
-            <c:set var="section" value="<%=(resume.getBody().get(sectionType))%>"/>
-            <jsp:useBean id="section" type="ru.javaonline.basejava.model.AbstractSection"/>
-            <c:choose>
-                <c:when test="${sectionName == \"OBJECTIVE\" || sectionName == \"PERSONAL\"}">
-                    <dl>
-                        <dt><b>${sectionType.title}:</b></dt>
-                        <dd><input type="text" name="sectionBlockText" size=130
-                                   placeholder="Введите описание"
-                                   value="<%=((TextBlockSection) section).getBlockPosition()%>">
-                        </dd>
-                    </dl>
-                </c:when>
-                <c:when test="${sectionName == \"ACHIEVEMENT\" || sectionName == \"QUALIFICATIONS\"}">
-                    <dl>
-                        <dt><b>${sectionType.title}:</b></dt>
-                        <dd>
-                            <textarea name="sectionListText" wrap="soft" rows="10" cols="150"
-                                      placeholder="Введите список позиций (разделение переводом строки)">
-                                <%=String.join("\n", ((TextListSection) section).getListPosition())%>
-                            </textarea>
-                        </dd>
-                    </dl>
-                </c:when>
-                <c:when test="${sectionName == \"EXPERIENCE\" || sectionName == \"EDUCATION\"}">
-                    <c:set var="companyList"
-                           value="<%=((CompanySection) section).getListPosition()%>"
-                           scope="request"/>
-                    <jsp:include page="fragments/company.jsp">
-                        <jsp:param name="companyList" value="companyList"/>
-                    </jsp:include>
-                </c:when>
-            </c:choose>
+            <c:set var="sectionName" scope="request" value="${sectionType.name()}"/>
+            <c:set var="section" scope="request" value="<%=(resume.getBody().get(sectionType))%>"/>
+            <dl>
+                <dt><b>${sectionType.title}:</b></dt>
+                <dd>
+                    <c:if test="${section != null}">
+                        <jsp:include page="/WEB-INF/jsp/fragments/editSection.jsp">
+                            <jsp:param name="sectionName" value="sectionName"/>
+                            <jsp:param name="section" value="section"/>
+                        </jsp:include>
+                    </c:if>
+                    <c:if test="${section == null}">
+                        <jsp:include page="/WEB-INF/jsp/fragments/createSection.jsp">
+                            <jsp:param name="sectionName" value="sectionName"/>
+                        </jsp:include>
+                    </c:if>
+                </dd>
+            </dl>
         </c:forEach>
         <hr>
         <button type="submit">Сохранить</button>
-        <button onclick="window.history.back()">Отменить</button>
+        <button type="reset" onclick="window.history.back()">Отменить</button>
     </form>
 </section>
 <jsp:include page="fragments/footer.jsp"/>
