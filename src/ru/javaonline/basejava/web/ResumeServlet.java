@@ -64,10 +64,11 @@ public class ResumeServlet extends HttpServlet {
         }
         resume.setFullName(fullName.trim());
         for (ContactType type : ContactType.values()) {
-            String contactValue = request.getParameter(String.format("%s_value", type.name()));
-            String contactUrl = request.getParameter(String.format("%s_url", type.name()));
+            String typeName = type.name();
+            String contactValue = request.getParameter(String.format("%s_value", typeName));
+            String contactUrl = request.getParameter(String.format("%s_url", typeName));
             if (contactValue != null && contactValue.trim().length() != 0) {
-                resume.addContact(type, new Contact(contactValue.trim(), contactUrl));
+                resume.addContact(type, new Contact(contactValue.trim(), ResumeUtil.checkUrl(contactUrl.trim(), typeName)));
             } else {
                 resume.getHeader().remove(type);
             }
@@ -75,16 +76,12 @@ public class ResumeServlet extends HttpServlet {
         for (SectionType type : SectionType.values()) {
             switch (type) {
                 case OBJECTIVE:
-                    editBlockText(resume, request.getParameter("sectionOBJECTIVE"), type);
-                    break;
                 case PERSONAL:
-                    editBlockText(resume, request.getParameter("sectionPERSONAL"), type);
+                    editBlockText(resume, request.getParameter(type.name()), type);
                     break;
                 case ACHIEVEMENT:
-                    editListText(resume, request.getParameter("sectionACHIEVEMENT"), type);
-                    break;
                 case QUALIFICATIONS:
-                    editListText(resume, request.getParameter("sectionQUALIFICATIONS"), type);
+                    editListText(resume, request.getParameter(type.name()), type);
                     break;
             }
         }
@@ -110,7 +107,7 @@ public class ResumeServlet extends HttpServlet {
 
     private void editBlockText(Resume resume, String paramValue, SectionType type) {
         editSectionText(resume, paramValue, type,
-                x -> new TextBlockSection(paramValue));
+                x -> new TextBlockSection(paramValue.trim()));
     }
 
     private void editListText(Resume resume, String paramValue, SectionType type) {
@@ -118,7 +115,7 @@ public class ResumeServlet extends HttpServlet {
                 x -> {
                     List<String> listPosition = new LinkedList<>();
                     for (String s : paramValue.split("\n")) {
-                        if (s.trim().length() != 0) listPosition.add(s);
+                        if (s.trim().length() != 0) listPosition.add(s.trim());
                     }
                     return new TextListSection(listPosition);
                 });

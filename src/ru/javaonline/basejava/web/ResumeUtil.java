@@ -34,29 +34,33 @@ public class ResumeUtil {
     }
 
     public static String[] getExampleContact(ContactType contactType) {
-        String[] exampleContact=new String[2];
+        String[] exampleContact = new String[2];
         String typeName = contactType.name();
         if (typeName.contains("PHONE")) {
-            exampleContact[0]=("пример: +7(111) 111-1111");
-            exampleContact[1]=("url не заполняется");
+            exampleContact[0] = ("пример: +7(111) 111-1111");
+            exampleContact[1] = ("url не заполняется");
         }
         if (typeName.contains("MESSENGER")) {
-            exampleContact[0]=("пример: skype, telegram и т.п.");
-            exampleContact[1]=("пример: guest.guest, @guest и т.п.");
+            exampleContact[0] = ("пример: skype, telegram и т.п.");
+            exampleContact[1] = ("пример: guest.guest, @guest и т.п.");
         }
         if ("EMAIL".equals(typeName)) {
-            exampleContact[0]=("пример: mail@mail.ru");
-            exampleContact[1]=("url не заполняется");
+            exampleContact[0] = ("пример: mail@mail.ru");
+            exampleContact[1] = ("url не заполняется");
         }
         if ("SITE".equals(typeName)) {
-            exampleContact[0]=("пример: Домашняя страница и т.п.");
-            exampleContact[1]=("пример: www.homepage.ru");
+            exampleContact[0] = ("пример: Домашняя страница и т.п.");
+            exampleContact[1] = ("пример: www.homepage.ru");
         }
         if (exampleContact[0] == null) {
-            exampleContact[0]=("пример: LinkedIn, GitHub и т.п.");
-            exampleContact[1]=("пример: https://www.linkedin.com/in/guest");
+            exampleContact[0] = ("пример: LinkedIn, GitHub и т.п.");
+            exampleContact[1] = ("пример: https://www.linkedin.com/in/guest");
         }
         return exampleContact;
+    }
+
+    public static String checkUrl(String url, String typeName) {
+        return (!"EMAIL".equals(typeName) && !typeName.contains("PHONE")) ? url : null;
     }
 
     private static String toLink(String href, String title) {
