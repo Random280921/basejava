@@ -4,8 +4,9 @@
   Date: 20.01.2022
   Time: 15:09
 --%>
-<%@ page import="ru.javaonline.basejava.model.ContactType" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="ru.javaonline.basejava.web.ResumeUtil" %>
+<%@ page import="ru.javaonline.basejava.model.*" %>
+<%@ page contentType="text/html;charset=UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
@@ -24,34 +25,62 @@
             <dd><input type="text" name="fullName" size=50 value="${resume.fullName}"></dd>
         </dl>
         <h3>Контакты:</h3>
-        <table border="1" cellpadding="8" cellspacing="0">
+        <table>
             <tr>
                 <th>Тип</th>
-                <th>Значение</th>
-                <th>URL/NICKNAME</th>
+                <th>Значение/Название</th>
+                <th>Url/Nickname</th>
             </tr>
             <c:forEach var="contactType" items="<%=ContactType.values()%>">
+                <jsp:useBean id="contactType" type="ru.javaonline.basejava.model.ContactType"/>
                 <tr>
                     <td>${contactType.title}</td>
-                        <%--                        <dl>--%>
-                        <%--                            <dt>${type.title}</dt>--%>
-                        <%--                            <dd><input type="text" name="${type.name()}" size=30--%>
-                        <%--                                       value="${resume.header.get(type).value}"></dd>--%>
-                        <%--                        </dl>--%>
-                    <td><input type="text" name="${contactType.name()}_value" size=30 value="${resume.header.get(contactType).value}">
+                    <td><input type="text" placeholder="<%=ResumeUtil.getExampleContact(contactType)[0]%>"
+                               name="${contactType.name()}_value" size=30
+                               value="${resume.header.get(contactType).value}">
                     </td>
-                        <%-- Список для выбора - нужно подпилить под типы (отдельно м и с) и подставлять значение выбора, если есть--%>
-                        <%--                    <td><select name="contactValue">--%>
-                        <%--                        <option value="s1">skype</option>--%>
-                        <%--                        <option value="s2">telegram</option>--%>
-                        <%--                        <option value="s3">viber</option>--%>
-                        <%--                        <option value="s3">whatsapp</option>--%>
-                        <%--                    </select></td>--%>
-                    <td><input type="text" name="${contactType.name()}_url" size=50 value="${resume.header.get(contactType).url}"></td>
+                    <td><input type="text" placeholder="<%=ResumeUtil.getExampleContact(contactType)[1]%>"
+                               name="${contactType.name()}_url" size=50
+                               value="${resume.header.get(contactType).url}"></td>
                 </tr>
             </c:forEach>
         </table>
-        <h3>Секции:</h3>
+        <hr>
+        <h3>Разделы резюме:</h3>
+        <c:forEach var="sectionType" items="<%=SectionType.values()%>">
+            <jsp:useBean id="sectionType" type="ru.javaonline.basejava.model.SectionType"/>
+            <c:set var="sectionName" value="${sectionType.name()}"/>
+            <c:set var="section" value="<%=(resume.getBody().get(sectionType))%>"/>
+            <jsp:useBean id="section" type="ru.javaonline.basejava.model.AbstractSection"/>
+            <c:choose>
+                <c:when test="${sectionName == \"OBJECTIVE\" || sectionName == \"PERSONAL\"}">
+                    <dl>
+                        <dt><b>${sectionType.title}:</b></dt>
+                        <dd><input type="text" name="sectionBlockText" size=130
+                                   value="<%=((TextBlockSection) section).getBlockPosition()%>">
+                        </dd>
+                    </dl>
+                </c:when>
+                <c:when test="${sectionName == \"ACHIEVEMENT\" || sectionName == \"QUALIFICATIONS\"}">
+                    <dl>
+                        <dt><b>${sectionType.title}:</b></dt>
+                        <dd>
+                            <textarea name="sectionListText" wrap="soft" rows="10" cols="150">
+                                <%=String.join("\n", ((TextListSection) section).getListPosition())%>
+                            </textarea>
+                        </dd>
+                    </dl>
+                </c:when>
+                <c:when test="${sectionName == \"EXPERIENCE\" || sectionName == \"EDUCATION\"}">
+                    <c:set var="companyList"
+                           value="<%=((CompanySection) section).getListPosition()%>"
+                           scope="request"/>
+                    <jsp:include page="fragments/company.jsp">
+                        <jsp:param name="companyList" value="companyList"/>
+                    </jsp:include>
+                </c:when>
+            </c:choose>
+        </c:forEach>
         <input type="text" name="section" size=30 value="1"><br/>
         <input type="text" name="section" size=30 value="2"><br/>
         <input type="text" name="section" size=30 value="3"><br/>

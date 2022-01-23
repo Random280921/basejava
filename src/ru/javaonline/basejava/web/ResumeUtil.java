@@ -33,6 +33,32 @@ public class ResumeUtil {
         return toLink((!"http".equals(contactUrl.substring(0, 4))) ? "http://" + contactUrl : contactUrl, contactValue);
     }
 
+    public static String[] getExampleContact(ContactType contactType) {
+        String[] exampleContact=new String[2];
+        String typeName = contactType.name();
+        if (typeName.contains("PHONE")) {
+            exampleContact[0]=("пример: +7(111) 111-1111");
+            exampleContact[1]=("url не заполняется");
+        }
+        if (typeName.contains("MESSENGER")) {
+            exampleContact[0]=("пример: skype, telegram и т.п.");
+            exampleContact[1]=("пример: guest.guest, @guest и т.п.");
+        }
+        if ("EMAIL".equals(typeName)) {
+            exampleContact[0]=("пример: mail@mail.ru");
+            exampleContact[1]=("url не заполняется");
+        }
+        if ("SITE".equals(typeName)) {
+            exampleContact[0]=("пример: Домашняя страница и т.п.");
+            exampleContact[1]=("пример: www.homepage.ru");
+        }
+        if (exampleContact[0] == null) {
+            exampleContact[0]=("пример: LinkedIn, GitHub и т.п.");
+            exampleContact[1]=("пример: https://www.linkedin.com/in/guest");
+        }
+        return exampleContact;
+    }
+
     private static String toLink(String href, String title) {
         return "<a href='" + href + "'>" + title + "</a>";
     }
