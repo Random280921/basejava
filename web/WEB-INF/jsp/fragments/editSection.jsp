@@ -13,15 +13,24 @@
 <c:set var="section" value="${requestScope[param.section]}"/>
 <jsp:useBean id="section" type="ru.javaonline.basejava.model.AbstractSection"/>
 <c:choose>
-    <c:when test="${sectionName == \"OBJECTIVE\" || sectionName == \"PERSONAL\"}">
-        <input type="text" name="sectionBlockText" size=160
+    <c:when test="${sectionName == \"OBJECTIVE\"}">
+        <input type="text" name="sectionOBJECTIVE" size=160
                placeholder="Введите описание"
                value="<%=((TextBlockSection) section).getBlockPosition()%>">
     </c:when>
-    <c:when test="${sectionName == \"ACHIEVEMENT\" || sectionName == \"QUALIFICATIONS\"}">
-        <textarea name="sectionListText" wrap="soft" rows="10" cols="150"
-                  placeholder="Введите список позиций (разделение переводом строки)">
-            <%=String.join("\n", ((TextListSection) section).getListPosition())%>
+    <c:when test="${sectionName == \"PERSONAL\"}">
+        <input type="text" name="sectionPERSONAL" size=160
+               placeholder="Введите описание"
+               value="<%=((TextBlockSection) section).getBlockPosition()%>">
+    </c:when>
+    <c:when test="${sectionName == \"ACHIEVEMENT\"}">
+        <textarea name="sectionACHIEVEMENT" wrap="soft" rows="10" cols="150"
+                  placeholder="Введите список позиций (разделение переводом строки)"><%=String.join("\n", ((TextListSection) section).getListPosition())%>
+        </textarea>
+    </c:when>
+    <c:when test="${sectionName == \"QUALIFICATIONS\"}">
+        <textarea name="sectionQUALIFICATIONS" wrap="soft" rows="10" cols="150"
+                  placeholder="Введите список позиций (разделение переводом строки)"><%=String.join("\n", ((TextListSection) section).getListPosition())%>
         </textarea>
     </c:when>
     <c:when test="${sectionName == \"EXPERIENCE\" || sectionName == \"EDUCATION\"}">

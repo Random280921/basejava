@@ -1,9 +1,7 @@
 package ru.javaonline.basejava.web;
 
 import ru.javaonline.basejava.exception.NotExistStorageException;
-import ru.javaonline.basejava.model.Contact;
-import ru.javaonline.basejava.model.ContactType;
-import ru.javaonline.basejava.model.Resume;
+import ru.javaonline.basejava.model.*;
 import ru.javaonline.basejava.storage.Storage;
 import ru.javaonline.basejava.util.Config;
 
@@ -13,6 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ResumeServlet extends HttpServlet {
     private static Storage storage;
@@ -40,11 +40,7 @@ public class ResumeServlet extends HttpServlet {
                 return;
             case "view":
             case "edit":
-                try {
-                    resume = storage.get(uuid);
-                } catch (NotExistStorageException e) {
-                    resume = new Resume(uuid, "");
-                }
+                resume = getResume(uuid);
                 break;
             default:
                 throw new IllegalArgumentException("Action " + action + " is illegal");
@@ -60,8 +56,12 @@ public class ResumeServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String uuid = request.getParameter("uuid");
         String fullName = request.getParameter("fullName");
-        Resume resume = storage.get(uuid);
-        if (fullName != null && fullName.length() != 0) resume.setFullName(fullName);
+        Resume resume = getResume(uuid);
+        if (fullName.trim().length() == 0) {
+            response.sendRedirect("resume");
+            return;
+        }
+        resume.setFullName(fullName.trim());
         for (ContactType type : ContactType.values()) {
             String contactValue = request.getParameter(String.format("%s_value", type.name()));
             String contactUrl = request.getParameter(String.format("%s_url", type.name()));
@@ -71,7 +71,59 @@ public class ResumeServlet extends HttpServlet {
                 resume.getHeader().remove(type);
             }
         }
-        storage.update(resume);
+        for (SectionType type : SectionType.values()) {
+            switch (type) {
+                case OBJECTIVE:
+                    editBlockText(resume, request.getParameter("sectionOBJECTIVE"), type);
+                    break;
+                case PERSONAL:
+                    editBlockText(resume, request.getParameter("sectionPERSONAL"), type);
+                    break;
+                case ACHIEVEMENT:
+                    editListText(resume, request.getParameter("sectionACHIEVEMENT"), type);
+                    break;
+                case QUALIFICATIONS:
+                    editListText(resume, request.getParameter("sectionQUALIFICATIONS"), type);
+                    break;
+            }
+        }
+        editResume(resume);
         response.sendRedirect("resume");
+    }
+
+    private Resume getResume(String uuid) {
+        try {
+            return storage.get(uuid);
+        } catch (NotExistStorageException e) {
+            return new Resume(uuid, "");
+        }
+    }
+
+    private void editResume(Resume resume) {
+        try {
+            storage.update(resume);
+        } catch (NotExistStorageException e) {
+            storage.save(resume);
+        }
+    }
+
+    private void editBlockText(Resume resume, String paramValue, SectionType type) {
+        if (paramValue.trim().length() != 0) {
+            resume.addSection(type, new TextBlockSection(paramValue));
+        } else {
+            resume.getBody().remove(type);
+        }
+    }
+
+    private void editListText(Resume resume, String paramValue, SectionType type) {
+        if (paramValue.trim().length() != 0) {
+            List<String> listPosition = new LinkedList<>();
+            for (String s : paramValue.split("\n")) {
+                if (s.trim().length() != 0) listPosition.add(s);
+            }
+            resume.addSection(type, new TextListSection(listPosition));
+        } else {
+            resume.getBody().remove(type);
+        }
     }
 }
