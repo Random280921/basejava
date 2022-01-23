@@ -57,6 +57,7 @@
                     <dl>
                         <dt><b>${sectionType.title}:</b></dt>
                         <dd><input type="text" name="sectionBlockText" size=130
+                                   placeholder="Введите описание"
                                    value="<%=((TextBlockSection) section).getBlockPosition()%>">
                         </dd>
                     </dl>
@@ -65,7 +66,8 @@
                     <dl>
                         <dt><b>${sectionType.title}:</b></dt>
                         <dd>
-                            <textarea name="sectionListText" wrap="soft" rows="10" cols="150">
+                            <textarea name="sectionListText" wrap="soft" rows="10" cols="150"
+                                      placeholder="Введите список позиций (разделение переводом строки)">
                                 <%=String.join("\n", ((TextListSection) section).getListPosition())%>
                             </textarea>
                         </dd>
