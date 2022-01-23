@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 
 public class ResumeServlet extends HttpServlet {
     private static Storage storage;
@@ -108,20 +109,27 @@ public class ResumeServlet extends HttpServlet {
     }
 
     private void editBlockText(Resume resume, String paramValue, SectionType type) {
-        if (paramValue.trim().length() != 0) {
-            resume.addSection(type, new TextBlockSection(paramValue));
-        } else {
-            resume.getBody().remove(type);
-        }
+        editSectionText(resume, paramValue, type,
+                x -> new TextBlockSection(paramValue));
     }
 
     private void editListText(Resume resume, String paramValue, SectionType type) {
+        editSectionText(resume, paramValue, type,
+                x -> {
+                    List<String> listPosition = new LinkedList<>();
+                    for (String s : paramValue.split("\n")) {
+                        if (s.trim().length() != 0) listPosition.add(s);
+                    }
+                    return new TextListSection(listPosition);
+                });
+    }
+
+    private void editSectionText(Resume resume,
+                                 String paramValue,
+                                 SectionType type,
+                                 Function<String, AbstractSection> function) {
         if (paramValue.trim().length() != 0) {
-            List<String> listPosition = new LinkedList<>();
-            for (String s : paramValue.split("\n")) {
-                if (s.trim().length() != 0) listPosition.add(s);
-            }
-            resume.addSection(type, new TextListSection(listPosition));
+            resume.addSection(type, function.apply(paramValue));
         } else {
             resume.getBody().remove(type);
         }
