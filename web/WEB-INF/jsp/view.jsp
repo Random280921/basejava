@@ -23,9 +23,11 @@
     <h2>${resume.fullName} <a href="resume?uuid=${resume.uuid}&action=edit">
         <img src="img/pencil.png"
              alt="edit"></a></h2>
-    <h3>Контакты <a href="resume?uuid=${resume.uuid}&action=edit">
-        <img src="img/pencil.png"
-             alt="edit"></a></h3>
+    <c:if test="${resume.header.size() != 0}">
+        <h3>Контакты <a href="resume?uuid=${resume.uuid}&action=edit">
+            <img src="img/pencil.png"
+                 alt="edit"></a></h3>
+    </c:if>
     <p>
         <c:forEach var="contacts" items="${resume.header}">
             <jsp:useBean id="contacts"

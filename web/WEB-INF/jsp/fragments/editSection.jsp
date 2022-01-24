@@ -18,8 +18,8 @@
                value="<%=((TextBlockSection) section).getBlockPosition()%>">
     </c:when>
     <c:when test="${sectionName == \"ACHIEVEMENT\" || sectionName == \"QUALIFICATIONS\"}">
+        <c:set var="listText" value="<%=String.join(System.lineSeparator(), ((TextListSection) section).getListPosition())%>"/>
         <textarea name="${sectionName}" wrap="soft" rows="10" cols="150"
-                  placeholder="Введите список позиций (разделение переводом строки)"><%= String.join("\n", ((TextListSection) section).getListPosition())%>
-        </textarea>
+                  placeholder="Введите список позиций (разделение переводом строки)">"${listText}"</textarea>
     </c:when>
 </c:choose>
