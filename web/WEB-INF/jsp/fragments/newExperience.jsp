@@ -13,7 +13,7 @@
     <td>
         <table>
             <tr>
-                <td><input type="text" required placeholder="Дата c MM/YYYY"
+                <td><input type="text" placeholder="Дата c MM/YYYY"
                            name="${sectionName}_company_new_dtB_new" size=20>
                 </td>
                 <td><input type="text" placeholder="Дата до MM/YYYY"
@@ -21,7 +21,7 @@
                 </td>
         </table>
     </td>
-    <td><input type="text" required placeholder="Должность/Курс"
+    <td><input type="text" placeholder="Должность/Курс"
                name="${sectionName}_company_new_Title_new" size=100>
     </td>
 </tr>

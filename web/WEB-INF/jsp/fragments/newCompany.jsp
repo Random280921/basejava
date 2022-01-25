@@ -11,7 +11,7 @@
 <h4>Добавить организацию</h4>
 <table frame="hsides">
     <tr>
-        <td><input type="text" required placeholder="Введите название компании"
+        <td><input type="text" placeholder="Введите название компании"
                    name="${sectionName}_company_new_name" size=50>
         </td>
         <td><input type="text" placeholder="Введите ссылку на сайт, если есть"

@@ -83,6 +83,22 @@ public class ResumeServlet extends HttpServlet {
                 case QUALIFICATIONS:
                     editListText(resume, request.getParameter(type.name()), type);
                     break;
+                case EXPERIENCE:
+                case EDUCATION:
+                    CompanySection companySection = new CompanySection();
+                    String typeName = type.name();
+                    String[] companies = request.getParameterValues(String.format("%s_companyName", typeName));
+                    String[] companyUrls = request.getParameterValues(String.format("%s_companyUrl", typeName));
+                    for (int i = 0; i < companies.length; i++) {
+                        if (companies[i].trim().length() != 0)
+                            companySection.addListPosition(new Company(companies[i], companyUrls[i]));
+                    }
+                    if (companySection.getListPosition().size() != 0) {
+                        resume.addSection(type, companySection);
+                    } else {
+                        resume.getBody().remove(type);
+                    }
+                    break;
             }
         }
         editResume(resume);
