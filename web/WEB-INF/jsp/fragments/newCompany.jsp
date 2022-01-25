@@ -8,20 +8,47 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <c:set var="sectionName" value="${requestScope[param.sectionName]}"/>
 <jsp:useBean id="sectionName" type="java.lang.String"/>
+<c:set var="partName" value="${sectionName}New"/>
+<jsp:useBean id="partName" type="java.lang.String"/>
 <h4>Добавить организацию</h4>
 <table frame="hsides">
     <tr>
         <td><input type="text" placeholder="Введите название компании"
-                   name="${sectionName}_companyName" size=50>
+                   name="${partName}Name" size=50>
         </td>
         <td><input type="text" placeholder="Введите ссылку на сайт, если есть"
-                   name="${sectionName}_companyUrl" size=50>
+                   name="${partName}Url" size=50>
         </td>
     </tr>
-    <c:set var="prefix" value="${sectionName}New"/>
-    <jsp:useBean id="prefix" scope="request" type="java.lang.String"/>
-    <jsp:include page="/WEB-INF/jsp/fragments/newExperience.jsp">
-        <jsp:param name="sectionName" value="sectionName"/>
-        <jsp:param name="prefix" value="prefix"/>
-    </jsp:include>
+    <tr>
+        <td><h5>Добавить опыт</h5></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>
+            <table>
+                <tr>
+                    <td><input type="text" placeholder="Дата c MM/YYYY"
+                               name="${partName}DtB" size=20>
+                    </td>
+                    <td><input type="text" placeholder="Дата до MM/YYYY"
+                               name="${partName}DtE" size=20>
+                    </td>
+            </table>
+        </td>
+        <td><input type="text" placeholder="Должность/Курс"
+                   name="${partName}Title" size=100>
+        </td>
+    </tr>
+    </tr>
+    <c:if test="${sectionName != \"EDUCATION\"}">
+        <tr>
+            <td></td>
+            <td>
+        <textarea name="${partName}Text"
+                  wrap="soft" rows="3" cols="100"
+                  placeholder="Введите описание выполняемой работы"></textarea>
+            </td>
+        </tr>
+    </c:if>
 </table>
