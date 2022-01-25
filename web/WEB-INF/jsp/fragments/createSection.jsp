@@ -16,4 +16,9 @@
         <textarea name="${sectionName}" wrap="soft" rows="10" cols="150"
                   placeholder="Введите список позиций (разделение переводом строки)"></textarea>
     </c:when>
+    <c:when test="${sectionName == \"EXPERIENCE\" || sectionName == \"EDUCATION\"}">
+        <jsp:include page="/WEB-INF/jsp/fragments/newCompany.jsp">
+            <jsp:param name="sectionName" value="sectionName"/>
+        </jsp:include>
+    </c:when>
 </c:choose>

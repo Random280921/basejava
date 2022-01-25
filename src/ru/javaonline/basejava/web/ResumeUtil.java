@@ -2,6 +2,10 @@ package ru.javaonline.basejava.web;
 
 import ru.javaonline.basejava.model.Contact;
 import ru.javaonline.basejava.model.ContactType;
+import ru.javaonline.basejava.util.DateUtil;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Класс - сервисный класс для web
@@ -61,6 +65,11 @@ public class ResumeUtil {
 
     public static String checkUrl(String url, String typeName) {
         return (!"EMAIL".equals(typeName) && !typeName.contains("PHONE")) ? url : null;
+    }
+
+    public static String getWebDate(LocalDate date) {
+        DateTimeFormatter PATTERN_DATE = DateTimeFormatter.ofPattern("MM/yyyy");
+        return (DateUtil.NOW.equals(date)) ? "" : date.format(PATTERN_DATE);
     }
 
     private static String toLink(String href, String title) {

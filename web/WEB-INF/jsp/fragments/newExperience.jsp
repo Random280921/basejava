@@ -8,6 +8,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <c:set var="sectionName" value="${requestScope[param.sectionName]}"/>
 <jsp:useBean id="sectionName" type="java.lang.String"/>
+<tr><td><h5>Добавить опыт</h5></td><td></td></tr>
 <tr>
     <td>
         <table>
@@ -18,17 +19,16 @@
                 <td><input type="text" placeholder="Дата до MM/YYYY"
                            name="${sectionName}_company_new_dtE_new" size=20>
                 </td>
-
         </table>
     </td>
-    <td><input type="text" required placeholder="Определение"
+    <td><input type="text" required placeholder="Должность/Курс"
                name="${sectionName}_company_new_Title_new" size=100>
     </td>
 </tr>
 </tr>
 <c:if test="${sectionName != \"EDUCATION\"}">
     <tr>
-        <td width="50"></td>
+        <td></td>
         <td>
         <textarea name="${sectionName}_company_new_Text_new"
                   wrap="soft" rows="3" cols="100"
