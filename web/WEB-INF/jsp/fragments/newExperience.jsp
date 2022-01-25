@@ -14,15 +14,15 @@
         <table>
             <tr>
                 <td><input type="text" placeholder="Дата c MM/YYYY"
-                           name="${sectionName}_company_new_dtB_new" size=20>
+                           name="${sectionName}_companyNewDtB" size=20>
                 </td>
                 <td><input type="text" placeholder="Дата до MM/YYYY"
-                           name="${sectionName}_company_new_dtE_new" size=20>
+                           name="${sectionName}_companyNewDtE" size=20>
                 </td>
         </table>
     </td>
     <td><input type="text" placeholder="Должность/Курс"
-               name="${sectionName}_company_new_Title_new" size=100>
+               name="${sectionName}_companyNewTitle" size=100>
     </td>
 </tr>
 </tr>
@@ -30,7 +30,7 @@
     <tr>
         <td></td>
         <td>
-        <textarea name="${sectionName}_company_new_Text_new"
+        <textarea name="${sectionName}_companyNewText"
                   wrap="soft" rows="3" cols="100"
                   placeholder="Введите описание выполняемой работы"></textarea>
         </td>

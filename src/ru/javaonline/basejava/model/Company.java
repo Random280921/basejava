@@ -52,7 +52,7 @@ public class Company implements Comparable<Company>, Serializable {
     }
 
     public void addExperience(LocalDate dateFrom, LocalDate dateTo, String positionTitle, String positionText) {
-        getExperienceList().add(new Experience(dateFrom, dateTo, positionTitle, positionText));
+        getExperienceList().add(new Experience(dateFrom, (dateTo == null) ? DateUtil.NOW : dateTo, positionTitle, positionText));
     }
 
     public void addExperience(LocalDate dateFrom, LocalDate dateTo, String positionTitle) {

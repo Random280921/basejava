@@ -53,12 +53,12 @@
                             <table>
                                 <tr>
                                     <td><input type="text" placeholder="Дата c MM/YYYY"
-                                               name="${sectionName}_company_${iterator.index}_dtB_${posIter.index}"
+                                               name="${sectionName}${company.companyName.value}${iterator.index}DtB"
                                                size=20
                                                value="<%=ResumeUtil.getWebDate(position.getDateFrom())%>">
                                     </td>
                                     <td><input type="text" placeholder="Дата до MM/YYYY"
-                                               name="${sectionName}_company_${iterator.index}_dtE_${posIter.index}"
+                                               name="${sectionName}${company.companyName.value}${iterator.index}DtE"
                                                size=20
                                                value="<%=ResumeUtil.getWebDate(position.getDateTo())%>">
                                     </td>
@@ -66,7 +66,7 @@
                             </table>
                         </td>
                         <td><input type="text" placeholder="Должность/Курс"
-                                   name="${sectionName}_company_${iterator.index}_Title_${posIter.index}" size=100
+                                   name="${sectionName}${company.companyName.value}${iterator.index}Title" size=100
                                    value="${fn:escapeXml(position.positionTitle)}">
                         </td>
                     </tr>
@@ -74,7 +74,7 @@
                         <tr>
                             <td width="50"></td>
                             <td>
-                            <textarea name="${sectionName}_company_${iterator.index}_Text_${posIter.index}"
+                            <textarea name="${sectionName}${company.companyName.value}${iterator.index}Text"
                                       wrap="soft" rows="3" cols="100"
                                       placeholder="Введите описание выполняемой работы">${position.positionText}</textarea>
                             </td>

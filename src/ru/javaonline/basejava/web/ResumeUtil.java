@@ -4,6 +4,7 @@ import ru.javaonline.basejava.model.Contact;
 import ru.javaonline.basejava.model.ContactType;
 import ru.javaonline.basejava.util.DateUtil;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -33,8 +34,8 @@ public class ResumeUtil {
     public static String getWebContact(Contact contact) {
         String contactValue = contact.getValue();
         String contactUrl = contact.getUrl();
-        if (contactUrl == null) return "<b>" + contactValue + "</b>";
-        return toLink((!"http".equals(contactUrl.substring(0, 4))) ? "http://" + contactUrl : contactUrl, contactValue);
+        if (contactUrl.length() == 0) return "<b>" + contactValue + "</b>";
+        return toLink((!contactUrl.startsWith("http")) ? "http://" + contactUrl : contactUrl, contactValue);
     }
 
     public static String[] getExampleContact(ContactType contactType) {
@@ -70,6 +71,16 @@ public class ResumeUtil {
     public static String getWebDate(LocalDate date) {
         DateTimeFormatter PATTERN_DATE = DateTimeFormatter.ofPattern("MM/yyyy");
         return (DateUtil.NOW.equals(date)) ? "" : date.format(PATTERN_DATE);
+    }
+
+    public static LocalDate getWebDate(String strDate) {
+        String[] partsDate = strDate.split("/");
+        if (partsDate.length != 2) return null;
+        try {
+            return LocalDate.of(Integer.parseInt(partsDate[1]), Integer.parseInt(partsDate[0]), 1);
+        } catch (DateTimeException d) {
+            return null;
+        }
     }
 
     private static String toLink(String href, String title) {
