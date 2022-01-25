@@ -28,17 +28,17 @@
                   placeholder="Введите список позиций (разделение переводом строки)">${listText}</textarea>
     </c:when>
     <c:when test="${sectionName == \"EXPERIENCE\" || sectionName == \"EDUCATION\"}">
-        <c:forEach var="company" items="<%=((CompanySection) section).getListPosition()%>" varStatus="compIter">
+        <c:forEach var="company" items="<%=((CompanySection) section).getListPosition()%>" varStatus="iterator">
             <jsp:useBean id="company" type="ru.javaonline.basejava.model.Company"/>
             <h4>Организация</h4>
             <table frame="hsides">
                 <tr>
-                    <td><input type="text" required placeholder="Введите название компании"
-                               name="${sectionName}_company_${compIter.index}_name" size=50
+                    <td><input type="text" placeholder="Введите название компании"
+                               name="${sectionName}_companyName" size=50
                                value="${company.companyName.value}">
                     </td>
                     <td><input type="text" placeholder="Введите ссылку на сайт, если есть"
-                               name="${sectionName}_company_${compIter.index}_url" size=50
+                               name="${sectionName}_companyUrl" size=50
                                value="${company.companyName.url}">
                     </td>
                 </tr>
@@ -52,21 +52,21 @@
                         <td>
                             <table>
                                 <tr>
-                                    <td><input type="text" required placeholder="Дата c MM/YYYY"
-                                               name="${sectionName}_company_${compIter.index}_dtB_${posIter.index}"
+                                    <td><input type="text" placeholder="Дата c MM/YYYY"
+                                               name="${sectionName}_company_${iterator.index}_dtB_${posIter.index}"
                                                size=20
                                                value="<%=ResumeUtil.getWebDate(position.getDateFrom())%>">
                                     </td>
                                     <td><input type="text" placeholder="Дата до MM/YYYY"
-                                               name="${sectionName}_company_${compIter.index}_dtE_${posIter.index}"
+                                               name="${sectionName}_company_${iterator.index}_dtE_${posIter.index}"
                                                size=20
                                                value="<%=ResumeUtil.getWebDate(position.getDateTo())%>">
                                     </td>
                                 </tr>
                             </table>
                         </td>
-                        <td><input type="text" required placeholder="Должность/Курс"
-                                   name="${sectionName}_company_${compIter.index}_Title_${posIter.index}" size=100
+                        <td><input type="text" placeholder="Должность/Курс"
+                                   name="${sectionName}_company_${iterator.index}_Title_${posIter.index}" size=100
                                    value="${fn:escapeXml(position.positionTitle)}">
                         </td>
                     </tr>
@@ -74,7 +74,7 @@
                         <tr>
                             <td width="50"></td>
                             <td>
-                            <textarea name="${sectionName}_company_${compIter.index}_Text_${posIter.index}"
+                            <textarea name="${sectionName}_company_${iterator.index}_Text_${posIter.index}"
                                       wrap="soft" rows="3" cols="100"
                                       placeholder="Введите описание выполняемой работы">${position.positionText}</textarea>
                             </td>

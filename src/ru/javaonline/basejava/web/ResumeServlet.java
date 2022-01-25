@@ -93,11 +93,10 @@ public class ResumeServlet extends HttpServlet {
                         if (companies[i].trim().length() != 0)
                             companySection.addListPosition(new Company(companies[i], companyUrls[i]));
                     }
-                    if (companySection.getListPosition().size() != 0) {
+                    if (companySection.getListPosition().size() != 0)
                         resume.addSection(type, companySection);
-                    } else {
+                    else
                         resume.getBody().remove(type);
-                    }
                     break;
             }
         }

@@ -14,13 +14,15 @@
             <td><%=ResumeUtil.getWebContact(company.getCompanyName())%>
             </td>
         </tr>
-        <tr>
-            <td>
-                <c:set var="expList" value="<%=company.getExperienceList()%>" scope="request"/>
-                <jsp:include page="/WEB-INF/jsp/fragments/experience.jsp">
-                    <jsp:param name="expList" value="expList"/>
-                </jsp:include>
-            </td>
-        </tr>
+        <c:if test="${company.experienceList.size() != 0}">
+            <tr>
+                <td>
+                    <c:set var="expList" value="<%=company.getExperienceList()%>" scope="request"/>
+                    <jsp:include page="/WEB-INF/jsp/fragments/experience.jsp">
+                        <jsp:param name="expList" value="expList"/>
+                    </jsp:include>
+                </td>
+            </tr>
+        </c:if>
     </c:forEach>
 </table>

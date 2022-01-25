@@ -12,10 +12,10 @@
 <table frame="hsides">
     <tr>
         <td><input type="text" placeholder="Введите название компании"
-                   name="${sectionName}_company_new_name" size=50>
+                   name="${sectionName}_companyName" size=50>
         </td>
         <td><input type="text" placeholder="Введите ссылку на сайт, если есть"
-                   name="${sectionName}_company_new_url" size=50>
+                   name="${sectionName}_companyUrl" size=50>
         </td>
     </tr>
     <jsp:include page="/WEB-INF/jsp/fragments/newExperience.jsp">

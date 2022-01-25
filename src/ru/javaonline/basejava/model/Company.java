@@ -72,10 +72,14 @@ public class Company implements Comparable<Company>, Serializable {
      */
     @Override
     public int compareTo(Company o) {
-        o.getExperienceList().sort(Experience::compareTo);
-        getExperienceList().sort(Experience::compareTo);
-        int compareResultFrom = o.getExperienceList().get(0).getDateFrom().compareTo(getExperienceList().get(0).getDateFrom());
-        int compareResultTo = o.getExperienceList().get(0).getDateTo().compareTo(getExperienceList().get(0).getDateTo());
+        List<Company.Experience> thisExp = getExperienceList();
+        List<Company.Experience> thatExp = o.getExperienceList();
+        if (thisExp.size() == 0 || thatExp.size() == 0)
+            return this.companyName.getValue().compareTo(o.companyName.getValue());
+        thatExp.sort(Experience::compareTo);
+        thisExp.sort(Experience::compareTo);
+        int compareResultFrom = thatExp.get(0).getDateFrom().compareTo(thisExp.get(0).getDateFrom());
+        int compareResultTo = thatExp.get(0).getDateTo().compareTo(thisExp.get(0).getDateTo());
         return (compareResultTo != 0) ? compareResultTo : compareResultFrom;
     }
 
