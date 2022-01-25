@@ -42,8 +42,8 @@
                                value="${company.companyName.url}">
                     </td>
                 </tr>
-                <c:set var="prefix" value="${sectionName}${company.companyName.value}${iterator.index}"/>
-                <jsp:useBean id="prefix" type="java.lang.String"/>
+                <c:set var="prefix" scope="request" value="${sectionName}${company.companyName.value}${iterator.index}"/>
+                <jsp:useBean id="prefix" scope="request" type="java.lang.String"/>
                 <c:forEach var="position" items="<%=company.getExperienceList()%>" varStatus="posIter">
                     <jsp:useBean id="position" type="ru.javaonline.basejava.model.Company.Experience"/>
                     <tr>

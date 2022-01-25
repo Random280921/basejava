@@ -116,7 +116,9 @@ public class ResumeServlet extends HttpServlet {
                     String partNameNew = String.format("%sNew", typeName);
                     String NameNew = request.getParameter(String.format("%sName", partNameNew));
                     String UrlNew = request.getParameter(String.format("%sUrl", partNameNew));
-                    company = new Company(NameNew, UrlNew);
+                    if (NameNew.trim().length() != 0)
+                        company = new Company(NameNew, UrlNew);
+                    else break;
                     String dateFromNew = request.getParameter(String.format("%sDtB", partNameNew));
                     String dateToNew = request.getParameter(String.format("%sDtE", partNameNew));
                     String positionTitleNew = request.getParameter(String.format("%sTitle", partNameNew));
