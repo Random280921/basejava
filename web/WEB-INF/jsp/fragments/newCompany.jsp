@@ -18,7 +18,10 @@
                    name="${sectionName}_companyUrl" size=50>
         </td>
     </tr>
+    <c:set var="prefix" value="${sectionName}New"/>
+    <jsp:useBean id="prefix" scope="request" type="java.lang.String"/>
     <jsp:include page="/WEB-INF/jsp/fragments/newExperience.jsp">
         <jsp:param name="sectionName" value="sectionName"/>
+        <jsp:param name="prefix" value="prefix"/>
     </jsp:include>
 </table>

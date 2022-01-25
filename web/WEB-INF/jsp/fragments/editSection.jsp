@@ -53,12 +53,12 @@
                             <table>
                                 <tr>
                                     <td><input type="text" placeholder="Дата c MM/YYYY"
-                                               name="${sectionName}${company.companyName.value}${iterator.index}DtB"
+                                               name="${prefix}DtB"
                                                size=20
                                                value="<%=ResumeUtil.getWebDate(position.getDateFrom())%>">
                                     </td>
                                     <td><input type="text" placeholder="Дата до MM/YYYY"
-                                               name="${sectionName}${company.companyName.value}${iterator.index}DtE"
+                                               name="${prefix}DtE"
                                                size=20
                                                value="<%=ResumeUtil.getWebDate(position.getDateTo())%>">
                                     </td>
@@ -66,7 +66,7 @@
                             </table>
                         </td>
                         <td><input type="text" placeholder="Должность/Курс"
-                                   name="${sectionName}${company.companyName.value}${iterator.index}Title" size=100
+                                   name="${prefix}Title" size=100
                                    value="${fn:escapeXml(position.positionTitle)}">
                         </td>
                     </tr>
@@ -74,15 +74,18 @@
                         <tr>
                             <td width="50"></td>
                             <td>
-                            <textarea name="${sectionName}${company.companyName.value}${iterator.index}Text"
+                            <textarea name="${prefix}Text"
                                       wrap="soft" rows="3" cols="100"
                                       placeholder="Введите описание выполняемой работы">${position.positionText}</textarea>
                             </td>
                         </tr>
                     </c:if>
                 </c:forEach>
+                <c:set var="prefix" scope="request" value="${sectionName}${company.companyName.value}${iterator.index}"/>
+                <jsp:useBean id="prefix" scope="request" type="java.lang.String"/>
                 <jsp:include page="/WEB-INF/jsp/fragments/newExperience.jsp">
                     <jsp:param name="sectionName" value="sectionName"/>
+                    <jsp:param name="prefix" value="prefix"/>
                 </jsp:include>
             </table>
         </c:forEach>

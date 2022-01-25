@@ -44,6 +44,7 @@ public class Company implements Comparable<Company>, Serializable {
     }
 
     public List<Experience> getExperienceList() {
+        experienceList.sort(Experience::compareTo);
         return experienceList;
     }
 

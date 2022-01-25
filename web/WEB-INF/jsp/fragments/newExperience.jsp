@@ -8,21 +8,26 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <c:set var="sectionName" value="${requestScope[param.sectionName]}"/>
 <jsp:useBean id="sectionName" type="java.lang.String"/>
-<tr><td><h5>Добавить опыт</h5></td><td></td></tr>
+<c:set var="prefix" value="${requestScope[param.prefix]}"/>
+<jsp:useBean id="prefix" type="java.lang.String"/>
+<tr>
+    <td><h5>Добавить опыт</h5></td>
+    <td></td>
+</tr>
 <tr>
     <td>
         <table>
             <tr>
                 <td><input type="text" placeholder="Дата c MM/YYYY"
-                           name="${sectionName}_companyNewDtB" size=20>
+                           name="${prefix}DtB" size=20>
                 </td>
                 <td><input type="text" placeholder="Дата до MM/YYYY"
-                           name="${sectionName}_companyNewDtE" size=20>
+                           name="${prefix}DtE" size=20>
                 </td>
         </table>
     </td>
     <td><input type="text" placeholder="Должность/Курс"
-               name="${sectionName}_companyNewTitle" size=100>
+               name="${prefix}Title" size=100>
     </td>
 </tr>
 </tr>
@@ -30,7 +35,7 @@
     <tr>
         <td></td>
         <td>
-        <textarea name="${sectionName}_companyNewText"
+        <textarea name="${prefix}Text"
                   wrap="soft" rows="3" cols="100"
                   placeholder="Введите описание выполняемой работы"></textarea>
         </td>

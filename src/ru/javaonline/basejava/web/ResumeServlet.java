@@ -102,12 +102,12 @@ public class ResumeServlet extends HttpServlet {
                         String[] positionText = request.getParameterValues(String.format("%sText", partName));
                         if (dateFrom != null && positionTitle != null)
                             for (int j = 0; j < dateFrom.length; j++) {
-                                LocalDate localDate = ResumeUtil.getWebDate(dateFrom[i]);
-                                if (localDate != null && positionTitle[i] != null)
-                                    company.addExperience(localDate, ResumeUtil.getWebDate(dateTo[i]),
-                                            positionTitle[i], (positionText != null) ? positionText[i] : null);
+                                LocalDate localDate = ResumeUtil.getWebDate(dateFrom[j]);
+                                if (localDate != null && positionTitle[j] != null)
+                                    company.addExperience(localDate, ResumeUtil.getWebDate(dateTo[j]),
+                                            positionTitle[j], (positionText != null) ? positionText[j] : null);
                             }
-                        String partNameNew = String.format("%s_companyNew", typeName);
+                        String partNameNew = String.format("%sNew", typeName);
                         String dateFromNew = request.getParameter(String.format("%sDtB", partNameNew));
                         String dateToNew = request.getParameter(String.format("%sDtE", partNameNew));
                         String positionTitleNew = request.getParameter(String.format("%sTitle", partNameNew));
