@@ -34,6 +34,7 @@ public class ResumeUtil {
     public static String getWebContact(Contact contact) {
         String contactValue = contact.getValue();
         String contactUrl = contact.getUrl();
+        if (contactUrl == null) return "<b>" + contactValue + "</b>";
         if (contactUrl.length() == 0) return "<b>" + contactValue + "</b>";
         return toLink((!contactUrl.startsWith("http")) ? "http://" + contactUrl : contactUrl, contactValue);
     }
