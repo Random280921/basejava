@@ -41,8 +41,20 @@ public class ResumeServlet extends HttpServlet {
                 response.sendRedirect("resume");
                 return;
             case "view":
+                resume = getResume(uuid);
+                break;
             case "edit":
                 resume = getResume(uuid);
+                for (SectionType type : new SectionType[]{SectionType.EXPERIENCE, SectionType.EDUCATION}) {
+                    CompanySection section = (CompanySection) resume.getBody().get(type);
+                    if (section != null) {
+                        for (Company company : section.getListPosition()) {
+                            company.getExperienceList().add(Company.Experience.EMPTY);
+                        }
+                        section.addListPosition(Company.EMPTY);
+                        resume.addSection(type, section);
+                    }
+                }
                 break;
             default:
                 throw new IllegalArgumentException("Action " + action + " is illegal");
@@ -93,43 +105,25 @@ public class ResumeServlet extends HttpServlet {
                     Company company;
                     if (companies != null)
                         for (int i = 0; i < companies.length; i++) {
-                            if (companies[i].trim().length() != 0)
+                            if (companies[i].trim().length() != 0) {
                                 company = new Company(companies[i], companyUrls[i]);
-                            else break;
-                            String partName = String.format("%s%s%d", typeName, companies[i], i);
-                            String[] dateFrom = request.getParameterValues(String.format("%sDtB", partName));
-                            String[] dateTo = request.getParameterValues(String.format("%sDtE", partName));
-                            String[] positionTitle = request.getParameterValues(String.format("%sTitle", partName));
-                            String[] positionText = request.getParameterValues(String.format("%sText", partName));
+                                String partName = String.format("%s%d", typeName, i);
+                                String[] dateFrom = request.getParameterValues(String.format("%sDtB", partName));
+                                String[] dateTo = request.getParameterValues(String.format("%sDtE", partName));
+                                String[] positionTitle = request.getParameterValues(String.format("%sTitle", partName));
+                                String[] positionText = request.getParameterValues(String.format("%sText", partName));
 
-                            if (dateFrom != null && positionTitle != null) {
-                                for (int j = 0; j < dateFrom.length; j++) {
-                                    LocalDate localDate = ResumeUtil.getWebDate(dateFrom[j]);
-                                    if (localDate != null && positionTitle[j].length() != 0)
-                                        company.addExperience(localDate, ResumeUtil.getWebDate(dateTo[j]),
-                                                positionTitle[j], (positionText != null) ? positionText[j] : null);
+                                if (dateFrom != null && positionTitle != null) {
+                                    for (int j = 0; j < dateFrom.length; j++) {
+                                        LocalDate localDate = ResumeUtil.getWebDate(dateFrom[j]);
+                                        if (localDate != null && positionTitle[j].length() != 0)
+                                            company.addExperience(localDate, ResumeUtil.getWebDate(dateTo[j]),
+                                                    positionTitle[j], (positionText != null) ? positionText[j] : null);
+                                    }
                                 }
+                                companySection.addListPosition(company);
                             }
-                            companySection.addListPosition(company);
                         }
-
-                    String partNameNew = String.format("%sNew", typeName);
-                    String NameNew = request.getParameter(String.format("%sName", partNameNew));
-                    String UrlNew = request.getParameter(String.format("%sUrl", partNameNew));
-                    if (NameNew.trim().length() != 0) {
-                        company = new Company(NameNew, UrlNew);
-                        String dateFromNew = request.getParameter(String.format("%sDtB", partNameNew));
-                        String dateToNew = request.getParameter(String.format("%sDtE", partNameNew));
-                        String positionTitleNew = request.getParameter(String.format("%sTitle", partNameNew));
-                        String positionTextNew = request.getParameter(String.format("%sText", partNameNew));
-                        LocalDate localDateNew = ResumeUtil.getWebDate(dateFromNew);
-                        if (localDateNew != null && positionTitleNew.length() != 0)
-                            company.addExperience(ResumeUtil.getWebDate(dateFromNew),
-                                    ResumeUtil.getWebDate(dateToNew),
-                                    positionTitleNew, positionTextNew);
-                        companySection.addListPosition(company);
-                    }
-
                     if (companySection.getListPosition().size() != 0)
                         resume.addSection(type, companySection);
                     else

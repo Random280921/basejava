@@ -54,6 +54,6 @@ public class Contact implements Serializable, Comparable<Contact> {
 
     @Override
     public int compareTo(Contact o) {
-        return this.compareTo(o);
+        return this.value.compareTo(o.value);
     }
 }

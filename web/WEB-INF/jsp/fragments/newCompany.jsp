@@ -8,16 +8,16 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <c:set var="sectionName" value="${requestScope[param.sectionName]}"/>
 <jsp:useBean id="sectionName" type="java.lang.String"/>
-<c:set var="partName" value="${sectionName}New"/>
+<c:set var="partName" value="${sectionName}"/>
 <jsp:useBean id="partName" type="java.lang.String"/>
 <h4>Добавить организацию</h4>
 <table frame="hsides">
     <tr>
         <td><input type="text" placeholder="Введите название компании"
-                   name="${partName}Name" size=50>
+                   name="${partName}_companyName" size=50>
         </td>
         <td><input type="text" placeholder="Введите ссылку на сайт, если есть"
-                   name="${partName}Url" size=50>
+                   name="${partName}_companyUrl" size=50>
         </td>
     </tr>
     <tr>
@@ -29,15 +29,15 @@
             <table>
                 <tr>
                     <td><input type="text" placeholder="Дата c MM/YYYY"
-                               name="${partName}DtB" size=20>
+                               name="${partName}0DtB" size=20>
                     </td>
                     <td><input type="text" placeholder="Дата до MM/YYYY"
-                               name="${partName}DtE" size=20>
+                               name="${partName}0DtE" size=20>
                     </td>
             </table>
         </td>
         <td><input type="text" placeholder="Должность/Курс"
-                   name="${partName}Title" size=100>
+                   name="${partName}0Title" size=100>
         </td>
     </tr>
     </tr>
@@ -45,7 +45,7 @@
         <tr>
             <td></td>
             <td>
-        <textarea name="${partName}Text"
+        <textarea name="${partName}0Text"
                   wrap="soft" rows="3" cols="100"
                   placeholder="Введите описание выполняемой работы"></textarea>
             </td>

@@ -18,9 +18,10 @@ import static java.util.Objects.requireNonNull;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Company implements Comparable<Company>, Serializable {
     private static final long serialVersionUID = 1L;
+    public static final Company EMPTY = new Company("", "", Experience.EMPTY);
 
     private Contact companyName;
-    private List<Experience> experienceList = new ArrayList<>();
+    private final List<Experience> experienceList = new ArrayList<>();
 
     public Company() {
     }
@@ -33,10 +34,9 @@ public class Company implements Comparable<Company>, Serializable {
         this(value, null);
     }
 
-    public Company(Contact companyName,
-                   List<Experience> experienceList) {
-        this.companyName = companyName;
-        this.experienceList = experienceList;
+    public Company(String value, String url, Experience experience) {
+        this.companyName = new Contact(value, url);
+        this.experienceList.add(experience);
     }
 
     public Contact getCompanyName() {
@@ -46,10 +46,6 @@ public class Company implements Comparable<Company>, Serializable {
     public List<Experience> getExperienceList() {
         experienceList.sort(Experience::compareTo);
         return experienceList;
-    }
-
-    public void addUrl(String url) {
-        companyName.setUrl(url);
     }
 
     public void addExperience(LocalDate dateFrom, LocalDate dateTo, String positionTitle, String positionText) {
@@ -64,24 +60,17 @@ public class Company implements Comparable<Company>, Serializable {
         addExperience(dateFrom, DateUtil.NOW, positionTitle, positionText);
     }
 
-    public void removeExperience(LocalDate fistDate) {
-        getExperienceList().removeIf(experience -> experience.getDateFrom().equals(fistDate));
-    }
-
     /**
      * Sorted: last date in Company to first, dateTo NOW is first position
      */
     @Override
     public int compareTo(Company o) {
+        if (this.equals(Company.EMPTY)) return -1;
         List<Company.Experience> thisExp = getExperienceList();
         List<Company.Experience> thatExp = o.getExperienceList();
         if (thisExp.size() == 0 || thatExp.size() == 0)
-            return this.companyName.getValue().compareTo(o.companyName.getValue());
-        thatExp.sort(Experience::compareTo);
-        thisExp.sort(Experience::compareTo);
-        int compareResultFrom = thatExp.get(0).getDateFrom().compareTo(thisExp.get(0).getDateFrom());
-        int compareResultTo = thatExp.get(0).getDateTo().compareTo(thisExp.get(0).getDateTo());
-        return (compareResultTo != 0) ? compareResultTo : compareResultFrom;
+            return o.companyName.compareTo(this.companyName);
+        return thisExp.get(0).compareTo(thatExp.get(0));
     }
 
     @Override
@@ -113,6 +102,7 @@ public class Company implements Comparable<Company>, Serializable {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class Experience implements Comparable<Experience>, Serializable {
         private static final long serialVersionUID = 1L;
+        public static final Experience EMPTY = new Experience();
 
         @XmlJavaTypeAdapter(LocalDateAdapter.class)
         private LocalDate dateFrom;
@@ -176,7 +166,13 @@ public class Company implements Comparable<Company>, Serializable {
          */
         @Override
         public int compareTo(Experience o) {
-            return o.getDateFrom().compareTo(getDateFrom());
+            LocalDate thisFrom = (getDateFrom() != null) ? getDateFrom() : DateUtil.NOW;
+            LocalDate thatFrom = (o.getDateFrom() != null) ? o.getDateFrom() : DateUtil.NOW;
+            LocalDate thisTo = (getDateTo() != null) ? getDateTo() : DateUtil.NOW;
+            LocalDate thatTo = (o.getDateTo() != null) ? o.getDateTo() : DateUtil.NOW;
+            int resultFrom = thatFrom.compareTo(thisFrom);
+            int resultTo = thatTo.compareTo(thisTo);
+            return (resultTo == 0) ? resultFrom : resultTo;
         }
 
         @Override

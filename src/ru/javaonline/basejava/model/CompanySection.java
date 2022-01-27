@@ -9,11 +9,15 @@ public class CompanySection extends AbstractSection {
 
     protected List<Company> listPosition = new ArrayList<>();
 
-    public void addListPosition(Company position) {
-        listPosition.add(position);
+    public CompanySection() {
     }
 
-    public CompanySection() {
+    public CompanySection(Company company) {
+        this.listPosition.add(company);
+    }
+
+    public void addListPosition(Company position) {
+        listPosition.add(position);
     }
 
     public List<Company> getListPosition() {

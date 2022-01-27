@@ -11,6 +11,7 @@
 <%@ page import="ru.javaonline.basejava.model.TextListSection" %>
 <%@ page import="ru.javaonline.basejava.model.CompanySection" %>
 <%@ page import="ru.javaonline.basejava.web.ResumeUtil" %>
+<%@ page import="ru.javaonline.basejava.model.Company" %>
 <c:set var="sectionName" value="${requestScope[param.sectionName]}"/>
 <c:set var="section" value="${requestScope[param.section]}"/>
 <jsp:useBean id="sectionName" scope="request" type="java.lang.String"/>
@@ -19,18 +20,21 @@
     <c:when test="${sectionName == \"OBJECTIVE\" || sectionName == \"PERSONAL\"}">
         <input type="text" name="${sectionName}" size=160
                placeholder="Введите описание"
-               value="<%=((TextBlockSection) section).getBlockPosition()%>">
+               value='<%=(section==null) ? "": ((TextBlockSection) section).getBlockPosition()%>'>
     </c:when>
     <c:when test="${sectionName == \"ACHIEVEMENT\" || sectionName == \"QUALIFICATIONS\"}">
         <c:set var="listText"
-               value="<%=String.join(System.lineSeparator(), ((TextListSection) section).getListPosition())%>"/>
+               value='<%=(section==null) ? "" : String.join(System.lineSeparator(), ((TextListSection) section).getListPosition())%>'/>
         <textarea name="${sectionName}" wrap="soft" rows="10" cols="150"
                   placeholder="Введите список позиций (разделение переводом строки)">${listText}</textarea>
     </c:when>
     <c:when test="${sectionName == \"EXPERIENCE\" || sectionName == \"EDUCATION\"}">
-        <c:forEach var="company" items="<%=((CompanySection) section).getListPosition()%>" varStatus="iterator">
+        <c:set var="companyList"
+               value='<%=(section==null) ? new CompanySection(Company.EMPTY) : ((CompanySection) section).getListPosition()%>'/>
+        <c:forEach var="company" items="${companyList}" varStatus="iterator">
             <jsp:useBean id="company" type="ru.javaonline.basejava.model.Company"/>
-            <h4>Организация</h4>
+            <h4><%=(company.getCompanyName().getValue().length() != 0) ? "Организация" : "Добавить организацию"%>
+            </h4>
             <table frame="hsides">
                 <tr>
                     <td><input type="text" placeholder="Введите название компании"
@@ -42,13 +46,15 @@
                                value="${company.companyName.url}">
                     </td>
                 </tr>
-                <c:set var="prefix" scope="request" value="${sectionName}${company.companyName.value}${iterator.index}"/>
+                <c:set var="prefix" scope="request" value="${sectionName}${iterator.index}"/>
                 <jsp:useBean id="prefix" scope="request" type="java.lang.String"/>
                 <c:forEach var="position" items="<%=company.getExperienceList()%>" varStatus="posIter">
                     <jsp:useBean id="position" type="ru.javaonline.basejava.model.Company.Experience"/>
                     <tr>
-                        <td><h5>Опыт</h5></td>
-                        <td></td>
+                        <td>
+                            <b><%=(ResumeUtil.getWebDate(position.getDateFrom()).length() != 0) ? "Опыт" : "Добавить опыт"%>
+                            </b>
+                        </td>
                     </tr>
                     <tr>
                         <td>
@@ -83,14 +89,7 @@
                         </tr>
                     </c:if>
                 </c:forEach>
-                <jsp:include page="/WEB-INF/jsp/fragments/newExperience.jsp">
-                    <jsp:param name="sectionName" value="sectionName"/>
-                    <jsp:param name="prefix" value="prefix"/>
-                </jsp:include>
             </table>
         </c:forEach>
-        <jsp:include page="/WEB-INF/jsp/fragments/newCompany.jsp">
-            <jsp:param name="sectionName" value="sectionName"/>
-        </jsp:include>
     </c:when>
 </c:choose>
