@@ -43,24 +43,24 @@ public class ResumeUtil {
         String[] exampleContact = new String[2];
         String typeName = contactType.name();
         if (typeName.contains("PHONE")) {
-            exampleContact[0] = ("пример: +7(111) 111-1111");
-            exampleContact[1] = ("url не заполняется");
+            exampleContact[0] = "пример: +7(111) 111-1111";
+            exampleContact[1] = "";
         }
         if (typeName.contains("MESSENGER")) {
-            exampleContact[0] = ("пример: skype, telegram и т.п.");
-            exampleContact[1] = ("пример: guest.guest, @guest и т.п.");
+            exampleContact[0] = "пример: skype, telegram и т.п.";
+            exampleContact[1] = "пример: guest.guest, @guest и т.п.";
         }
         if ("EMAIL".equals(typeName)) {
-            exampleContact[0] = ("пример: mail@mail.ru");
-            exampleContact[1] = ("url не заполняется");
+            exampleContact[0] = "пример: mail@mail.ru";
+            exampleContact[1] = "";
         }
         if ("SITE".equals(typeName)) {
-            exampleContact[0] = ("пример: Домашняя страница и т.п.");
-            exampleContact[1] = ("пример: www.homepage.ru");
+            exampleContact[0] = "пример: Домашняя страница и т.п.";
+            exampleContact[1] = "пример: www.homepage.ru";
         }
         if (exampleContact[0] == null) {
-            exampleContact[0] = ("пример: LinkedIn, GitHub и т.п.");
-            exampleContact[1] = ("пример: https://www.linkedin.com/in/guest");
+            exampleContact[0] = "пример: LinkedIn, GitHub и т.п.";
+            exampleContact[1] = "пример: https://www.linkedin.com/in/guest";
         }
         return exampleContact;
     }
