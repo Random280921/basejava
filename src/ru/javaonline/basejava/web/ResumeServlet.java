@@ -1,6 +1,5 @@
 package ru.javaonline.basejava.web;
 
-import ru.javaonline.basejava.exception.NotExistStorageException;
 import ru.javaonline.basejava.model.*;
 import ru.javaonline.basejava.storage.Storage;
 import ru.javaonline.basejava.util.Config;
@@ -41,19 +40,39 @@ public class ResumeServlet extends HttpServlet {
                 response.sendRedirect("resume");
                 return;
             case "view":
-                resume = getResume(uuid);
+                resume = storage.get(uuid);
+                break;
+            case "add":
+                resume = Resume.EMPTY;
                 break;
             case "edit":
-                resume = getResume(uuid);
-                for (SectionType type : new SectionType[]{SectionType.EXPERIENCE, SectionType.EDUCATION}) {
-                    CompanySection section = (CompanySection) resume.getBody().get(type);
-                    if (section != null) {
-                        for (Company company : section.getListPosition()) {
-                            company.getExperienceList().add(Company.Experience.EMPTY);
-                        }
-                        section.addListPosition(Company.EMPTY);
-                        resume.addSection(type, section);
+                resume = storage.get(uuid);
+                for (SectionType type : SectionType.values()) {
+                    AbstractSection section = resume.getBody().get(type);
+                    switch (type) {
+                        case OBJECTIVE:
+                        case PERSONAL:
+                            if (section == null)
+                                section = TextBlockSection.EMPTY;
+                            break;
+                        case ACHIEVEMENT:
+                        case QUALIFICATIONS:
+                            if (section == null)
+                                section = TextListSection.EMPTY;
+                            break;
+                        case EXPERIENCE:
+                        case EDUCATION:
+                            CompanySection companySection = (CompanySection) section;
+                            if (companySection != null) {
+                                for (Company company : companySection.getListPosition()) {
+                                    company.getExperienceList().add(Company.Experience.EMPTY);
+                                }
+                                companySection.addListPosition(Company.EMPTY);
+                                resume.addSection(type, companySection);
+                            }
+                            break;
                     }
+                    resume.addSection(type, section);
                 }
                 break;
             default:
@@ -63,19 +82,28 @@ public class ResumeServlet extends HttpServlet {
         request.getRequestDispatcher(
                 ("view".equals(action) ? "/WEB-INF/jsp/view.jsp" : "/WEB-INF/jsp/edit.jsp")
         ).forward(request, response);
+
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws
+            ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         String uuid = request.getParameter("uuid");
         String fullName = request.getParameter("fullName");
-        Resume resume = getResume(uuid);
         if (fullName.trim().length() == 0) {
             response.sendRedirect("resume");
             return;
         }
-        resume.setFullName(fullName.trim());
+        final boolean isCreate = (uuid == null || uuid.length() == 0);
+        Resume resume;
+        if (isCreate) {
+            resume = new Resume(fullName);
+        } else {
+            resume = storage.get(uuid);
+            resume.setFullName(fullName.trim());
+        }
+
         for (ContactType type : ContactType.values()) {
             String typeName = type.name();
             String contactValue = request.getParameter(String.format("%s_value", typeName));
@@ -131,24 +159,12 @@ public class ResumeServlet extends HttpServlet {
                     break;
             }
         }
-        editResume(resume);
-        response.sendRedirect("resume");
-    }
-
-    private Resume getResume(String uuid) {
-        try {
-            return storage.get(uuid);
-        } catch (NotExistStorageException e) {
-            return new Resume(uuid, "");
-        }
-    }
-
-    private void editResume(Resume resume) {
-        try {
-            storage.update(resume);
-        } catch (NotExistStorageException e) {
+        if (isCreate) {
             storage.save(resume);
+        } else {
+            storage.update(resume);
         }
+        response.sendRedirect("resume");
     }
 
     private void editBlockText(Resume resume, String paramValue, SectionType type) {

@@ -3,6 +3,7 @@ package ru.javaonline.basejava.model;
 import java.util.Objects;
 
 public class TextBlockSection extends AbstractSection {
+    public static final TextBlockSection EMPTY = new TextBlockSection("");
     private static final long serialVersionUID = 1L;
 
     private String blockPosition;
