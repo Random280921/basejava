@@ -67,13 +67,13 @@ public class ResumeTestData {
 
     public static void writeResumeTest(Resume resumeModelTest) {
         // Заполняем контакты
-        resumeModelTest.addContact(ContactType.PHONE_DEFAULT, new Contact("+7(921) 855-0482"));
-        resumeModelTest.addContact(ContactType.MESSENGER_DEFAULT, new Contact("Skype", "grigory.kislin"));
-        resumeModelTest.addContact(ContactType.EMAIL, new Contact("gkislin@yandex.ru"));
-        resumeModelTest.addContact(ContactType.NETWORK_DEFAULT, new Contact("LinkedIn", "https://www.linkedin.com/in/gkislin"));
-        resumeModelTest.addContact(ContactType.NETWORK_ADD1, new Contact("GitHub", "https://github.com/gkislin"));
+        resumeModelTest.addContact(ContactType.PHONE_DEFAULT, new Contact("+7(999) 111-1111"));
+        resumeModelTest.addContact(ContactType.MESSENGER_DEFAULT, new Contact("skype", "guest.guest"));
+        resumeModelTest.addContact(ContactType.EMAIL, new Contact("gguest@yandex.ru"));
+        resumeModelTest.addContact(ContactType.NETWORK_DEFAULT, new Contact("LinkedIn", "https://www.linkedin.com/in/gguest"));
+        resumeModelTest.addContact(ContactType.NETWORK_ADD1, new Contact("GitHub", "https://github.com/gguest"));
         resumeModelTest.addContact(ContactType.NETWORK_ADD2, new Contact("Stackoverflow", "https://stackoverflow.com/users/548473"));
-        resumeModelTest.addContact(ContactType.SITE, new Contact("Домашняя страница", "gkislin.ru"));
+        resumeModelTest.addContact(ContactType.SITE, new Contact("Домашняя страница", "gguest.ru"));
 
         // Заполняем Позиция и Личные качества
 

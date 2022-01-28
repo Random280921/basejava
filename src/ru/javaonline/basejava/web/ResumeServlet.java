@@ -2,7 +2,7 @@ package ru.javaonline.basejava.web;
 
 import ru.javaonline.basejava.model.*;
 import ru.javaonline.basejava.storage.Storage;
-import ru.javaonline.basejava.util.Config;
+import ru.javaonline.basejava.Config;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;

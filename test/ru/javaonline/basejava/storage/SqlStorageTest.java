@@ -1,6 +1,6 @@
 package ru.javaonline.basejava.storage;
 
-import ru.javaonline.basejava.util.Config;
+import ru.javaonline.basejava.Config;
 
 public class SqlStorageTest extends AbstractStorageTest {
     public SqlStorageTest() {
