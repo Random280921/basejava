@@ -62,13 +62,13 @@ public class ResumeServlet extends HttpServlet {
                             break;
                         case EXPERIENCE:
                         case EDUCATION:
-                            CompanySection companySection = (CompanySection) section;
-                            if (companySection != null) {
-                                for (Company company : companySection.getListPosition()) {
+                            if (section == null)
+                                section = CompanySection.EMPTY;
+                            else {
+                                for (Company company : ((CompanySection) section).getListPosition()) {
                                     company.getExperienceList().add(Company.Experience.EMPTY);
                                 }
-                                companySection.addListPosition(Company.EMPTY);
-                                resume.addSection(type, companySection);
+                                ((CompanySection) section).addListPosition(Company.EMPTY);
                             }
                             break;
                     }

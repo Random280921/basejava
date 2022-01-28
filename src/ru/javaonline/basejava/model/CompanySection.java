@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class CompanySection extends AbstractSection {
+    public static final CompanySection EMPTY = new CompanySection(Company.EMPTY);
     private static final long serialVersionUID = 1L;
 
     protected List<Company> listPosition = new ArrayList<>();
