@@ -75,6 +75,7 @@
             </tr>
         </c:forEach>
     </table>
+    <button type="reset" onclick="window.history.back()">Ок</button>
 </section>
 <jsp:include page="fragments/footer.jsp"/>
 </body>

@@ -17,8 +17,7 @@
 <body>
 <jsp:include page="fragments/header.jsp"/>
 <section>
-    <a href="resume?uuid=<%=UUID.randomUUID().toString()%>&action=edit">
-        Создать новое резюме <img src="img/add.png" alt="create"></a><br/>
+    <a href="resume?action=add">Создать новое резюме <img src="img/add.png" alt="create"></a><br/>
     <table border="1" cellpadding="8" cellspacing="0">
         <tr>
             <th>Имя</th>

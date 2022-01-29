@@ -70,6 +70,7 @@ public class ResumeUtil {
     }
 
     public static String getWebDate(LocalDate date) {
+        if (date == null) return "";
         DateTimeFormatter PATTERN_DATE = DateTimeFormatter.ofPattern("MM/yyyy");
         return (DateUtil.NOW.equals(date)) ? "" : date.format(PATTERN_DATE);
     }

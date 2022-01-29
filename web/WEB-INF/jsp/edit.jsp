@@ -55,17 +55,10 @@
             <dl>
                 <dt><b>${sectionType.title}:</b></dt>
                 <dd>
-                    <c:if test="${section != null}">
                         <jsp:include page="/WEB-INF/jsp/fragments/editSection.jsp">
                             <jsp:param name="sectionName" value="sectionName"/>
                             <jsp:param name="section" value="section"/>
                         </jsp:include>
-                    </c:if>
-                    <c:if test="${section == null}">
-                        <jsp:include page="/WEB-INF/jsp/fragments/createSection.jsp">
-                            <jsp:param name="sectionName" value="sectionName"/>
-                        </jsp:include>
-                    </c:if>
                 </dd>
             </dl>
         </c:forEach>

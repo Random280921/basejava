@@ -6,7 +6,7 @@ import org.junit.Test;
 import ru.javaonline.basejava.exception.ExistStorageException;
 import ru.javaonline.basejava.exception.NotExistStorageException;
 import ru.javaonline.basejava.model.Resume;
-import ru.javaonline.basejava.util.Config;
+import ru.javaonline.basejava.Config;
 
 import java.io.File;
 import java.util.ArrayList;

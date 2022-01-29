@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class TextListSection extends AbstractSection {
+    public static final TextListSection EMPTY = new TextListSection("");
     private static final long serialVersionUID = 1L;
 
     protected List<String> listPosition = new ArrayList<>();
@@ -14,6 +15,10 @@ public class TextListSection extends AbstractSection {
 
     public TextListSection(List<String> listPosition) {
         this.listPosition = listPosition;
+    }
+
+    public TextListSection(String position) {
+        this.listPosition.add(position);
     }
 
     public void addListPosition(String position) {

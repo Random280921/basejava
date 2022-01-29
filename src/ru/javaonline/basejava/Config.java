@@ -1,9 +1,8 @@
-package ru.javaonline.basejava.util;
+package ru.javaonline.basejava;
 
 import ru.javaonline.basejava.storage.SqlStorage;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -17,7 +16,8 @@ import java.util.Properties;
  */
 public class Config {
     //    Для запуска Tomcat нужно указать переменную для запуска -DhomeDir="полный путь к проекту до /config"
-    private static final File PROPS = new File(getHomeDir(), "config/resumes.properties");
+//    private static final File PROPS = new File(getHomeDir(), "config/resumes.properties");
+    private static final String PROPS = "/resumes.properties";
     private static final Config INSTANCE = new Config();
 
     private final File storageDir;
@@ -28,7 +28,9 @@ public class Config {
     }
 
     private Config() {
-        try (InputStream is = new FileInputStream(PROPS)) {
+        try (InputStream is = Config.class.getResourceAsStream(PROPS)
+//                InputStream is = new FileInputStream(PROPS)
+        ) {
             Properties properties = new Properties();
             properties.load(is);
             storageDir = new File(properties.getProperty("storage.dir"));
@@ -36,7 +38,7 @@ public class Config {
                     properties.getProperty("db.user"),
                     properties.getProperty("db.password"));
         } catch (IOException e) {
-            throw new IllegalStateException("Invalid config file " + PROPS.getAbsolutePath());
+            throw new IllegalStateException("Invalid config file " + PROPS);
         }
     }
 
@@ -48,12 +50,12 @@ public class Config {
         return sqlStorage;
     }
 
-    private static File getHomeDir() {
-        String prop = System.getProperty("homeDir");
-        File homeDir = new File(prop == null ? "." : prop);
-        if (!homeDir.isDirectory()) {
-            throw new IllegalStateException(homeDir + " is not directory");
-        }
-        return homeDir;
-    }
+//    private static File getHomeDir() {
+//        String prop = System.getProperty("homeDir");
+//        File homeDir = new File(prop == null ? "." : prop);
+//        if (!homeDir.isDirectory()) {
+//            throw new IllegalStateException(homeDir + " is not directory");
+//        }
+//        return homeDir;
+//    }
 }
